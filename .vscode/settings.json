@@ -1,0 +1,7 @@
+{
+    "files.exclude": {
+        ".gitmodules": true,
+        "*.gitattributes": true,
+        "**.js": true
+    }
+}
