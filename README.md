@@ -7,8 +7,8 @@ Don't let that turn you away, you can have a lot of fun playing it!
 
 Join our discord(link) and look around our website(link)! 
 
-🌐 **Website** (to be added)
-➡️ **Add** the bot here: (to be added)  
+🌐 **Website** (to be added)  
+➡️ **Add** the bot here: (to be added)    
 🌸 **Join** the support server here: (to be added)
 
 > I am the artist/writer/developer of the bot. This is a joint collaboration between my three brain cells. 
