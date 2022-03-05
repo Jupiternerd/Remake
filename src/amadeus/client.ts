@@ -118,7 +118,7 @@ export default class Custom_Client extends Client {
 
             this.commands.set(payload.name, cmd); // Set the name of the command to the class for command handling later.
 
-            console.log("Loaded CMD > " + cmd.data.name);
+            console.log("\n + Loaded CMD > " + cmd.data.name);
 
         }, (onlyFile: string) => onlyFile.endsWith(".js"))
 
@@ -142,7 +142,7 @@ export default class Custom_Client extends Client {
                 super.on(ev.name, (...args) => ev.execute(this, ...args))
             }
 
-            console.log("Loaded EVT > " + ev.name)
+            console.log("\n + Loaded EVT > " + ev.name)
 
         }, (onlyFile: string) => onlyFile.endsWith(".js"))
     }

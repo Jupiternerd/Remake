@@ -9,7 +9,7 @@ require("dotenv").config();
 new Custom_Client(
     {
         // Data that is needed to initialize the bot.
-        name: "Amadeus",
+        name: "Ophelia",
         bot_token: process.env.TOKEN,
         owner_id: process.env.OWNER_ID,
         main_server_id: process.env.GUILD_ID,
