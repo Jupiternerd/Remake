@@ -17,8 +17,8 @@ Special thanks to *A_Pain* for testing everything. he's a_pain in the a**
 
 
 # 🏷️ License
-  Use any part of the code to your liking. Just **don't use my own assets** (Character, Background and Emoji) artworks. 
-If you **do** use them though don't do it in **bad faith**   
+Use any part of the code to your liking. Just **don't use my own assets** (Character, Background and Emoji) artworks.   
+If you **do** use them though don't do it in **bad faith**     
 ie. *claiming them as your own, profitting from them, etc.*
 
 
