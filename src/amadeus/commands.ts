@@ -88,14 +88,18 @@ export default abstract class Commands {
     /** Checks */
 
     async defaultCheck(bot: Custom_Client, interaction: CommandInteraction): Promise<boolean | void> {
+
         // Disabled command check.
         if (this.disabled) {
             interaction.reply("This command has been disabled.")
             return false;
         };
+
+        // Owner check.
         if (this.ownerOnly) if (interaction.user.id !== bot.owner_id) {
             return false;
         }
+
         // Cool down check.
         if (this.cooldown > 0) 
             if (await this.isUserInCoolDown(interaction)) {
@@ -107,7 +111,6 @@ export default abstract class Commands {
 
         // All clear.
         return true;
-
     }
 
     /** @Helpful Functions */
