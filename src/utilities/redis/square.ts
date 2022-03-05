@@ -19,7 +19,7 @@ export default class Square {
     static async con() {
 
         mem = new Redis(port) // init new redis.
-        console.info("Redis connected.")
+        console.info("\n🟥 Redis connected.")
     }
 
     // Returns ioRedis class.

@@ -35,7 +35,7 @@ class InteractionCreate extends Listener {
                 // If this is a sub command, we will look for the function with the same name to invoke it.
                 if (interaction.options.data[0]?.type == "SUB_COMMAND") {
                     //log
-                    console.log(interaction.user.username + " used sub command " + interaction.commandName)
+                    console.log("➡️  " + interaction.user.username + " used sub command " + interaction.commandName + ".")
 
                     // get the sub command.
                     sub = interaction.options.getSubcommand(); 
@@ -43,7 +43,7 @@ class InteractionCreate extends Listener {
                     if (typeof cmd[sub] === "function") return cmd[sub](bot, interaction); // risky, calling a function if only the name matches. could be exploited. Trusting discord.
                 }
 
-                console.log(interaction.user.username + " used main command " + interaction.commandName) //log
+                console.log("➡️  " + interaction.user.username + " used main command " + interaction.commandName + ".") //log
 
                 return cmd.execute(bot, interaction); // if there are no subcommands/methods, we call the normal entry. (execute)
             };

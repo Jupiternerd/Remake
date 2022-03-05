@@ -6,6 +6,7 @@ import { Routes } from 'discord-api-types/v9'
 import Commands from './commands';
 import Listener from './listeners';
 import Square from '../utilities/redis/square';
+import Mango from '../utilities/mongodb/mango';
 
 // define intents.
 const default_intents: number[] = [
@@ -118,7 +119,7 @@ export default class Custom_Client extends Client {
 
             this.commands.set(payload.name, cmd); // Set the name of the command to the class for command handling later.
 
-            console.log("\n + Loaded CMD > " + cmd.data.name);
+            console.log("\n 🟢 Loaded CMD > " + cmd.data.name);
 
         }, (onlyFile: string) => onlyFile.endsWith(".js"))
 
@@ -142,7 +143,7 @@ export default class Custom_Client extends Client {
                 super.on(ev.name, (...args) => ev.execute(this, ...args))
             }
 
-            console.log("\n + Loaded EVT > " + ev.name)
+            console.log("\n 🟩 Loaded EVT > " + ev.name)
 
         }, (onlyFile: string) => onlyFile.endsWith(".js"))
     }
@@ -175,13 +176,21 @@ export default class Custom_Client extends Client {
      * Description | This function activates the bot.
      */
     async activate() {
-        console.info("Activating " + this.name + "...\n")
+
+        // warn.
+        console.info("\n🌼 Activating " + this.name + "...\n")
+
+        // verify local files.
         await this.verifyLocalAssets();
 
         // connect redis.
         await Square.con()
 
-        await this.loadModules()
+        // connect mongo.
+        await Mango.con();
+
+        // load local files.
+        this.loadModules()
         await this.loadEvents();
         
         this.login(this._token); // login to the bot using the token.
