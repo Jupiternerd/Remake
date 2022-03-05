@@ -15,7 +15,7 @@ class Startup extends Listener {
         )
     }
 
-    async execute(bot: client, interaction: CommandInteraction & Interaction): Promise<void> {
+    async execute(bot: client): Promise<void> {
         // log that the bot is logged in.
         console.info("\n🌼 " + bot.name + " is currently serving: " + bot.guilds.cache.size + " servers.");
 
