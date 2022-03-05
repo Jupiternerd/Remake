@@ -1,3 +1,6 @@
 [submodule "Ophelia_Assets"]
 	path = Ophelia_Assets
 	url = https://github.com/Wai-Playground/assets
+[submodule "assets"]
+	path = assets
+	url = https://github.com/Wai-Playground/assets
