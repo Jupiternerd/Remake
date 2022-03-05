@@ -1,5 +1,6 @@
 // import classes from discord.js
 import {Client, Collection, Intents} from 'discord.js';
+import { payload } from '../types/local/commandPayload';
 
 // define intents.
 const default_intents: number[] = [
@@ -43,8 +44,8 @@ export default class Custom_Client extends Client {
      * @Name | driveThroughLocalFiles
      * Description | This function recursively loops through the files in the directory, ignoring folders and spitting back file paths.
      * @param path | String that leads to the path.
-     * @param filter | Function that is ran before a callback is passed. Passes the file name. ie: "file.js"
      * @param callback | Function that is called when a file is found.
+     * @param filter | Function that is ran before a callback is passed. Passes the file name. ie: "file.js"
      */
     async driveThroughLocalFiles(path: string, callback: Function, filter: Function = () => {return true}): Promise<void> {
         // drive through the files in the directory.
@@ -69,14 +70,44 @@ export default class Custom_Client extends Client {
      * @Name | verifyLocalAssets
      * Description | This function checks if ./assets exists and has files.
      */
-    async verifyLocalAssets(path: string): Promise<number> {
+    async verifyLocalAssets(): Promise<void> {
         // keep count of how many files are in the directories.
-        let count: number = 0;
-        await this.driveThroughLocalFiles(path, (file: string) => {
+        let countOfCh: number, countOfBg: number;
+        countOfCh = countOfBg = 0
+
+        await this.driveThroughLocalFiles("./assets/backgrounds/", (file: string) => {
             // count the file.
-            count++;
+            countOfBg++;
         });
-        return count; // return the count.   
+        await this.driveThroughLocalFiles("./assets/characters/", (file: string) => {
+            // count the file.
+            countOfCh++;
+        });
+
+        console.info("Backgrounds: " + countOfBg + "\nCharacters: " + countOfCh + "\n") 
+    }
+
+    async loadCommands(path: string = "./src/modules/") {
+        this.driveThroughLocalFiles(path, (file: string) => {
+            // gives us the full path of the file.
+            const command = require(file);
+            const cmd = new command();
+
+            let payload: payload = cmd.data.toJSON();
+
+
+
+
+            
+            
+            
+            
+
+        }, (onlyFile: string) => onlyFile.endsWith(".js"))
+    }
+
+    async loadEvents(path: string = "./src/modules/") {
+
     }
 
     /**
@@ -85,11 +116,7 @@ export default class Custom_Client extends Client {
      */
     async activate() {
         console.info("Activating " + this.name + "...\n")
-
-        const bgs = await this.verifyLocalAssets("./assets/backgrounds/")
-        const chs = await this.verifyLocalAssets("./assets/characters/")
-
-        console.info("Backgrounds: " + bgs + "\nCharacters: " + chs + "\n")
+        await this.verifyLocalAssets();
         
         //this.login(this._token); // login to the bot using the token.
 
