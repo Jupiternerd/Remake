@@ -34,8 +34,8 @@ class InteractionCreate extends Listener {
 
                 // If this is a sub command, we will look for the function with the same name to invoke it.
                 if (interaction.options.data[0]?.type == "SUB_COMMAND") {
-                    //log
-                    console.log("➡️  " + interaction.user.username + " used sub command " + interaction.commandName + ".")
+                    
+                    console.log("➡️  " + interaction.user.username + " used sub command " + interaction.commandName + ".") //log
 
                     // get the sub command.
                     sub = interaction.options.getSubcommand(); 
