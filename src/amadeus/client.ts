@@ -1,6 +1,7 @@
 // import classes from discord.js
 import {Client, Collection, Intents} from 'discord.js';
 import { payload } from '../types/local/commandPayload';
+import { statSync, readdirSync } from "fs";
 
 // define intents.
 const default_intents: number[] = [
@@ -10,7 +11,6 @@ const default_intents: number[] = [
     Intents.FLAGS.GUILD_MEMBERS,
 ]
 
-const fs = require("fs");
 // Author = Shokkunn
 
 export default class Custom_Client extends Client {
@@ -53,9 +53,9 @@ export default class Custom_Client extends Client {
     async driveThroughLocalFiles(path: string, callback: Function, filter: Function = () => {return true}): Promise<void> {
         // drive through the files in the directory.
         try {
-            for (const file of fs.readdirSync(path)) {
+            for (const file of readdirSync(path)) {
                 // if the file is a directory.
-                if (fs.statSync(path + file).isDirectory()) {
+                if (statSync(path + file).isDirectory()) {
                     // see this function again.
                     await this.driveThroughLocalFiles(path + file + "/", callback);
                 } else {
@@ -64,6 +64,7 @@ export default class Custom_Client extends Client {
                 }
             }
         } catch (error) {
+            // incase the path is not available.
             console.error(error);
         }
         
@@ -75,19 +76,20 @@ export default class Custom_Client extends Client {
      */
     async verifyLocalAssets(): Promise<void> {
         // keep count of how many files are in the directories.
-        let countOfCh: number, countOfBg: number;
-        countOfCh = countOfBg = 0
+        let countArr: number[] = [0, 0], folder: string, dirs: string[] = ["backgrounds", "characters"], i: number = 0;
 
-        await this.driveThroughLocalFiles("./assets/backgrounds/", (file: string) => {
-            // count the file.
-            countOfBg++;
-        });
-        await this.driveThroughLocalFiles("./assets/characters/", (file: string) => {
-            // count the file.
-            countOfCh++;
-        });
+        // loop block
+        for (folder of dirs) {
+            // loop through the dirs
+            await this.driveThroughLocalFiles(`./assets/${folder}/`, (file: string) => { // essentially look through ./assets/{backgrounds} then ./assets/{characters}.
+                // count the files in those folders.
+                countArr[i]++;
+            });
+            // add one so that it goes from "backgrounds" -> "characters";
+            i++;
+        }
 
-        console.info("Backgrounds: " + countOfBg + "\nCharacters: " + countOfCh + "\n") 
+        console.info("Backgrounds: " + countArr[0] + "\nCharacters: " + countArr[1] + "\n") // log the output.
     }
 
     /**
