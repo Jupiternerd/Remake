@@ -2,7 +2,7 @@
 Name | Ophelia
 Desc | A Discord.js bot that is focussed on minigames and visual novels. 
 
-➡️ **Add** the bot here: (to be added)
+➡️ **Add** the bot here: (to be added)\n
 🌸 **Join** the support server here: (to be added)
 
 I am the artist/writer/developer of the bot. This is a joint collaboration between my three brain cells. Special thanks to *A_Pain*. He's a_pain in the ass.
