@@ -30,6 +30,7 @@ export default abstract class Commands {
         }
 
     ) {
+        // Set Values
         this.name = name.toLowerCase();
         this.desc = desc;
         this._data = settings.data;
