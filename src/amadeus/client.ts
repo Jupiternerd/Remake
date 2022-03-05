@@ -41,7 +41,8 @@ export default class Custom_Client extends Client {
 
     }) {
         super({
-            intents: default_intents
+            intents: default_intents,
+            shards: "auto"
         }); // get the default intents from the global variable default_intents.
 
         // set the variables.
