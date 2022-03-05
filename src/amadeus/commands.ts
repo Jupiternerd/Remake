@@ -62,7 +62,7 @@ export default abstract class Commands {
      */
     async execute(bot: Custom_Client, interaction: CommandInteraction): Promise<void> {
         throw new Error("Command not implemented.");
-      }
+    }
 
     /**
      * @override
