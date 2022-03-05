@@ -1,6 +1,6 @@
 // imports
-import { SlashCommandBuilder } from "@discordjs/builders" ;
-import { CommandInteraction, Interaction } from "discord.js";
+const { SlashCommandBuilder } = require("@discordjs/builders");
+import { CommandInteraction } from "discord.js";
 import square from "../utilities/redis/square.js"
 import Custom_Client from "./client";
 
@@ -12,7 +12,7 @@ import Custom_Client from "./client";
 export default abstract class Commands {
     // Declare types.
     public name: string;
-    private _data: SlashCommandBuilder;
+    public data: typeof SlashCommandBuilder = new SlashCommandBuilder();
     public desc: string;
     public limits: object;
     private _cooldown: number;
@@ -21,24 +21,24 @@ export default abstract class Commands {
     constructor(
         name: string = null,
         desc: string = null,
-        settings?: {
+        settings: {
             max?: number
             ownerOnly?: boolean
             mainOnly?: boolean
             coolDown?: number // in ms.
         },
-        data: SlashCommandBuilder = new SlashCommandBuilder(),
+        data?: typeof SlashCommandBuilder
 
     ) {
         // Set Values
         this.name = name.toLowerCase();
         this.desc = desc;
-        this._data = data;
+        this.data = data || new SlashCommandBuilder();
         this.ownerOnly = settings ? settings.ownerOnly : false;
         this._cooldown = settings ? settings.coolDown / 1000 : 2; // in s.
 
         // Store this in the slash command builder.
-        this._data.setName(this.name).setDescription(this.desc);
+        this.data.setName(this.name).setDescription(this.desc);
     }
 
     /** @Getters & @Setters */
@@ -47,18 +47,9 @@ export default abstract class Commands {
         return this._cooldown;
     }
 
-    get data() {
-        return this._data;
-    }
-
     set cooldown(time: number) {
         this._cooldown = time;
     }
-
-    set data(override: SlashCommandBuilder) {
-        this._data = override;
-    }
-
 
     /** @Overwritten functions */
 

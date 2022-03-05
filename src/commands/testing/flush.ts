@@ -21,8 +21,8 @@ class Flush extends Commands {
 
     // Executes the command.
     public async execute(bot: client, interaction: CommandInteraction): Promise<void> {
-        await Square.flushAll();
-        interaction.editReply("Flushed");
+        console.log(await Square.flushAll());
+        interaction.reply("Flushed");
     }
 }
 

@@ -17,11 +17,6 @@ class InteractionCreate extends Listener {
     }
 
     async execute(bot: client, interaction: CommandInteraction & Interaction): Promise<void> {
-
-        console.log(interaction.user.username + " used " + interaction.commandName)
-
-
-        
         // Check if the interaction is a command.
         if (!interaction.isCommand()) return; 
 
@@ -34,12 +29,13 @@ class InteractionCreate extends Listener {
 
             // see if this passes checks.
             if ((await cmd.check(bot, interaction) && await cmd.defaultCheck(bot, interaction))) {
-
                 // Trying out if the random discord api errors go away when I use deferReply.
                 //await interaction.deferReply() 
 
                 // If this is a sub command, we will look for the function with the same name to invoke it.
                 if (interaction.options.data[0]?.type == "SUB_COMMAND") {
+                    //log
+                    console.log(interaction.user.username + " used sub command " + interaction.commandName)
 
                     // get the sub command.
                     sub = interaction.options.getSubcommand(); 
@@ -47,7 +43,9 @@ class InteractionCreate extends Listener {
                     if (typeof cmd[sub] === "function") return cmd[sub](bot, interaction); // risky, calling a function if only the name matches. could be exploited. Trusting discord.
                 }
 
-                return cmd.execute(bot, interaction);
+                console.log(interaction.user.username + " used main command " + interaction.commandName) //log
+
+                return cmd.execute(bot, interaction); // if there are no subcommands/methods, we call the normal entry. (execute)
             };
         } catch (error) {
             console.error(error);
