@@ -126,6 +126,11 @@ export default class Custom_Client extends Client {
 
     }
 
+    /**
+     * @Name | loadEvents
+     * @Desc | loads listeners in a specific path.
+     * @param {string} path of the events. default.
+     */
     async loadEvents(path: string = "./src/events/") {
         await this.driveThroughLocalFiles(path, (file: string) => {
             const event = require(`../.${file}`);
