@@ -10,8 +10,9 @@ new Custom_Client(
     {
         // Data that is needed to initialize the bot.
         name: "Amadeus",
-        bot_token: process.env.BOT_TOKEN,
+        bot_token: process.env.TOKEN,
         owner_id: process.env.OWNER_ID,
         main_server_id: process.env.GUILD_ID,
+        client_id: process.env.CLIENT_ID
 }
 ).activate();

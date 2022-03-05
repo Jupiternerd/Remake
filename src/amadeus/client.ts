@@ -1,7 +1,11 @@
 // import classes from discord.js
 import {Client, Collection, Intents} from 'discord.js';
-import { payload } from '../types/local/commandPayload';
-import { statSync, readdirSync } from "fs";
+import { statSync, readdirSync } from 'fs';
+import { REST } from '@discordjs/rest';
+import { Routes } from 'discord-api-types/v9'
+import Commands from './commands';
+import Listener from './listeners';
+import Square from '../utilities/redis/square';
 
 // define intents.
 const default_intents: number[] = [
@@ -18,7 +22,10 @@ export default class Custom_Client extends Client {
     private _token: string;
     private _owner_id: string;
     private _guild_id: string;
+    private _client_id: string;
     public name: string;
+    public slashCommands: any[] = [];
+    public commands: Collection<string, Commands> = new Collection()
     
     /**
      * @param {object} entryOptions 
@@ -29,6 +36,7 @@ export default class Custom_Client extends Client {
         bot_token: string, // Bot token.
         owner_id: string, // Bypass slow mode,etc.
         main_server_id: string, // We need this to get the slash commands to the server.
+        client_id: string, // bot client ID.
 
     }) {
         super({
@@ -40,6 +48,9 @@ export default class Custom_Client extends Client {
         this._token = entryOptions.bot_token;
         this._owner_id = entryOptions.owner_id;
         this._guild_id = entryOptions.main_server_id;
+        this._client_id = entryOptions.client_id;
+
+        // slash commands
 
     }
 
@@ -57,7 +68,7 @@ export default class Custom_Client extends Client {
                 // if the file is a directory.
                 if (statSync(path + file).isDirectory()) {
                     // see this function again.
-                    await this.driveThroughLocalFiles(path + file + "/", callback);
+                    await this.driveThroughLocalFiles(path + file + "/", callback, filter);
                 } else {
                     // if the file matches the filter, we return the callback.
                     if (filter(file)) callback(path + file);          
@@ -93,22 +104,69 @@ export default class Custom_Client extends Client {
     }
 
     /**
-     * @Name | loadCommands
+     * @Name | loadModules
      * Desc | Loads the command using the driveThroughLocalFiles function, if it is a js file we require it and init it.
      * @param {string} path
      */
-    async loadModule(path: string = "./src/modules/") {
-        this.driveThroughLocalFiles(path, (file: string) => {
+    async loadModules(path: string = "./src/commands/") {
+        await this.driveThroughLocalFiles(path, (file: string) => {
             // gives us the full path of the file.
-            const command = require(file);
-            const cmd = new command();
+            const command = require(`../.${file}`);
+            const cmd: Commands = new command();
 
-            let payload: payload = cmd.data.toJSON();
+            // Command storing.
+            const payload = cmd.data.toJSON(); // prepare to JSON to PUT.
+
+            this.slashCommands.push(payload); // push into slashCommands to send.
+
+            this.commands.set(payload.name, cmd); // Set the name of the command to the class for command handling later.
+
+            console.log("Loaded CMD > " + cmd.data.name);
+
+        }, (onlyFile: string) => onlyFile.endsWith(".js"))
+
+        this.pushSlashesToDiscord() // finally send the slash commands to discord.
+
+    }
+
+    async loadEvents(path: string = "./src/events/") {
+        await this.driveThroughLocalFiles(path, (file: string) => {
+            const event = require(`../.${file}`);
+            const ev: Listener = new event(); // init new event listener
+
+            if (ev.once) { // if it is once
+                super.once(ev.name, (...args) => ev.execute(this, ...args))
+            } else { // if it is continuous
+                super.on(ev.name, (...args) => ev.execute(this, ...args))
+            }
+
+            console.log("Loaded EVT > " + ev.name)
 
         }, (onlyFile: string) => onlyFile.endsWith(".js"))
     }
+    
+    /**
+     * Name | pushSlashesToDiscord
+     * Desc | Pushes the slash commands to discord.
+     */
+    async pushSlashesToDiscord() {
+        const rest = new REST({ version: "9"}).setToken(this._token); // init new Rest client.
 
-    async loadEvents(path: string = "./src/modules/") {
+        console.log(this.slashCommands)
+
+        try {
+            await rest.put(
+                Routes.applicationGuildCommands(
+                    this._client_id, 
+                    this._guild_id
+                ),
+            {
+                body: this.slashCommands // json of our slash commands.
+            });
+
+        } catch(error) {
+            console.error(error);
+        }
 
     }
 
@@ -119,8 +177,14 @@ export default class Custom_Client extends Client {
     async activate() {
         console.info("Activating " + this.name + "...\n")
         await this.verifyLocalAssets();
+
+        // connect redis.
+        await Square.con()
+
+        await this.loadModules()
+        await this.loadEvents();
         
-        //this.login(this._token); // login to the bot using the token.
+        this.login(this._token); // login to the bot using the token.
 
     }
 
