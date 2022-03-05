@@ -17,23 +17,25 @@ export default abstract class Commands {
     public limits: object;
     private _cooldown: number;
     public disabled: boolean = false;
+    public ownerOnly: boolean;
     constructor(
         name: string = null,
         desc: string = null,
-        data: SlashCommandBuilder = new SlashCommandBuilder(),
         settings?: {
             max?: number
             ownerOnly?: boolean
             mainOnly?: boolean
             coolDown?: number // in ms.
-        }
+        },
+        data: SlashCommandBuilder = new SlashCommandBuilder(),
 
     ) {
         // Set Values
         this.name = name.toLowerCase();
         this.desc = desc;
         this._data = data;
-        this._cooldown = settings ? settings.coolDown : 2000; // in ms.
+        this.ownerOnly = settings ? settings.ownerOnly : false;
+        this._cooldown = settings ? settings.coolDown / 1000 : 2; // in s.
 
         // Store this in the slash command builder.
         this._data.setName(this.name).setDescription(this.desc);
@@ -85,11 +87,23 @@ export default abstract class Commands {
 
     /** Checks */
 
-    async defaultCheck(interaction: CommandInteraction): Promise<boolean | void> {
+    async defaultCheck(bot: Custom_Client, interaction: CommandInteraction): Promise<boolean | void> {
         // Disabled command check.
-        if (this.disabled) return interaction.reply("This command has been disabled.");
+        if (this.disabled) {
+            interaction.reply("This command has been disabled.")
+            return false;
+        };
+        if (this.ownerOnly) if (interaction.user.id !== bot.owner_id) {
+            return false;
+        }
         // Cool down check.
-        if (this.cooldown > 0) if (await this.isUserInCoolDown(interaction)) return interaction.reply("Sorry you are on cooldown!")
+        if (this.cooldown > 0) 
+            if (await this.isUserInCoolDown(interaction)) {
+                interaction.reply("Sorry you are on cooldown!")
+                return false;
+            } else {
+                this.addUserToCoolDown(interaction);
+            }
 
         // All clear.
         return true;
@@ -106,7 +120,7 @@ export default abstract class Commands {
      */
     static async isUserInCoolDown(interaction: CommandInteraction, command: string): Promise<boolean> {
         // The .exists() spits out a number that matches the key so if there are 2 matches it will return 2. 0 if none.
-        return (await square.memory().exists("cooldown", interaction.user.id, command) > 0 ? true : false ) // > 0 true. less than 0: false.
+        return (await square.memory().exists(`cd_${interaction.user.id}`, command) > 0 ? true : false ) // > 0 true. less than 0: false.
 
     }
 
@@ -118,8 +132,9 @@ export default abstract class Commands {
      * @param {int} time in ms
      */
     static async addUserToCoolDown(interaction: CommandInteraction, command: string, time: number): Promise<void> {
-        await square.memory().hset("cooldown", interaction.user.id, command) // set the cooldown with the name of the command.
-        square.memory().expire("cooldown", time);
+        const key = `cd_${interaction.user.id}`
+        await square.memory().set(key, command) // set the cooldown with the name of the command.
+        square.memory().expire(key, time);
     }
 
 

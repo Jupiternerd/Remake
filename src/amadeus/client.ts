@@ -20,10 +20,10 @@ const default_intents: number[] = [
 export default class Custom_Client extends Client {
     // declare variables.
     private _token: string;
-    private _owner_id: string;
     private _guild_id: string;
     private _client_id: string;
     public name: string;
+    public owner_id: string;
     public slashCommands: any[] = [];
     public commands: Collection<string, Commands> = new Collection()
     
@@ -46,7 +46,7 @@ export default class Custom_Client extends Client {
         // set the variables.
         this.name = entryOptions.name;
         this._token = entryOptions.bot_token;
-        this._owner_id = entryOptions.owner_id;
+        this.owner_id = entryOptions.owner_id;
         this._guild_id = entryOptions.main_server_id;
         this._client_id = entryOptions.client_id;
 

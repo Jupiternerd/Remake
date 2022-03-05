@@ -19,6 +19,8 @@ class InteractionCreate extends Listener {
     async execute(bot: client, interaction: CommandInteraction & Interaction): Promise<void> {
 
         console.log(interaction.user.username + " used " + interaction.commandName)
+
+
         
         // Check if the interaction is a command.
         if (!interaction.isCommand()) return; 
@@ -31,7 +33,10 @@ class InteractionCreate extends Listener {
             let cmd: Commands = bot.commands.get(interaction.commandName), sub: string; // get the stored command object of the interaction.
 
             // see if this passes checks.
-            if ((await cmd.check(bot, interaction) && cmd.defaultCheck(interaction))) {
+            if ((await cmd.check(bot, interaction) && await cmd.defaultCheck(bot, interaction))) {
+
+                // Trying out if the random discord api errors go away when I use deferReply.
+                //await interaction.deferReply() 
 
                 // If this is a sub command, we will look for the function with the same name to invoke it.
                 if (interaction.options.data[0]?.type == "SUB_COMMAND") {

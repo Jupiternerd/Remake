@@ -29,7 +29,7 @@ export default class Square {
 
     // Flushes the Redis database.
     static async flushAll() {
-        console.log(await mem.flushall())
+        console.log(await mem.flushdb())
     }
 
 }

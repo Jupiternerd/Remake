@@ -2,23 +2,28 @@
 import { CommandInteraction } from "discord.js";
 import client from "../../amadeus/client";
 import Commands from "../../amadeus/commands";
+import Square from "../../utilities/redis/square";
 
 // author = Shokkunn
 
 /**
  * Name | Ping command
  */
-class Ding extends Commands {
+class Flush extends Commands {
     constructor() {
-        super("ding", // name 
-        "does super cool stuff like ding -> dong." // description;
+        super("flush", // name 
+        "flushes DB",
+        {
+            ownerOnly: true
+        }
         )
     }
 
     // Executes the command.
     public async execute(bot: client, interaction: CommandInteraction): Promise<void> {
-        interaction.editReply("dong");
+        await Square.flushAll();
+        interaction.editReply("Flushed");
     }
 }
 
-export = Ding; // require doesn't seem to like export default class.
+export = Flush; // require doesn't seem to like export default class.
