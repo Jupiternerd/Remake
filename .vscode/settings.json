@@ -3,5 +3,6 @@
         ".gitmodules": true,
         "*.gitattributes": true,
         "**/**.js": true
-    }
+    },
+    "rpc.appName": "Visual Studio Code"
 }

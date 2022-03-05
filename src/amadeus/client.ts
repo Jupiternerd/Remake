@@ -20,6 +20,9 @@ export default class Custom_Client extends Client {
     private _guild_id: string;
     public name: string;
     
+    /**
+     * @param {object} entryOptions 
+     */
     constructor(entryOptions: {
         // Data that is needed to initialize the bot. 
         name: string, // Name of the bot.
@@ -43,9 +46,9 @@ export default class Custom_Client extends Client {
     /**
      * @Name | driveThroughLocalFiles
      * Description | This function recursively loops through the files in the directory, ignoring folders and spitting back file paths.
-     * @param path | String that leads to the path.
-     * @param callback | Function that is called when a file is found.
-     * @param filter | Function that is ran before a callback is passed. Passes the file name. ie: "file.js"
+     * @param {string} path | String that leads to the path.
+     * @param {function} callback | Function that is called when a file is found.
+     * @param {function} filter | Function that is ran before a callback is passed. Passes the file name. ie: "file.js"
      */
     async driveThroughLocalFiles(path: string, callback: Function, filter: Function = () => {return true}): Promise<void> {
         // drive through the files in the directory.
@@ -87,21 +90,18 @@ export default class Custom_Client extends Client {
         console.info("Backgrounds: " + countOfBg + "\nCharacters: " + countOfCh + "\n") 
     }
 
-    async loadCommands(path: string = "./src/modules/") {
+    /**
+     * @Name | loadCommands
+     * Desc | Loads the command using the driveThroughLocalFiles function, if it is a js file we require it and init it.
+     * @param {string} path
+     */
+    async loadModule(path: string = "./src/modules/") {
         this.driveThroughLocalFiles(path, (file: string) => {
             // gives us the full path of the file.
             const command = require(file);
             const cmd = new command();
 
             let payload: payload = cmd.data.toJSON();
-
-
-
-
-            
-            
-            
-            
 
         }, (onlyFile: string) => onlyFile.endsWith(".js"))
     }
