@@ -42,4 +42,13 @@ export default class Mango {
 
     }
 
+    /**
+     * Name | DB_STATIC
+     * Desc | returns the database static.
+     * @returns mongodb db.
+     */
+    static get DB_STATIC() {
+        return client.db("static")
+    }
+
 }
