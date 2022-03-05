@@ -1,6 +1,6 @@
 # 🌼 Ophelia 🌼
 <pre>
-  Ophelia is a discord.js bot that is focussed on Minigames...  Specifically Visual Novel type games...  
+Ophelia is a discord.js bot that is focussed on Minigames...  Specifically Visual Novel type games...  
 *A dating simulator.* :)
 
 Don't let that turn you away, you can have a lot of fun playing it!    
