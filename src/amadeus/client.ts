@@ -49,9 +49,6 @@ export default class Custom_Client extends Client {
         this.owner_id = entryOptions.owner_id;
         this._guild_id = entryOptions.main_server_id;
         this._client_id = entryOptions.client_id;
-
-        // slash commands
-
     }
 
     /**
