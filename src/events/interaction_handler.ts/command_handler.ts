@@ -18,7 +18,7 @@ class InteractionCreate extends Listener {
 
     async execute(bot: client, interaction: CommandInteraction & Interaction): Promise<void> {
 
-        console.log("executed")
+        console.log(interaction.user.username + " used " + interaction.commandName)
         
         // Check if the interaction is a command.
         if (!interaction.isCommand()) return; 
@@ -32,7 +32,6 @@ class InteractionCreate extends Listener {
 
             // see if this passes checks.
             if ((await cmd.check(bot, interaction) && cmd.defaultCheck(interaction))) {
-                console.log(Reflect.getPrototypeOf(cmd))
 
                 // If this is a sub command, we will look for the function with the same name to invoke it.
                 if (interaction.options.data[0]?.type == "SUB_COMMAND") {

@@ -37,8 +37,6 @@ export default abstract class Commands {
 
         // Store this in the slash command builder.
         this._data.setName(this.name).setDescription(this.desc);
-
-        console.log(this._data.toJSON())
     }
 
     /** @Getters & @Setters */

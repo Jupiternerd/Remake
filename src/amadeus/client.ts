@@ -152,8 +152,6 @@ export default class Custom_Client extends Client {
     async pushSlashesToDiscord() {
         const rest = new REST({ version: "9"}).setToken(this._token); // init new Rest client.
 
-        console.log(this.slashCommands)
-
         try {
             await rest.put(
                 Routes.applicationGuildCommands(
