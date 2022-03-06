@@ -51,4 +51,22 @@ export default class Mango {
         return client.db("static")
     }
 
+    /**
+     * Name | DB_CHARACTERS
+     * Desc | returns the database ch.
+     * @returns mongodb db.
+     */
+    static get DB_CHARACTERS() {
+        return client.db("characters")
+    }
+
+    /**
+     * Name | DB_BACKGROUNDS
+     * Desc | returns the database bg.
+     * @returns mongodb db.
+     */
+    static get DB_BACKGROUNDS() {
+        return client.db("characters")
+    }
+
 }
