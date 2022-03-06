@@ -92,13 +92,14 @@ export default abstract class Commands {
         }
 
         // Cool down check.
-        if (this.cooldown > 0) 
+        if (this.cooldown > 0) {
             if (await this.isUserInCoolDown(interaction)) {
                 interaction.reply("Sorry you are on cooldown!")
                 return false;
             } else {
                 this.addUserToCoolDown(interaction);
             }
+        }
 
         // All clear.
         return true;

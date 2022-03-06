@@ -92,7 +92,7 @@ export default class Custom_Client extends Client {
         // loop block
         for (folder of dirs) {
             // loop through the dirs
-            await this.driveThroughLocalFiles(`../assets/${folder}/`, (file: string) => { // essentially look through ./assets/{backgrounds} then ./assets/{characters}.
+            await this.driveThroughLocalFiles(`./assets/${folder}/`, (file: string) => { // essentially look through ./assets/{backgrounds} then ./assets/{characters}.
                 // count the files in those folders.
                 countArr[i]++;
             });
