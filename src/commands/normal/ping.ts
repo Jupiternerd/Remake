@@ -2,7 +2,7 @@
 import { CommandInteraction } from "discord.js";
 const { SlashCommandBuilder } = require("@discordjs/builders")
 import client from "../../amadeus/client/client";
-import Commands from "../../amadeus/handlers/commands";
+import Commands from "../../amadeus/abstracts/commands";
 
 // author = Shokkunn
 

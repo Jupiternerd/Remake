@@ -1,7 +1,7 @@
 // imports
 import client from "../../amadeus/client/client";
-import Listener from "../../amadeus/handlers/listeners";
-import { StaticBotData } from "../../types/models/static";
+import Listener from "../../amadeus/abstracts/listeners";
+import { StaticBotData } from "../../types/models/bot";
 import Mango from "../../utilities/mongodb/mango";
 
 // author = shokkunn
