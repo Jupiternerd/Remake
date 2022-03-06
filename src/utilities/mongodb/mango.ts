@@ -66,7 +66,16 @@ export default class Mango {
      * @returns mongodb db.
      */
     static get DB_BACKGROUNDS() {
-        return client.db("characters")
+        return client.db("backgrounds")
     }
+    /**
+     * Name | DB_USERS
+     * Desc | returns the database users.
+     * @returns mongodb db.
+     */
+     static get DB_USERS() {
+        return client.db("users")
+    }
+    
 
 }

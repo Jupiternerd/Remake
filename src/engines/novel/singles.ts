@@ -1,8 +1,5 @@
 //imports
-
 import { Single, SingleTypes } from "../../types/models/stories";
-
-
 
 // author = shokkunn
 

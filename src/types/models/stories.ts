@@ -8,6 +8,7 @@ export interface Single {
     bg?: number;
     ch?: {
         id: number,
+        useSkin?: boolean,
         mood: TemporaryMoodTypeStrings
     }
     txt?: number;

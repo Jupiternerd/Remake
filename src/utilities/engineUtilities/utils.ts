@@ -6,7 +6,7 @@ const EMOJI_CONSTANTS = {
     emptyBar: "▱"
 }
 
-export class GUI {
+export class GUIUtils {
     /**
      * Name | barUI
      * Desc | a handy tool to display progress.
@@ -25,6 +25,38 @@ export class GUI {
           }        
 
         return ret;
+    }
+}
 
+export class MathUtils {
+    /**
+     * Name | randIntFromZero
+     * Desc | returns a number from 0 to the max.
+     * @param max number that's the ceiling.
+     */
+    static async randIntFromZero(max: number): Promise<number> {
+        return (Math.floor(Math.random() * max))
+    }
+}
+
+export class StringUtils {
+    /**
+     * Name | capitalizeFirstLetter
+     * Desc | read name.
+     * @param string you want to capitalize
+     * @returns string 
+     */
+    static async capitalizeFirstLetter(string: string): Promise<string> {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+    
+    /**
+     * Name | periodTheString
+     * Desc | read name.
+     * @param string you want to period.
+     * @returns string
+     */
+    static async periodTheString(string: string): Promise<string> {
+        return (string.endsWith('.') && !string.endsWith("?" || "!") ? string : string + '.');
     }
 }
