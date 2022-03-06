@@ -34,7 +34,7 @@ export enum AdvancementMoodType {
 
 export type AdvancementMoodTypeStrings = keyof typeof AdvancementMoodType
 
-export enum Mood_Emoji {
+export enum MoodEmoji {
     "💟",
     "😄",
     "⛈️",

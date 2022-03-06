@@ -7,6 +7,7 @@ import Commands from '../abstracts/commands';
 import Listener from '../abstracts/listeners';
 import Square from '../../utilities/redis/square';
 import Mango from '../../utilities/mongodb/mango';
+import { AssetType } from '../../types/local/static';
 
 // define intents.
 const default_intents: number[] = [
@@ -86,12 +87,12 @@ export default class Custom_Client extends Client {
      */
     async verifyLocalAssets(): Promise<void> {
         // keep count of how many files are in the directories.
-        let countArr: number[] = [0, 0], folder: string, dirs: string[] = ["backgrounds", "characters"], i: number = 0;
+        let countArr: number[] = [0, 0], folder: string, dirs: string[] = Object.keys(AssetType).filter((val) => isNaN(Number(val)) === false).map(key => AssetType[key]), i: number = 0;
 
         // loop block
         for (folder of dirs) {
             // loop through the dirs
-            await this.driveThroughLocalFiles(`./assets/${folder}/`, (file: string) => { // essentially look through ./assets/{backgrounds} then ./assets/{characters}.
+            await this.driveThroughLocalFiles(`../assets/${folder}/`, (file: string) => { // essentially look through ./assets/{backgrounds} then ./assets/{characters}.
                 // count the files in those folders.
                 countArr[i]++;
             });
@@ -110,7 +111,7 @@ export default class Custom_Client extends Client {
     async loadModules(path: string = "./src/commands/") {
         await this.driveThroughLocalFiles(path, (file: string) => {
             // gives us the full path of the file.
-            const command = require(`../.${file}`);
+            const command = require(`../../.${file}`);
             const cmd: Commands = new command();
 
             // Command storing.
@@ -135,7 +136,7 @@ export default class Custom_Client extends Client {
      */
     async loadEvents(path: string = "./src/events/") {
         await this.driveThroughLocalFiles(path, (file: string) => {
-            const event = require(`../.${file}`);
+            const event = require(`../../.${file}`);
             const ev: Listener = new event(); // init new event listener
 
             if (ev.once) { // if it is once

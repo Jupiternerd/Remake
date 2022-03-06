@@ -19,6 +19,7 @@ export enum GradeEmoji {
     "🇸🇸🇸",
     "🇽"
 }
+
 export enum GradeColor {
     "#d0f9ff",
     "#7fb9e7",
@@ -35,4 +36,11 @@ export interface basic {
     name: string,
     grade: BaseGrade
 }
+
+export enum AssetType {
+    characters,
+    backgrounds
+}
+
+export type AssetTypeStrings = keyof typeof AssetType;
 
