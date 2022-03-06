@@ -1,8 +1,8 @@
 // imports
 const { SlashCommandBuilder } = require("@discordjs/builders");
 import { CommandInteraction } from "discord.js";
-import square from "../utilities/redis/square.js"
-import Custom_Client from "./client";
+import square from "../../utilities/redis/square.js"
+import Custom_Client from "../client/client";
 
 // author = Shokkunn
 

@@ -1,9 +1,9 @@
 // imports
 
 import { CommandInteraction, Interaction } from "discord.js";
-import client from "../../amadeus/client";
-import Commands from "../../amadeus/commands";
-import Listener from "../../amadeus/listeners";
+import client from "../../amadeus/client/client";
+import Commands from "../../amadeus/handlers/commands";
+import Listener from "../../amadeus/handlers/listeners";
 
 // author = shokkunn
 

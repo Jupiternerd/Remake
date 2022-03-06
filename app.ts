@@ -1,5 +1,5 @@
 // import the custom client from src/amadeus/client.ts
-import Custom_Client from "./src/amadeus/client";
+import Custom_Client from "./src/amadeus/client/client";
 
 // init the dot env.
 require("dotenv").config();

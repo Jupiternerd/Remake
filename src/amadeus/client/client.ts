@@ -3,10 +3,10 @@ import {Client, Collection, Intents} from 'discord.js';
 import { statSync, readdirSync } from 'fs';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9'
-import Commands from './commands';
-import Listener from './listeners';
-import Square from '../utilities/redis/square';
-import Mango from '../utilities/mongodb/mango';
+import Commands from '../handlers/commands';
+import Listener from '../handlers/listeners';
+import Square from '../../utilities/redis/square';
+import Mango from '../../utilities/mongodb/mango';
 
 // define intents.
 const default_intents: number[] = [

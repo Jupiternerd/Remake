@@ -1,7 +1,7 @@
 // imports
 import { CommandInteraction } from "discord.js";
-import client from "../../amadeus/client";
-import Commands from "../../amadeus/commands";
+import client from "../../amadeus/client/client";
+import Commands from "../../amadeus/handlers/commands";
 import Square from "../../utilities/redis/square";
 
 // author = Shokkunn
