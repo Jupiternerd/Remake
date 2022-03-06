@@ -1,4 +1,5 @@
-import { basic } from "./static";
+import { basic } from "../local/static";
+
 
 export interface BackgroundBasic extends basic {
 
