@@ -33,8 +33,8 @@ export enum GradeColor {
 
 export interface basic {
     _id: number,
-    name: string,
-    grade: BaseGrade
+    name?: string,
+    grade?: BaseGrade
 }
 
 export enum AssetType {

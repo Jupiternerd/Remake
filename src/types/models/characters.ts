@@ -4,9 +4,11 @@ import { basic } from "../local/static";
 export interface CharacterBasic extends basic {
     description: string,
     pointers: {
-        skin: number,
+        original?: number
+        skin: number
         interaction: number
     }
+    link: string
 
 }
 export enum TemporaryMoodType {
@@ -17,7 +19,7 @@ export enum TemporaryMoodType {
     flustered,
     hungry
 }
-export type TemporaryMoodTypeStrings = keyof typeof TemporaryMoodType
+export type TemporaryMoodTypeStrings = keyof typeof TemporaryMoodType;
 
 export enum AdvancementMoodType {
     hate,
@@ -45,15 +47,11 @@ export enum MoodEmoji {
 
 export interface CharacterSkins extends basic {
     pointer: number
-    moods: Array<string>
-    painting: string
+    link: string
 }
 
-export interface CharacterInteractions extends basic{
-    pointer: {
-        story: number,
-        basic: number
-    }
+export interface CharacterInteractions extends basic {
+    pointer: number
     base: {
         greetings: Array<string>
         farewells: Array<string>
