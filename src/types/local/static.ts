@@ -35,6 +35,7 @@ export interface basic {
     _id: number,
     name?: string,
     grade?: BaseGrade
+    emoji?: string
 }
 
 export enum AssetType {
