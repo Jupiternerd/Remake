@@ -15,6 +15,7 @@ class Startup extends Listener {
         )
     }
 
+
     async execute(bot: client): Promise<void> {
         // log that the bot is logged in.
         console.info("\n🌼 " + bot.name + " is currently serving: " + bot.guilds.cache.size + " servers.");
@@ -23,7 +24,7 @@ class Startup extends Listener {
         const botDB = await Mango.DB_STATIC.collection<StaticBotData>("bot").findOne()
 
         // set the bot presence to a random one from the collection.
-        bot.user.setPresence(botDB.activity_feed[Math.floor(Math.random() * botDB.activity_feed.length)]);
+        setTimeout(() => bot.user.setPresence(botDB.activity_feed[Math.floor(Math.random() * botDB.activity_feed.length)]), 60000) // every minute
 
         
         
