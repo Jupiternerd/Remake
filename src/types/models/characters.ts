@@ -5,7 +5,7 @@ export interface CharacterBasic extends basic {
     description: string,
     pointers: {
         original?: number
-        skin: number
+        skin?: number
         interaction: number
     }
     link: string
@@ -56,7 +56,7 @@ export interface CharacterInteractions extends basic {
         greetings: Array<string>
         farewells: Array<string>
     }
-    gifts: {
+    gifts: { 
         default: Array<string>
         likes: Array<string>
         dislikes: Array<string>
