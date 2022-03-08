@@ -15,7 +15,8 @@ export default abstract class Commands {
     public data: typeof SlashCommandBuilder;
     public desc: string;
     public limits: object;
-    private _cooldown: number;
+    public mainOnly: boolean;
+    public cooldown: number;
     public disabled: boolean = false;
     public ownerOnly: boolean;
     constructor(
@@ -35,21 +36,13 @@ export default abstract class Commands {
         this.desc = desc;
         this.data = data || new SlashCommandBuilder();
         this.ownerOnly = settings ? settings.ownerOnly : false;
-        this._cooldown = settings ? settings.coolDown / 1000 : 2; // in s.
+        this.cooldown = settings ? settings.coolDown / 1000 : 2; // in s.
+        this.mainOnly = settings ? settings.mainOnly : false;
 
         // Store this in the slash command builder.
         this.data.setName(this.name).setDescription(this.desc);
     }
 
-    /** @Getters & @Setters */
-
-    get cooldown() {
-        return this._cooldown;
-    }
-
-    set cooldown(time: number) {
-        this._cooldown = time;
-    }
 
     /** @Overwritten functions */
 
@@ -85,6 +78,10 @@ export default abstract class Commands {
             interaction.reply("This command has been disabled.")
             return false;
         };
+
+        if (this.mainOnly) {
+            interaction.reply("This command does not work here.")
+        }
 
         // Owner check.
         if (this.ownerOnly) if (interaction.user.id !== bot.owner_id) {
@@ -152,7 +149,7 @@ export default abstract class Commands {
      * @param command 
      * @param time 
      */
-     async addUserToCoolDown(interaction: CommandInteraction, command: string = this.name, time: number = this._cooldown) {
+     async addUserToCoolDown(interaction: CommandInteraction, command: string = this.name, time: number = this.cooldown) {
         Commands.addUserToCoolDown(interaction, command, time);
     }
 }
