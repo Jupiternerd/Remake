@@ -24,7 +24,7 @@ class Startup extends Listener {
         const botDB = await Mango.DB_STATIC.collection<StaticBotData>("bot").findOne()
 
         // set the bot presence to a random one from the collection.
-        setTimeout(() => bot.user.setPresence(botDB.activity_feed[Math.floor(Math.random() * botDB.activity_feed.length)]), 60000) // every minute
+        setInterval(() => bot.user.setPresence(botDB.activity_feed[Math.floor(Math.random() * botDB.activity_feed.length)]), 60000) // every minute
 
         
         
