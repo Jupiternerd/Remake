@@ -25,8 +25,8 @@ export default class EngineBase extends EventEmitter {
     // caches
     public loadedImageCharacters: Map<number, Image>
     public loadedImageBackgrounds: Map<number, Image>
-    public cachedBackgrounds: Map<number | string, Background> = new Map();
-    public cachedCharacters: Map<number | string, Character> = new Map();
+    public cachedBackgrounds: Map<number, Background>;
+    public cachedCharacters: Map<number, Character>;
 
     // settings
     public useSkins: boolean = false
@@ -54,6 +54,13 @@ export default class EngineBase extends EventEmitter {
         this.interaction = interaction;
         this.multiples = multiples;
         this.requiredKeyPositions = keys;
+
+        // initialize caches.
+        this.loadedImageBackgrounds = new Map();
+        this.loadedImageCharacters = new Map();
+        this.cachedBackgrounds = new Map();
+        this.cachedCharacters = new Map();
+
 
         // create canvas
         this.canvas = createCanvas(settings.x, settings.y)
@@ -87,11 +94,11 @@ export default class EngineBase extends EventEmitter {
             // edge cases.
             if (capsule.useSkin == undefined) capsule.useSkin = false;
             // return if we already have the id.
-            if (this.cachedBackgrounds.has(capsule.id)) return;
+            if (this.cachedCharacters.has(capsule.id)) return;
             const BASIC = await Queries.character(capsule.id, "basic") as CharacterBasic // Store basic data for use later.
 
-            // Check if the basic we got is original.
-            if (BASIC.pointers.original != BASIC._id) throw new EngineError("Base", "Pointer for Character is not Original.")
+            // Check if the basic we got is original.             If it is undefined, then we assume its the original.
+            if (BASIC.pointers.original != BASIC._id && BASIC.pointers.original != undefined) throw new EngineError("Base", "Pointer for Character is not Original.")
 
             // set the cache.
             this.cachedCharacters.set(capsule.id, 
@@ -138,16 +145,12 @@ export default class EngineBase extends EventEmitter {
             if (singlet.i == undefined) singlet.i = i;
 
             // caching block.
-            this.injectBackground(singlet.bg)
+            await this.injectBackground(singlet.bg)
 
-            this.injectCharacter(singlet.ch)
+            await this.injectCharacter(singlet.ch)
 
             i++;
         }
-        console.log(this.cachedCharacters)
-
-
-        
         // On next processor tick we declare everything as ready.
         process.nextTick(() => this.ready())
     }

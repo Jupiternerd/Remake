@@ -41,7 +41,7 @@ class Novel extends Commands {
         ]
         const novel = new NovelCore(interaction, multiples)
         novel.on("ready", () => {
-            console.log("ready!")
+            console.log(novel.cachedCharacters)
         })
         interaction.reply("Logged");
     }
