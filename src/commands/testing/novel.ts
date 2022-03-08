@@ -27,15 +27,23 @@ class Novel extends Commands {
             {
                 backable: false,
                 bg: 0,
+                type: {
+                    display: "normal"
+                },
                 ch: [{
                     id: 0,
                     useSkin: false,
                     mood: "normal"
                 }],
-                txt: "wassup"
-                
+                txt: {
+                    speaker: "character",
+                    who: 0
+                }
             },
             {
+                type: {
+                    display: "normal"
+                },
                 backable: false,
             },
         ]

@@ -4,6 +4,7 @@ import { TemporaryMoodTypeStrings } from "./characters";
 
 export type DisplayTypes = "wallpaper" | "duet" | "normal";
 export type SpecialTypes = "selection" | "timed" | "normal";
+export type SpeakerTypes = "character" | "monologue";
 
 export interface CharacterCapsule {
     id: number,
@@ -18,11 +19,14 @@ export interface BaseSingle {
 }
 
 export interface NovelSingle extends BaseSingle {
-    txt?: string;
-    type?: {
+    txt?: {
+        speaker: SpeakerTypes
+        who?: number
+    }
+    type: {
         display: DisplayTypes
-        special: {
-            type: SpecialTypes
+        special?: {
+            type?: SpecialTypes
             wait?: number,
             choices?: Array<MessageSelectMenuOptions>
         }
