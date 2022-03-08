@@ -22,7 +22,13 @@
     disableButtons?: boolean;
     disableSelect?: boolean;
     //rowCol: Array<MessageActionRow>; // messageActionRow
-    constructor(single, count = null) {
+    constructor(single: {
+      index?: number,
+      emoji?: string,
+      disableSelect?: boolean,
+      disableButtons?: boolean,
+      embed: MessageEmbed
+    }, count = null) {
       super();
       
       /**
