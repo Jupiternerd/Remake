@@ -118,7 +118,7 @@ export default class EngineBase extends EventEmitter {
     /**
      * Name | injectBackground
      * Desc | used in and outside the obj, this is to add bg caches.
-     * @param 
+     * @param {BackgroundCapsule} capsule that you want to inject into the engine.
      */
     public async injectBackground(capsule: BackgroundCapsule) {
         // if we already have it stored, return.
