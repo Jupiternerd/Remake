@@ -3,6 +3,11 @@
 // author = shokkunn
 
 export default abstract class UniBase {
-    _id: number | string
+    id: number | string
+
+    constructor(id: number) {
+        this.id = id;
+
+    }
 
 }

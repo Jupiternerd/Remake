@@ -1,12 +1,14 @@
 //imp
 
-import { CharacterInteractions, CharacterSkins } from "../../types/models/characters";
+import { CharacterBasic, CharacterInteractions, CharacterSkins } from "../../types/models/characters";
 import Queries from "../../utilities/mongodb/queries";
 import UniBase from "./base";
 
 // author = shokkunn
 
 export default class Character extends UniBase{
+    // define
+    basic: CharacterBasic
     skins: CharacterSkins
     interactions: CharacterInteractions
     /**
@@ -15,8 +17,9 @@ export default class Character extends UniBase{
      * @param skins 
      * @param interactions 
      */
-    constructor(skins?: CharacterSkins, interactions?: CharacterInteractions) {
-        super()
+    constructor(id: number, basic?: CharacterBasic, skins?: CharacterSkins, interactions?: CharacterInteractions) {
+        super(id)
+        this.basic = basic ? basic : null;
         this.skins = skins ? skins : null;
         this.interactions = interactions ? interactions : null;
     }
@@ -27,7 +30,7 @@ export default class Character extends UniBase{
      * @returns characterSkins
      */
     async setSkinFromDB() {
-        this.skins = await Queries.character(this._id as number, "skins") as CharacterSkins;
+        this.skins = await Queries.character(this.id as number, "skins") as CharacterSkins;
     }
 
     /**
@@ -35,7 +38,7 @@ export default class Character extends UniBase{
      * Desc | gets interaction from db
      */
     async setInteractionFromDB() {
-        this.interactions= await Queries.character(this._id as number, "interactions") as CharacterInteractions;
+        this.interactions= await Queries.character(this.id as number, "interactions") as CharacterInteractions;
     }
 
     /** Overloads */

@@ -2,10 +2,10 @@ import { MessageSelectMenuOptions } from "discord.js";
 import { basic } from "../local/static";
 import { TemporaryMoodTypeStrings } from "./characters";
 
-export type DisplayTypes = "wallpaper" | "duo" | "normal";
-export type SpecialTypes = "gift" | "timed" | "normal";
+export type DisplayTypes = "wallpaper" | "duet" | "normal";
+export type SpecialTypes = "selection" | "timed" | "normal";
 
-export interface Single {
+export interface BaseSingle {
     i?: number;
     bg?: number;
     ch?: Array<{
@@ -13,6 +13,9 @@ export interface Single {
         useSkin?: boolean,
         mood: TemporaryMoodTypeStrings
     }>
+}
+
+export interface NovelSingle extends BaseSingle {
     txt?: number;
     type?: {
         display: DisplayTypes
@@ -26,7 +29,7 @@ export interface Single {
 }
 
 export interface Story extends basic {
-    mutiples: Array<Single>
+    mutiples: Array<NovelSingle>
     
 
 }

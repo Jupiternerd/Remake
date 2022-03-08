@@ -1,30 +1,28 @@
 //imports
 
 import { CommandInteraction } from "discord.js";
-import { Single } from "../../types/models/stories";
+import { NovelSingle } from "../../types/models/stories";
 import EngineBase from "../base";
 
 // author = shokkunn
 
-export default class TomoCore extends EngineBase {
+/**
+ * Name | NovelCore
+ * Desc | Novel engine.
+ */
+export default class NovelCore extends EngineBase {
     constructor(
         interaction: CommandInteraction,
-        private multiples: Array<Single>
         ) {
         super(interaction,
             {
                 x: 724,
                 y: 480
             });
-        
         this.prepareAssets()
+        this.loadedBackgrounds
     }
 
-    private async prepareAssets() {
-        
-        
-
-    }
 
 
 

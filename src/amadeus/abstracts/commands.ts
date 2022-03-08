@@ -12,7 +12,7 @@ import Custom_Client from "../client/client";
 export default abstract class Commands {
     // Declare types.
     public name: string;
-    public data: typeof SlashCommandBuilder = new SlashCommandBuilder();
+    public data: typeof SlashCommandBuilder;
     public desc: string;
     public limits: object;
     private _cooldown: number;

@@ -34,17 +34,20 @@ export default class Queries {
         // try and see if we can get the cache, if not we can just get the data from mongodb it self.
         try {
             cache = await redis.get(key);
-            if (!cache) {
-                payload = await Mango.DB_CHARACTERS.collection<basic>(collections).findOne({_id: id})
-                if (!payload) throw new UniBaseNotFoundError(id)
-
-                // store the payload in redis.
-                redis.set(key, JSON.stringify(payload))
-                redis.expire(key, EXPIRATION)
-                return payload;
+            // if there is a cache
+            if (cache) {
+                // parse it.
+                payload = JSON.parse(cache) as basic;
+                return payload; // return it.
             }
-            
-            return JSON.parse(cache) as basic;
+
+            // if there is no cache.
+            payload = await Mango.DB_CHARACTERS.collection<basic>(collections).findOne({_id: id})
+            if (!payload) throw new UniBaseNotFoundError(id)
+
+            // store the payload in redis.
+            redis.set(key, JSON.stringify(payload))
+            redis.expire(key, EXPIRATION)
 
         } catch(error) {
             console.error(error);
@@ -67,17 +70,21 @@ export default class Queries {
         // try and see if we can get the cache, if not we can just get the data from mongodb it self.
         try {
             cache = await redis.get(key);
-            if (!cache) {
-                payload = await Mango.DB_BACKGROUNDS.collection<BackgroundBasic>("basics").findOne({_id: id})
-                if (!payload) throw new UniBaseNotFoundError(id)
-
-                // store the payload in redis.
-                redis.set(key, JSON.stringify(payload))
-                redis.expire(key, EXPIRATION)
-                return payload;
+            // if there is a cache
+            if (cache) {
+                // parse it.
+                payload = JSON.parse(cache) as BackgroundBasic;
+                return payload; // return it.
             }
-            
-            return JSON.parse(cache) as BackgroundBasic;
+
+            // if there is no cache.
+            payload = await Mango.DB_BACKGROUNDS.collection<BackgroundBasic>("basic").findOne({_id: id})
+            if (!payload) throw new UniBaseNotFoundError(id)
+
+            // store the payload in redis.
+            redis.set(key, JSON.stringify(payload))
+            redis.expire(key, EXPIRATION)
+            return payload;
 
         } catch(error) {
             console.error(error);

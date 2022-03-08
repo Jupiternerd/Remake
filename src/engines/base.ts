@@ -2,6 +2,7 @@
 import { Canvas, createCanvas, Image } from "canvas";
 import { CommandInteraction } from "discord.js";
 import { EventEmitter } from "events";
+import { BaseSingle } from "../types/models/stories";
 import Background from "./classes/backgrounds";
 import Character from "./classes/characters";
 
@@ -13,16 +14,19 @@ import Character from "./classes/characters";
  */
 export default class EngineBase extends EventEmitter {
     // define vars
-    interaction: CommandInteraction
+    public interaction: CommandInteraction
 
     // caches
-    loadedCharacters: Map<number, Image>
-    loadedBackgrounds: Map<number, Image>
-    backgrounds: Map<number | string, Background> = new Map();
-    characters: Map<number | string, Character> = new Map();
+    public loadedCharacters: Map<number, Image>
+    public loadedBackgrounds: Map<number, Image>
+    public backgrounds: Map<number | string, Background> = new Map();
+    public characters: Map<number | string, Character> = new Map();
+
+    // iterables
+    public multiples: Array<BaseSingle>
 
     // canvas
-    canvas: Canvas;
+    public canvas: Canvas;
 
     constructor(
         interaction: CommandInteraction,
@@ -38,20 +42,34 @@ export default class EngineBase extends EventEmitter {
         // create canvas
         this.canvas = createCanvas(size.x, size.y)
 
+        // prepare assets.
+        this.prepareAssets()
     }
 
     /** Emitters */
     
-    ready() {
+    public ready() {
         this.emit("ready");
     }
 
-    pause() {
+    public pause() {
         this.emit("pause");
     }
 
-    end() {
+    public end() {
         this.emit("end")
+    }
+
+    /**
+     * Name | prepareAssets
+     * Desc | prepare Assets.
+     */
+    public async prepareAssets() {
+        // defining variables.
+        
+        
+        // On next processor tick we declare everything as ready.
+        process.nextTick(() => this.ready())
     }
     
 
