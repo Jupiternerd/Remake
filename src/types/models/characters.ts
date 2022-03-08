@@ -1,4 +1,4 @@
-import { basic } from "../local/static";
+import { basic, FixedLengthArray } from "../local/static";
 
 
 export interface CharacterBasic extends basic {
@@ -8,8 +8,6 @@ export interface CharacterBasic extends basic {
         skin?: number
         interaction: number
     }
-    link: string
-
 }
 export enum TemporaryMoodType {
     normal,
@@ -47,7 +45,7 @@ export enum MoodEmoji {
 
 export interface CharacterSkins extends basic {
     pointer: number
-    link: string
+    moods: FixedLengthArray<[string, string, string, string, string]>
 }
 
 export interface CharacterInteractions extends basic {

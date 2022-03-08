@@ -53,7 +53,9 @@ class InteractionCreate extends Listener {
                 content: "Error executing this command!",
                 ephemeral: true
             })
-        };
+        } finally {
+            bot.emit("commandExecuted", interaction)
+        }
     }
 }
 

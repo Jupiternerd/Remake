@@ -29,16 +29,16 @@ export default class Character extends UniBase{
      * Desc | gets skin from db 
      * @returns characterSkins
      */
-    async setSkinFromDB() {
-        this.skins = await Queries.character(this.id as number, "skins") as CharacterSkins;
+    async setSkinFromDB(id: number = this.id as number) {
+        this.skins = await Queries.character(id, "skins") as CharacterSkins;
     }
 
     /**
      * Name | SetInteractionFromDB
      * Desc | gets interaction from db
      */
-    async setInteractionFromDB() {
-        this.interactions= await Queries.character(this.id as number, "interactions") as CharacterInteractions;
+    async setInteractionFromDB(id: number = this.id as number) {
+        this.interactions= await Queries.character(id, "interactions") as CharacterInteractions;
     }
 
     /** Overloads */

@@ -5,18 +5,20 @@ import { TemporaryMoodTypeStrings } from "./characters";
 export type DisplayTypes = "wallpaper" | "duet" | "normal";
 export type SpecialTypes = "selection" | "timed" | "normal";
 
+export interface CharacterCapsule {
+    id: number,
+    useSkin?: boolean,
+    mood?: TemporaryMoodTypeStrings
+}
+
 export interface BaseSingle {
     i?: number;
     bg?: number;
-    ch?: Array<{
-        id: number,
-        useSkin?: boolean,
-        mood: TemporaryMoodTypeStrings
-    }>
+    ch?: Array<CharacterCapsule>
 }
 
 export interface NovelSingle extends BaseSingle {
-    txt?: number;
+    txt?: string;
     type?: {
         display: DisplayTypes
         special: {
@@ -30,6 +32,4 @@ export interface NovelSingle extends BaseSingle {
 
 export interface Story extends basic {
     mutiples: Array<NovelSingle>
-    
-
 }

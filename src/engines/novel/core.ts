@@ -1,7 +1,7 @@
 //imports
 
 import { CommandInteraction } from "discord.js";
-import { NovelSingle } from "../../types/models/stories";
+import { BaseSingle, NovelSingle } from "../../types/models/stories";
 import EngineBase from "../base";
 
 // author = shokkunn
@@ -13,14 +13,19 @@ import EngineBase from "../base";
 export default class NovelCore extends EngineBase {
     constructor(
         interaction: CommandInteraction,
+        multiples: Array<NovelSingle>,
+
         ) {
         super(interaction,
             {
                 x: 724,
-                y: 480
-            });
-        this.prepareAssets()
-        this.loadedBackgrounds
+                y: 480,
+
+            },
+             multiples,
+
+            );
+        
     }
 
 
