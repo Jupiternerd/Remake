@@ -26,7 +26,10 @@ class Novel extends Commands {
         const multiples: Array<NovelSingle> = [ 
             {
                 backable: false,
-                bg: 0,
+                bg: {
+                    id: 0,
+                    blurred: true
+                },
                 type: {
                     display: "normal"
                 },
@@ -41,15 +44,12 @@ class Novel extends Commands {
                 }
             },
             {
-                type: {
-                    display: "normal"
-                },
                 backable: false,
             },
         ]
         const novel = new NovelCore(interaction, multiples)
         novel.on("ready", () => {
-            console.log(novel.cachedCharacters)
+            console.log(novel.loadedImageBackgrounds)
         })
         interaction.reply("Logged");
     }

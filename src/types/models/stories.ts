@@ -9,12 +9,17 @@ export type SpeakerTypes = "character" | "monologue";
 export interface CharacterCapsule {
     id: number,
     useSkin?: boolean,
-    mood?: TemporaryMoodTypeStrings
+    mood: TemporaryMoodTypeStrings
+}
+
+export interface BackgroundCapsule {
+    id: number,
+    blurred: boolean
 }
 
 export interface BaseSingle {
     i?: number;
-    bg?: number;
+    bg?: BackgroundCapsule,
     ch?: Array<CharacterCapsule>
 }
 
@@ -23,8 +28,8 @@ export interface NovelSingle extends BaseSingle {
         speaker: SpeakerTypes
         who?: number
     }
-    type: {
-        display: DisplayTypes
+    type?: {
+        display?: DisplayTypes
         special?: {
             type?: SpecialTypes
             wait?: number,

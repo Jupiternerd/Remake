@@ -9,6 +9,6 @@ import Singlet from "../singlet"
  * Desc | Butchers the long multiples into single Singles.
  */
 export default class NovelSingles extends Singlet implements NovelSingle {
-    type: { display: DisplayTypes; special: { type: SpecialTypes; wait?: number; choices?: MessageSelectMenuOptions[]; }; };
+    
 
 }

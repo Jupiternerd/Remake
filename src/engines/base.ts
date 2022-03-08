@@ -1,10 +1,12 @@
 //imports
-import { Canvas, createCanvas, Image } from "canvas";
+import { Canvas, createCanvas, Image, loadImage } from "canvas";
 import { CommandInteraction } from "discord.js";
 import { EventEmitter } from "events";
-import { CharacterBasic, CharacterInteractions, CharacterSkins } from "../types/models/characters";
-import { BaseSingle, CharacterCapsule } from "../types/models/stories";
+import { CharacterBasic, CharacterInteractions, CharacterSkins, TemporaryMoodType } from "../types/models/characters";
+import { BackgroundCapsule, BaseSingle, CharacterCapsule } from "../types/models/stories";
 import { UniverseUser } from "../types/models/users";
+import AssetManagement from "../utilities/assetManagement/assetUtililties";
+import { EngineUtils } from "../utilities/engineUtilities/utils";
 import { EngineError } from "../utilities/errors/errors";
 import Queries from "../utilities/mongodb/queries";
 import Background from "./classes/backgrounds";
@@ -23,7 +25,7 @@ export default class EngineBase extends EventEmitter {
     public requiredKeyPositions: Array<string>;
 
     // caches
-    public loadedImageCharacters: Map<number, Image>
+    public loadedImageCharacters: Map<string, Image>
     public loadedImageBackgrounds: Map<number, Image>
     public cachedBackgrounds: Map<number, Background>;
     public cachedCharacters: Map<number, Character>;
@@ -61,7 +63,6 @@ export default class EngineBase extends EventEmitter {
         this.cachedBackgrounds = new Map();
         this.cachedCharacters = new Map();
 
-
         // create canvas
         this.canvas = createCanvas(settings.x, settings.y)
 
@@ -91,35 +92,45 @@ export default class EngineBase extends EventEmitter {
     public async injectCharacter(ch: Array<CharacterCapsule>) {
         // loop around the ch object to get individual capsules.
         for (const capsule of ch) {
+            const KEY = `${capsule.id}_${capsule.mood}` // Key for Image loading map.
             // edge cases.
             if (capsule.useSkin == undefined) capsule.useSkin = false;
             // return if we already have the id.
-            if (this.cachedCharacters.has(capsule.id)) return;
-            const BASIC = await Queries.character(capsule.id, "basic") as CharacterBasic // Store basic data for use later.
+            if (this.cachedCharacters.has(capsule.id) && this.loadedImageCharacters.has(KEY)) return;
+            // query block.
+            const BASIC = await Queries.character(capsule.id, "basic") as CharacterBasic; // Store basic data for use later.
+            const SKINS = await Queries.character(capsule.useSkin ? this.user.getSkinOfTomo(capsule.id) : BASIC.pointers.interaction, "skins") as CharacterSkins;
 
             // Check if the basic we got is original.             If it is undefined, then we assume its the original.
             if (BASIC.pointers.original != BASIC._id && BASIC.pointers.original != undefined) throw new EngineError("Base", "Pointer for Character is not Original.")
 
             // set the cache.
             this.cachedCharacters.set(capsule.id, 
-                new Character(capsule.id, BASIC,
-                    await Queries.character(capsule.useSkin ? this.user.getSkinOfTomo(capsule.id) : BASIC.pointers.interaction, "skins") as CharacterSkins,
+                new Character(capsule.id, BASIC, SKINS,
                     await Queries.character(BASIC.pointers.interaction, "interactions") as CharacterInteractions
                     )
-                )
+            )
+            // Image cache.
+            this.loadedImageCharacters.set(KEY, await loadImage(AssetManagement.convertToPhysicalLink("characters", SKINS.moods[EngineUtils.convertStrToMoodNumber(capsule.mood)])))
+            
         }
     }
     /**
      * Name | injectBackground
      * Desc | used in and outside the obj, this is to add bg caches.
-     * @param {number} id | id of the background you want to inject.
+     * @param 
      */
-    public async injectBackground(id: number) {
+    public async injectBackground(capsule: BackgroundCapsule) {
         // if we already have it stored, return.
-        if (this.cachedBackgrounds.has(id)) return;
+        if (this.cachedBackgrounds.has(capsule.id)) return;
+
+        const BKG = await Queries.background(capsule.id)
 
         // set the cache.
-        this.cachedBackgrounds.set(id, new Background(id, await Queries.background(id)));
+        this.cachedBackgrounds.set(capsule.id, new Background(capsule.id, BKG));
+
+        // set the image cache.
+        this.loadedImageBackgrounds.set(capsule.id, await loadImage(AssetManagement.convertToPhysicalLink("backgrounds", BKG.link, capsule.blurred)))
     }
 
     /**
@@ -155,9 +166,4 @@ export default class EngineBase extends EventEmitter {
         process.nextTick(() => this.ready())
     }
     
-
-    
-
-
-
 }

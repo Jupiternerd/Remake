@@ -1,5 +1,7 @@
 // author = shokkunn
 
+import { TemporaryMoodType, TemporaryMoodTypeStrings } from "../../types/models/characters";
+
 // Constants
 const EMOJI_CONSTANTS = {
     filledBar: "▰",
@@ -58,5 +60,28 @@ export class StringUtils {
      */
     static async periodTheString(string: string): Promise<string> {
         return (string.endsWith('.') && !string.endsWith("?" || "!") ? string : string + '.');
+    }
+}
+
+export class EngineUtils {
+    /**
+     * Name | convertStrToMoodNumber
+     * Desc | Does what is says, string -> int for mood types.
+     * @param str | string you want to convert to int.
+     * @returns Temporary Mood State that is in int format.
+     */
+    public static convertStrToMoodNumber(str: TemporaryMoodTypeStrings) {
+        return TemporaryMoodType[str] as number;
+    }
+
+    /**
+     * Name | convertNumberToMoodStr
+     * Desc | string mood -> int
+     * @param int | int that you want to convert to string.
+     * @returns Temporary Mood State that is in str format.
+     */
+    public static convertNumberToMoodStr(int: number) {
+        if (int > Object.keys(TemporaryMoodType).length / 2) return; // Since int is larger than the enums.
+        return TemporaryMoodType[int] as TemporaryMoodTypeStrings;
     }
 }

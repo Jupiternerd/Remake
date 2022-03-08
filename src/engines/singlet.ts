@@ -1,5 +1,5 @@
 //imports
-import { BaseSingle, CharacterCapsule } from "../types/models/stories";
+import { BackgroundCapsule, BaseSingle, CharacterCapsule } from "../types/models/stories";
 
 // author = shokkunn
 
@@ -9,13 +9,13 @@ import { BaseSingle, CharacterCapsule } from "../types/models/stories";
  */
 export default class Singlet implements BaseSingle {
     public i: number
-    public bg?: number;
+    public bg?: BackgroundCapsule;
     public ch?: Array<CharacterCapsule>;
     constructor(
         single: BaseSingle,
         index: number,
         ch: Array<CharacterCapsule>,
-        bg: number
+        bg: BackgroundCapsule
     ) {
         this.i = (single.hasOwnProperty("i") ? single.i : index) // If the single comes with no index, we will provide it.
         this.ch = ch;

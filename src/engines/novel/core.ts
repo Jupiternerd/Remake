@@ -14,7 +14,6 @@ export default class NovelCore extends EngineBase {
     constructor(
         interaction: CommandInteraction,
         multiples: Array<NovelSingle>,
-
         ) {
         super(interaction,
             {
@@ -23,9 +22,13 @@ export default class NovelCore extends EngineBase {
 
             },
              multiples,
+             ["bg", "ch", "backable", "type"]
+            );   
+    }
 
-            );
+    public async prepareAssets() {
         
+
     }
 
 
