@@ -26,7 +26,7 @@ class Novel extends Commands {
         const multiples: Array<NovelSingle> = [ 
             {
                 type: {
-                    display: "normal"
+                    display: "duet"
                 },
                 backable: false,
                 bg: {
@@ -40,13 +40,14 @@ class Novel extends Commands {
                 }, {
                     id: 0,
                     useSkin: false,
-                    mood: "happy"
+                    mood: "normal"
                 }],
                 txt: {
-                    speaker: "monologue",
+                    speaker: 1,
                     content: "Hi!"
                 }
             },
+            
             {
                 backable: false,
                 bg: {
@@ -54,7 +55,7 @@ class Novel extends Commands {
                     blurred: false
                 },
                 type: {
-                    display: "wallpaper"
+                    display: "duet"
                 },
                 ch: [{
                     id: 0,
@@ -69,7 +70,9 @@ class Novel extends Commands {
                     speaker: "monologue",
                     content: "Hi!"
                 }
+                
             }
+            
         ]
         const novel = new NovelCore(interaction, multiples)
         novel.on("ready", () => {
