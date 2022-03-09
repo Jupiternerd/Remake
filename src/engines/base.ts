@@ -125,7 +125,7 @@ export default class EngineBase extends EventEmitter {
         // if we already have it stored, return.
         if (this.cachedBackgrounds.has(capsule.id)) return;
 
-        const BKG = await Queries.background(capsule.id)
+        const BKG = await Queries.background(capsule.id) // Query the background from our Query handler.
 
         // set the cache.
         this.cachedBackgrounds.set(capsule.id, new Background(capsule.id, BKG));
