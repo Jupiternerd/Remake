@@ -104,8 +104,6 @@ export default class NovelCore extends EngineBase {
                 // Resize Image.
                 IMAGE.resize({width: 270, fit: sharp.fit.contain})
                 // Grayscale the image if the character image is not the one talking.
-                console.log(single.txt.speaker)
-                console.log(i)
                 if (single.txt.speaker != i) IMAGE.grayscale(true); else IMAGE.grayscale(false);
                 // Push the image into the composite array.
                 IMGARR.push(IMAGE)
