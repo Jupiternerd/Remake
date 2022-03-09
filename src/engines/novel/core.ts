@@ -88,12 +88,14 @@ export default class NovelCore extends EngineBase {
             // edge cases.
             if (single.ch.length != 2) throw new NovelError("Duet characters more than two in array.")
             // define constant properties.
-            const POSITIONS: Array<number> = [130, 390], CONSTY: number = 30;
+            const POSITIONS: Array<number> = [30, 390], CONSTY: number = 130;
 
             for (let i = 0; i < 2; i++) {
+                // Get image object.
+                const IMAGE = this.loadedImageCharacters.get(EngineUtils.getCharacterCacheKey(single.ch[i].id, single.ch[i].mood));
+
                 // Draw characters 
-                ctx.drawImage(this.loadedImageCharacters.get(EngineUtils.getCharacterCacheKey(single.ch[i].id, single.ch[i].mood)),
-                    POSITIONS[i], CONSTY)
+                ctx.drawImage(IMAGE, 0, 0, 0, 0, POSITIONS[i], CONSTY, IMAGE.naturalWidth, IMAGE.naturalHeight)
             }
 
             single.built = new MessageAttachment(this.canvas.toBuffer("image/jpeg", quality), CUSTOM_ID) 
