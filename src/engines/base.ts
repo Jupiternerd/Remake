@@ -89,15 +89,20 @@ export default class EngineBase extends EventEmitter {
      */
     public async injectCharacter(capsule: CharacterCapsule) {
         // get the key.
-        let KEY = EngineUtils.getCharacterCacheKey(capsule.id, capsule.mood)
+        let KEY = EngineUtils.getCharacterCacheKey(capsule.id, capsule.mood), skinBuffer: number;
         // edge cases.
         if (capsule.useSkin == undefined) capsule.useSkin = false;
-        //console.log(KEY)
         // return if we already have the id.
         if (this.cachedCharacters.has(capsule.id) && this.loadedImageCharacters.has(KEY)) return;
         // query block.
         const BASIC: CharacterBasic = await Queries.character(capsule.id, "basic") as CharacterBasic; // Store basic data for use later.
-        const SKINS: CharacterSkins = await Queries.character(capsule.useSkin ? this.user.getSkinOfTomo(capsule.id) : BASIC.pointers.skin, "skins") as CharacterSkins;
+        // If we have to use the skin that the user has set.
+        if (capsule.useSkin) {
+            skinBuffer = this.user.getSkinOfTomo(capsule.id);
+            skinBuffer = (skinBuffer > 0 ? skinBuffer : skinBuffer = BASIC.pointers.skin);
+        } else skinBuffer = BASIC.pointers.skin;
+        // Get the skins frmo the db.
+        const SKINS: CharacterSkins = await Queries.character(skinBuffer, "skins") as CharacterSkins;
         // Interaction query is a bit tricky.         if the mood is normal (the current basic)                we just get it's interactions               :            we have to go through the character class where it 
         // fetches us the data from the Query.            
         const INTERACTION: CharacterInteractions = capsule.mood == "normal" ? await Queries.character(capsule.id, "interactions") as CharacterInteractions : await Character.getInteractionFromMood(capsule.id, capsule.mood);
@@ -137,9 +142,7 @@ export default class EngineBase extends EventEmitter {
      */
     public async cacheAssets() {
         // defining variables.
-        var i: number = 0, singlet: BaseSingle,
-        toCacheBG: Array<BackgroundCapsule>,
-        toCacheCH: Array<CharacterCapsule>
+        var i: number = 0, singlet: BaseSingle
         // grab user.
         this.user = new Users(this.interaction.user.id, await Queries.user(this.interaction.user.id, "universe") as UniverseUser);
 

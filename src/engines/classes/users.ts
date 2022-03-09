@@ -59,11 +59,7 @@ export default class Users extends UniBase {
      * Desc | populates the skins with 
      * @returns Populated db.
      */
-    /*
-    public async populateSkins(): Promise<Promise<Item>[]> {
-        // cycle through skins and replace them with item.
-        return this.skins.map(async (item) => await Queries.item(item))
-    }*/
+    
 
     /**
      * Name | populateBackground
@@ -74,6 +70,10 @@ export default class Users extends UniBase {
         return this.bgs.map(async (item) => await Queries.background(item))
     }
 
+    public findTomoIndexInInventory(tomoID: number) {
+        return this.chs.findIndex((tomo) => tomo._id = tomoID)
+    }
+
     /**
      * Name | getSkinOfTomo
      * Desc | Gets the skin ID that the user wants to use for the requested tomo. NOT FULL SKIN
@@ -81,6 +81,7 @@ export default class Users extends UniBase {
      * @returns ID of the skin that the user has set for the tomo
      */
     public getSkinOfTomo(tomoID: number): number {
-        return this.chs[tomoID].skinToUse;
+        if (this.findTomoIndexInInventory(tomoID) > 0) return this.chs[tomoID].skinToUse;
+        return -1;
     }
 }

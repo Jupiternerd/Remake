@@ -26,7 +26,7 @@ class Novel extends Commands {
         const multiples: Array<NovelSingle> = [ 
             {
                 type: {
-                    display: "normal"
+                    display: "duet"
                 },
                 backable: false,
                 bg: {
@@ -62,15 +62,15 @@ class Novel extends Commands {
                     mood: "normal"
                 }],
                 txt: {
-                    speaker: 1,
+                    speaker: 0,
                     content: "Hi!"
                 }
             }
             
         ]
         const novel = new NovelCore(interaction, multiples)
-        novel.once("ready", async () => {
-            await novel.stageTwo()
+        novel.once("ready", () => {
+            novel.stageTwo()
         })
         interaction.reply("Logged");
     }
