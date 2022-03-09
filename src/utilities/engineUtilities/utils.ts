@@ -84,4 +84,15 @@ export class EngineUtils {
         if (int > Object.keys(TemporaryMoodType).length / 2) return; // Since int is larger than the enums.
         return TemporaryMoodType[int] as TemporaryMoodTypeStrings;
     }
+
+    /**
+     * Name | getCharacterCacheKey
+     * Desc | Combines two seperate identifiers in the middle with a "_";
+     * @param id | id of the character
+     * @param mood | mood that you want to retrieve @default normal
+     * @returns {string} of key.
+     */
+    public static getCharacterCacheKey(id: number, mood: TemporaryMoodTypeStrings = "normal") {
+        return `${id}_${mood}`
+    }
 }

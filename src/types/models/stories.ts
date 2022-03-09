@@ -1,10 +1,9 @@
-import { MessageSelectMenuOptions } from "discord.js";
+import { MessageAttachment, MessageSelectMenuOptions } from "discord.js";
 import { basic } from "../local/static";
 import { TemporaryMoodTypeStrings } from "./characters";
 
 export type DisplayTypes = "wallpaper" | "duet" | "normal";
 export type SpecialTypes = "selection" | "timed" | "normal";
-export type SpeakerTypes = "character" | "monologue";
 
 export interface CharacterCapsule {
     id: number,
@@ -25,8 +24,8 @@ export interface BaseSingle {
 
 export interface NovelSingle extends BaseSingle {
     txt?: {
-        speaker: SpeakerTypes
-        who?: number
+        speaker: number | "monologue"
+        content: string
     }
     type?: {
         display?: DisplayTypes
@@ -36,6 +35,7 @@ export interface NovelSingle extends BaseSingle {
             choices?: Array<MessageSelectMenuOptions>
         }
     }
+    built?: MessageAttachment
     backable?: boolean;
 }
 

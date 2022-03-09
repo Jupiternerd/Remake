@@ -31,28 +31,35 @@ class Novel extends Commands {
                     blurred: true
                 },
                 type: {
-                    display: "normal"
+                    display: "duet"
                 },
                 ch: [{
                     id: 0,
                     useSkin: false,
                     mood: "normal"
+                }, {
+                    id: 0,
+                    useSkin: false,
+                    mood: "happy"
                 }],
                 txt: {
-                    speaker: "character",
-                    who: 0
+                    speaker: 0,
+                    content: "Hi!"
                 }
             },
             {
+                type: {
+                    display: "wallpaper"
+                },
                 backable: false,
             },
         ]
         const novel = new NovelCore(interaction, multiples)
         novel.on("ready", () => {
-            console.log(novel.cachedCharacters.get(0).interactions.base.greetings[0])
+            novel.stageTwo()
         })
         interaction.reply("Logged");
     }
 }
 
-export = Novel; // require doesn't seem to like export default class.
+export = Novel; // require doesn't seem to like 'export default class.'

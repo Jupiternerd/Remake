@@ -23,7 +23,6 @@ export default class Character extends UniBase{
         this.skins = skins ? skins : null;
         this.interactions = interactions ? interactions : null;
     }
-
     /**
      * Name | GetSkinFromDB
      * Desc | gets skin from db 
@@ -32,7 +31,6 @@ export default class Character extends UniBase{
     async getSkinFromDB(id: number = this.id as number) {
         await Character.getSkinFromDB(id);
     }
-
     /**
      * Name | SetInteractionFromDB
      * Desc | gets interaction from db
@@ -50,7 +48,6 @@ export default class Character extends UniBase{
      async getInteractionFromMood(id: number = this.id as number, mood: TemporaryMoodTypeStrings): Promise<CharacterInteractions> {
          return await Character.getInteractionFromMood(id, mood);
     }
-    
 
     /** Overloads */
 

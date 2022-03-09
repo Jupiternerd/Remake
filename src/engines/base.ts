@@ -92,7 +92,8 @@ export default class EngineBase extends EventEmitter {
     public async injectCharacter(ch: Array<CharacterCapsule>) {
         // loop around the ch object to get individual capsules.
         for (const capsule of ch) {
-            const KEY = `${capsule.id}_${capsule.mood}` // Key for Image loading map.
+            // get the key.
+            const KEY = EngineUtils.getCharacterCacheKey(capsule.id, capsule.mood)
             // edge cases.
             if (capsule.useSkin == undefined) capsule.useSkin = false;
             // return if we already have the id.

@@ -1,6 +1,7 @@
 //imports
 
 import { AssetTypeStrings } from "../../types/local/static";
+import { TemporaryMoodTypeStrings } from "../../types/models/characters";
 
 // author = shokkunn
 
