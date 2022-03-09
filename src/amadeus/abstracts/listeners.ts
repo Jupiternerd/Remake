@@ -1,6 +1,7 @@
-// author = shokkunn
-
+// imports
 import Custom_Client from "../client/client";
+
+// author = shokkunn
 
 // Listner class.
 export default abstract class Listener {
