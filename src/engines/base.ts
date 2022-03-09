@@ -99,7 +99,7 @@ export default class EngineBase extends EventEmitter {
         // If we have to use the skin that the user has set.
         if (capsule.useSkin) {
             skinBuffer = this.user.getSkinOfTomo(capsule.id);
-            skinBuffer = (skinBuffer > 0 ? skinBuffer : skinBuffer = BASIC.pointers.skin);
+            skinBuffer = (skinBuffer >= 0 ? skinBuffer : skinBuffer = BASIC.pointers.skin);
         } else skinBuffer = BASIC.pointers.skin;
         // Get the skins frmo the db.
         const SKINS: CharacterSkins = await Queries.character(skinBuffer, "skins") as CharacterSkins;
