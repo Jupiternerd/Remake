@@ -25,13 +25,13 @@ class Novel extends Commands {
     public async execute(bot: client, interaction: CommandInteraction): Promise<void> {
         const multiples: Array<NovelSingle> = [ 
             {
+                type: {
+                    display: "normal"
+                },
                 backable: false,
                 bg: {
                     id: 0,
                     blurred: true
-                },
-                type: {
-                    display: "normal"
                 },
                 ch: [{
                     id: 0,
@@ -43,16 +43,33 @@ class Novel extends Commands {
                     mood: "happy"
                 }],
                 txt: {
-                    speaker: 0,
+                    speaker: "monologue",
                     content: "Hi!"
                 }
-            }/*,
+            },
             {
+                backable: false,
+                bg: {
+                    id: 0,
+                    blurred: false
+                },
                 type: {
                     display: "wallpaper"
                 },
-                backable: false,
-            },*/
+                ch: [{
+                    id: 0,
+                    useSkin: false,
+                    mood: "normal"
+                }, {
+                    id: 0,
+                    useSkin: false,
+                    mood: "happy"
+                }],
+                txt: {
+                    speaker: "monologue",
+                    content: "Hi!"
+                }
+            }
         ]
         const novel = new NovelCore(interaction, multiples)
         novel.on("ready", () => {

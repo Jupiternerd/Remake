@@ -31,6 +31,7 @@ export default class NovelCore extends EngineBase {
 
     public async stageTwo() {
         for (let SINGLES of this.multiples as Array<NovelSingle>) {
+            console.log(SINGLES)
             SINGLES.built = await this.buildSinglet(SINGLES.i)
             await this.interaction.channel.send({
                 attachments: [],
@@ -52,16 +53,16 @@ export default class NovelCore extends EngineBase {
         console.time("BUILD_" + i);
 
         // variables.
-        let single = this.multiples[i] as NovelSingle;
+        let single = this.multiples[i] as NovelSingle, IMAGE: Sharp, CANVAS: Sharp
         const CUSTOM_ID = "NOVEL" + "_" + single.i + "_" + single.type.display.toUpperCase() + "_"+ "_USERID_" + this.interaction.user.id + "." + "jpeg"; // file name.
 
         // redundant filters. So we don't waste power on drawing the same image.
         const SIMILAR_NODE: NovelSingle = this.multiples.find((node: NovelSingle) => 
             (node.built != undefined) && // is it built?
-            (node.type.display == single.type.display) && // if there are nodes that have the same display type.
-            (node.ch == single.ch) && // same characters.
-            (node.txt.speaker == node.txt.speaker) && // same speaker.
-            (node.bg.id == single.bg.id)) // and same background.
+            (node.type.display === single.type.display) && // if there are nodes that have the same display type.
+            (node.ch === single.ch) && // same characters.
+            (node.txt.speaker === node.txt.speaker) && // same speaker.
+            (node.bg.id === single.bg.id)) // and same background.
 
         // if we do find one.
         if (SIMILAR_NODE) {
@@ -70,8 +71,14 @@ export default class NovelCore extends EngineBase {
             console.timeEnd("BUILD_" + i);
             return single.built;
         }
-        // draw the background.
-        let CANVAS = this.loadedImageBackgrounds.get(single.bg.id).resize(this.X, this.Y) 
+        // try to get bg.
+        try {
+            // get bg from cache.
+            CANVAS = this.loadedImageBackgrounds.get(EngineUtils.getBackgroundCacheKey(single.bg.id, single.bg.blurred)).resize(this.X, this.Y) 
+        } catch(e) {
+            // throw if error.
+            throw new NovelError("Could not get Background of novel.")
+        }
         // Since this is a wallpaper display, it only will show the background.
         if (single.type.display === "wallpaper") {
             console.log("wallpaper")
@@ -93,7 +100,7 @@ export default class NovelCore extends EngineBase {
             // Loop block. Resize, grayscale.
             for (let i = 0; i < 2; i++) {
                 // load the image.
-                let IMAGE = this.loadedImageCharacters.get(EngineUtils.getCharacterCacheKey(single.ch[i].id, single.ch[i].mood))
+                IMAGE = this.loadedImageCharacters.get(EngineUtils.getCharacterCacheKey(single.ch[i].id, single.ch[i].mood))
                 // Resize Image.
                 IMAGE.resize({width: 270, fit: sharp.fit.contain})
                 // Grayscale the image if the character image is not the one talking.
@@ -114,7 +121,7 @@ export default class NovelCore extends EngineBase {
 
         // Finally the default normal display.
         console.log("normal")
-        let IMAGE = this.loadedImageCharacters.get(EngineUtils.getCharacterCacheKey(single.ch[0].id, single.ch[0].mood))
+        IMAGE = this.loadedImageCharacters.get(EngineUtils.getCharacterCacheKey(single.ch[0].id, single.ch[0].mood))
         IMAGE.resize({width: 290, fit: sharp.fit.contain})
         // if it is a monologue, since the 'mc' is talking we gray out the ch.
         if (single.txt.speaker == "monologue") IMAGE.grayscale(true)

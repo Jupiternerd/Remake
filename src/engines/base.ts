@@ -26,7 +26,7 @@ export default class EngineBase extends EventEmitter {
 
     // caches
     public loadedImageCharacters: Map<string, Sharp>
-    public loadedImageBackgrounds: Map<number, Sharp>
+    public loadedImageBackgrounds: Map<string, Sharp>
     public cachedBackgrounds: Map<number, Background>;
     public cachedCharacters: Map<number, Character>;
 
@@ -123,19 +123,20 @@ export default class EngineBase extends EventEmitter {
      * @param {BackgroundCapsule} capsule that you want to inject into the engine.
      */
     public async injectBackground(capsule: BackgroundCapsule) {
+        // variables.
+        let BGSHARP: Sharp;
         // if we already have it stored, return.
-        if (this.cachedBackgrounds.has(capsule.id)) return;
+        if (this.cachedBackgrounds.has(capsule.id) && this.loadedImageBackgrounds.has(EngineUtils.getBackgroundCacheKey(capsule.id, capsule.blurred))) return;
 
         const BKG = await Queries.background(capsule.id) // Query the background from our Query handler.
-
+        BGSHARP = sharp(AssetManagement.convertToPhysicalLink("backgrounds", BKG.link)) // Turn the background into image.
         // set the cache.
         this.cachedBackgrounds.set(capsule.id, new Background(capsule.id, BKG));
-        
-        // set the image cache.
-        this.loadedImageBackgrounds.set(capsule.id, sharp(AssetManagement.convertToPhysicalLink("backgrounds", BKG.link)))
-        //console.log(sharp(AssetManagement.convertToPhysicalLink("backgrounds", BKG.link, capsule.blurred)))
+        // if the setting is to be blurred.
+        if (capsule.blurred) BGSHARP.blur(6);
+        // load the image into the cache.
+        this.loadedImageBackgrounds.set(EngineUtils.getBackgroundCacheKey(capsule.id, capsule.blurred), BGSHARP)
     }
-
     /**
      * Name | cacheAssets
      * Desc | prepare Assets.
@@ -159,14 +160,14 @@ export default class EngineBase extends EventEmitter {
             if (singlet.i == undefined) singlet.i = i;
 
             // caching block.
-            await this.injectBackground(singlet.bg)
+            if (singlet.bg != undefined) await this.injectBackground(singlet.bg); 
 
-            await this.injectCharacter(singlet.ch)
-
+            if (singlet.ch != undefined) await this.injectCharacter(singlet.ch);
+            
             i++;
         }
         // On next processor tick we declare everything as ready.
-        process.nextTick(() => this.ready())
+        process.nextTick(() => this.ready());
     }
     
 }

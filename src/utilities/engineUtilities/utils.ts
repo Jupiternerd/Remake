@@ -95,4 +95,15 @@ export class EngineUtils {
     public static getCharacterCacheKey(id: number, mood: TemporaryMoodTypeStrings = "normal") {
         return `${id}_${mood}`
     }
+
+    /**
+     * Name | getBackgroundCacheKey
+     * Desc | Combines two seperate identifiers in the middle with a "_";
+     * @param id | id of the bg
+     * @param bool | if you want the blurred version or not.
+     * @returns {string} of key.
+     */
+     public static getBackgroundCacheKey(id: number, bool: boolean = false) {
+        return `${id}_${bool}`
+    }
 }
