@@ -31,7 +31,7 @@ class Novel extends Commands {
                     blurred: true
                 },
                 type: {
-                    display: "duet"
+                    display: "normal"
                 },
                 ch: [{
                     id: 0,
@@ -46,13 +46,13 @@ class Novel extends Commands {
                     speaker: 0,
                     content: "Hi!"
                 }
-            },
+            }/*,
             {
                 type: {
                     display: "wallpaper"
                 },
                 backable: false,
-            },
+            },*/
         ]
         const novel = new NovelCore(interaction, multiples)
         novel.on("ready", () => {

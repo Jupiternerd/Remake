@@ -76,7 +76,7 @@ export default class Users extends UniBase {
 
     /**
      * Name | getSkinOfTomo
-     * Desc | Gets the skin that the user wants to use for the requested tomo. NOT FULL SKIN
+     * Desc | Gets the skin ID that the user wants to use for the requested tomo. NOT FULL SKIN
      * @param tomoID | ID of the tomodachi
      * @returns ID of the skin that the user has set for the tomo
      */

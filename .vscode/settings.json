@@ -4,5 +4,6 @@
         "*.gitattributes": true,
         "**/**.js": true
     },
-    "rpc.appName": "Visual Studio Code"
+    "rpc.appName": "Visual Studio Code",
+    "git.ignoreLimitWarning": true
 }
