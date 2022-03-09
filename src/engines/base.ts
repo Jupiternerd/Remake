@@ -1,5 +1,4 @@
 //imports
-import { Canvas, createCanvas, Image, loadImage } from "canvas";
 import { CommandInteraction } from "discord.js";
 import { EventEmitter } from "events";
 import { CharacterBasic, CharacterInteractions, CharacterSkins, TemporaryMoodType } from "../types/models/characters";
@@ -12,6 +11,7 @@ import Queries from "../utilities/mongodb/queries";
 import Background from "./classes/backgrounds";
 import Character from "./classes/characters";
 import Users from "./classes/users";
+import sharp, { Sharp } from "sharp";
 
 // author = shokkunn
 
@@ -25,19 +25,18 @@ export default class EngineBase extends EventEmitter {
     public requiredKeyPositions: Array<string>;
 
     // caches
-    public loadedImageCharacters: Map<string, Image>
-    public loadedImageBackgrounds: Map<number, Image>
+    public loadedImageCharacters: Map<string, Sharp>
+    public loadedImageBackgrounds: Map<number, Sharp>
     public cachedBackgrounds: Map<number, Background>;
     public cachedCharacters: Map<number, Character>;
 
     // settings
-    public useSkins: boolean = false
+    public useSkins: boolean = false;
+    public X: number;
+    public Y: number;
 
     // iterables
     public multiples: Array<BaseSingle>
-
-    // canvas
-    public canvas: Canvas;
 
     // user
     public user: Users
@@ -63,8 +62,8 @@ export default class EngineBase extends EventEmitter {
         this.cachedBackgrounds = new Map();
         this.cachedCharacters = new Map();
 
-        // create canvas
-        this.canvas = createCanvas(settings.x, settings.y)
+        this.X = settings.x,
+        this.Y = settings.y,
 
         // prepare assets.
         this.cacheAssets()
@@ -113,7 +112,8 @@ export default class EngineBase extends EventEmitter {
                 new Character(capsule.id, BASIC, SKINS, INTERACTION)
             )
             // Image cache.
-            this.loadedImageCharacters.set(KEY, await loadImage(AssetManagement.convertToPhysicalLink("characters", SKINS.moods[EngineUtils.convertStrToMoodNumber(capsule.mood)])))
+            this.loadedImageCharacters.set(KEY, sharp(AssetManagement.convertToPhysicalLink("characters", SKINS.moods[EngineUtils.convertStrToMoodNumber(capsule.mood)])))
+            //this.loadedImageCharacters.set(KEY, await loadImage(AssetManagement.convertToPhysicalLink("characters", SKINS.moods[EngineUtils.convertStrToMoodNumber(capsule.mood)])))
             
         }
     }
@@ -130,9 +130,10 @@ export default class EngineBase extends EventEmitter {
 
         // set the cache.
         this.cachedBackgrounds.set(capsule.id, new Background(capsule.id, BKG));
-
+        
         // set the image cache.
-        this.loadedImageBackgrounds.set(capsule.id, await loadImage(AssetManagement.convertToPhysicalLink("backgrounds", BKG.link, capsule.blurred)))
+        this.loadedImageBackgrounds.set(capsule.id, sharp(AssetManagement.convertToPhysicalLink("backgrounds", BKG.link)))
+        //console.log(sharp(AssetManagement.convertToPhysicalLink("backgrounds", BKG.link, capsule.blurred)))
     }
 
     /**

@@ -15,9 +15,8 @@ export default class AssetManagement {
      * @param {boolean} blurred | if the file you requested should be blurred. Will navigate to correct dir to get the image.
      * @returns {string} of the physical link that we have on disk.
      */
-    static convertToPhysicalLink(type: AssetTypeStrings, link: string, blurred: boolean = false): string {
-        blurred = (type == "characters" && blurred == true ? false : blurred) // Since character images can't be blurred (why would you even want that) we default it to false.
+    static convertToPhysicalLink(type: AssetTypeStrings, link: string): string {
         const FTR = '.' + "png"//(type == "characters" ? "png" : "jpg")
-        return `./assets/${type}/${blurred ? 'blurred' : 'normal'}/${link}${FTR}` // returen the file location.
+        return `./assets/${type}/normal/${link}${FTR}` // returen the file location.
     }
 }
