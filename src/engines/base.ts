@@ -38,9 +38,6 @@ export default class EngineBase extends EventEmitter {
     // iterables
     public multiples: Array<BaseSingle>
 
-    // canvas
-    //public canvas: Canvas;
-
     // user
     public user: Users
 
@@ -65,7 +62,6 @@ export default class EngineBase extends EventEmitter {
         this.cachedBackgrounds = new Map();
         this.cachedCharacters = new Map();
 
-        // create canvas
         this.X = settings.x,
         this.Y = settings.y,
 

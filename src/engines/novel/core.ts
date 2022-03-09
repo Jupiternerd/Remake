@@ -1,10 +1,8 @@
 //imports
 
-import { Image, NodeCanvasRenderingContext2DSettings } from "canvas";
-import { CommandInteraction, Message, MessageAttachment } from "discord.js";
+import { CommandInteraction, MessageAttachment } from "discord.js";
 import sharp, { Sharp } from "sharp";
 import { NovelSingle } from "../../types/models/stories";
-import AssetManagement from "../../utilities/assetManagement/assetUtililties";
 import { EngineUtils } from "../../utilities/engineUtilities/utils";
 import { NovelError } from "../../utilities/errors/errors";
 import EngineBase from "../base";
