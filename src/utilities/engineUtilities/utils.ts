@@ -92,7 +92,7 @@ export class EngineUtils {
      * @param mood | mood that you want to retrieve @default normal
      * @returns {string} of key.
      */
-    public static getCharacterCacheKey(id: number, mood: TemporaryMoodTypeStrings = "normal") {
+    public static getCharacterCacheKey(id: number, mood: TemporaryMoodTypeStrings) {
         return `${id}_${mood}`
     }
 

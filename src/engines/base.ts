@@ -65,21 +65,20 @@ export default class EngineBase extends EventEmitter {
         this.X = settings.x,
         this.Y = settings.y,
 
-        // prepare assets.
         this.cacheAssets()
     }
 
     /** Emitters */
     
-    public ready() {
+    public async ready() {
         this.emit("ready");
     }
 
-    public pause() {
+    public async pause() {
         this.emit("pause");
     }
 
-    public end() {
+    public async end() {
         this.emit("end")
     }
 
@@ -88,34 +87,29 @@ export default class EngineBase extends EventEmitter {
      * Desc | used in and outside the obj, this is to add character caches.
      * @param {CharacterCapsule[]} ch | Array of character capsules you want to cache inside the engine.
      */
-    public async injectCharacter(ch: Array<CharacterCapsule>) {
-        // loop around the ch object to get individual capsules.
-        for (const capsule of ch) {
-            // get the key.
-            const KEY = EngineUtils.getCharacterCacheKey(capsule.id, capsule.mood)
-            // edge cases.
-            if (capsule.useSkin == undefined) capsule.useSkin = false;
-            // return if we already have the id.
-            if (this.cachedCharacters.has(capsule.id) && this.loadedImageCharacters.has(KEY)) return;
-            // query block.
-            const BASIC: CharacterBasic = await Queries.character(capsule.id, "basic") as CharacterBasic; // Store basic data for use later.
-            const SKINS: CharacterSkins = await Queries.character(capsule.useSkin ? this.user.getSkinOfTomo(capsule.id) : BASIC.pointers.skin, "skins") as CharacterSkins;
-            // Interaction query is a bit tricky.         if the mood is normal (the current basic)                we just get it's interactions               :            we have to go through the character class where it 
-            // fetches us the data from the Query.            
-            const INTERACTION: CharacterInteractions = capsule.mood == "normal" ? await Queries.character(capsule.id, "interactions") as CharacterInteractions : await Character.getInteractionFromMood(capsule.id, capsule.mood);
-            
-            // Check if the basic we got is original.             If it is undefined, then we assume its the original.
-            if (BASIC.pointers.original != BASIC._id && BASIC.pointers.original != undefined) throw new EngineError("Base", "Pointer for Character is not Original.")
-
-            // set the cache.
-            this.cachedCharacters.set(capsule.id, 
-                new Character(capsule.id, BASIC, SKINS, INTERACTION)
-            )
-            // Image cache.
-            this.loadedImageCharacters.set(KEY, sharp(AssetManagement.convertToPhysicalLink("characters", SKINS.moods[EngineUtils.convertStrToMoodNumber(capsule.mood)])))
-            //this.loadedImageCharacters.set(KEY, await loadImage(AssetManagement.convertToPhysicalLink("characters", SKINS.moods[EngineUtils.convertStrToMoodNumber(capsule.mood)])))
-            
-        }
+    public async injectCharacter(capsule: CharacterCapsule) {
+        // get the key.
+        let KEY = EngineUtils.getCharacterCacheKey(capsule.id, capsule.mood)
+        // edge cases.
+        if (capsule.useSkin == undefined) capsule.useSkin = false;
+        //console.log(KEY)
+        // return if we already have the id.
+        if (this.cachedCharacters.has(capsule.id) && this.loadedImageCharacters.has(KEY)) return;
+        // query block.
+        const BASIC: CharacterBasic = await Queries.character(capsule.id, "basic") as CharacterBasic; // Store basic data for use later.
+        const SKINS: CharacterSkins = await Queries.character(capsule.useSkin ? this.user.getSkinOfTomo(capsule.id) : BASIC.pointers.skin, "skins") as CharacterSkins;
+        // Interaction query is a bit tricky.         if the mood is normal (the current basic)                we just get it's interactions               :            we have to go through the character class where it 
+        // fetches us the data from the Query.            
+        const INTERACTION: CharacterInteractions = capsule.mood == "normal" ? await Queries.character(capsule.id, "interactions") as CharacterInteractions : await Character.getInteractionFromMood(capsule.id, capsule.mood);
+        
+        // Check if the basic we got is original.             If it is undefined, then we assume its the original.
+        if (BASIC.pointers.original != BASIC._id && BASIC.pointers.original != undefined) throw new EngineError("Base", "Pointer for Character is not Original.")
+        // set the cache.
+        this.cachedCharacters.set(capsule.id, 
+            new Character(capsule.id, BASIC, SKINS, INTERACTION)
+        )
+        // Image cache.
+        this.loadedImageCharacters.set(KEY, sharp(AssetManagement.convertToPhysicalLink("characters", SKINS.moods[EngineUtils.convertStrToMoodNumber(capsule.mood)])))
     }
     /**
      * Name | injectBackground
@@ -143,13 +137,15 @@ export default class EngineBase extends EventEmitter {
      */
     public async cacheAssets() {
         // defining variables.
-        let i: number = 0, singlet: BaseSingle;
-
+        var i: number = 0, singlet: BaseSingle,
+        toCacheBG: Array<BackgroundCapsule>,
+        toCacheCH: Array<CharacterCapsule>
         // grab user.
         this.user = new Users(this.interaction.user.id, await Queries.user(this.interaction.user.id, "universe") as UniverseUser);
 
         // loop
         for (singlet of this.multiples) {
+            console.log(i)
             // loop variables.
             let indexSwap: number = (i > 0 ? i - 1 : 0), swappedMultiple: BaseSingle = this.multiples[indexSwap];
 
@@ -159,15 +155,17 @@ export default class EngineBase extends EventEmitter {
             // index is optional but will be required later on so we substitute it with the internal iterator.
             if (singlet.i == undefined) singlet.i = i;
 
-            // caching block.
-            if (singlet.bg != undefined) await this.injectBackground(singlet.bg); 
+            // since there is only one bg we can just give the handler just that.
+            await this.injectBackground(singlet.bg)
 
-            if (singlet.ch != undefined) await this.injectCharacter(singlet.ch);
+            // however since the chs are in an array, we have to give it one by one using the loop.
+            for (const ch of singlet.ch) await this.injectCharacter(ch)
             
+            // iterator to store index.
             i++;
         }
         // On next processor tick we declare everything as ready.
-        process.nextTick(() => this.ready());
+        process.nextTick(async () => await this.ready());
     }
     
 }

@@ -26,7 +26,7 @@ class Novel extends Commands {
         const multiples: Array<NovelSingle> = [ 
             {
                 type: {
-                    display: "duet"
+                    display: "normal"
                 },
                 backable: false,
                 bg: {
@@ -36,7 +36,26 @@ class Novel extends Commands {
                 ch: [{
                     id: 0,
                     useSkin: false,
-                    mood: "normal"
+                    mood: "happy"
+                }, {
+                    id: 0,
+                    useSkin: false,
+                    mood: "happy"
+                }],
+                txt: {
+                    speaker: 1,
+                    content: "Hi!"
+                }
+            },
+            {
+                type: {
+                    display: "duet"
+                },
+                backable: false,
+                ch: [{
+                    id: 0,
+                    useSkin: false,
+                    mood: "happy"
                 }, {
                     id: 0,
                     useSkin: false,
@@ -46,37 +65,12 @@ class Novel extends Commands {
                     speaker: 1,
                     content: "Hi!"
                 }
-            },
-            
-            {
-                backable: false,
-                bg: {
-                    id: 0,
-                    blurred: false
-                },
-                type: {
-                    display: "duet"
-                },
-                ch: [{
-                    id: 0,
-                    useSkin: false,
-                    mood: "normal"
-                }, {
-                    id: 0,
-                    useSkin: false,
-                    mood: "happy"
-                }],
-                txt: {
-                    speaker: "monologue",
-                    content: "Hi!"
-                }
-                
             }
             
         ]
         const novel = new NovelCore(interaction, multiples)
-        novel.on("ready", () => {
-            novel.stageTwo()
+        novel.once("ready", async () => {
+            await novel.stageTwo()
         })
         interaction.reply("Logged");
     }

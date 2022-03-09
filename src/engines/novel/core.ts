@@ -31,7 +31,7 @@ export default class NovelCore extends EngineBase {
 
     public async stageTwo() {
         for (let SINGLES of this.multiples as Array<NovelSingle>) {
-            console.log(SINGLES)
+            //console.log(SINGLES)
             SINGLES.built = await this.buildSinglet(SINGLES.i)
             await this.interaction.channel.send({
                 attachments: [],
@@ -98,15 +98,21 @@ export default class NovelCore extends EngineBase {
             let IMGARR: Array<Sharp> = []
 
             // Loop block. Resize, grayscale.
-            for (let i = 0; i < 2; i++) {
+            for (let i = 0; i < 2;) {
                 // load the image.
-                IMAGE = this.loadedImageCharacters.get(EngineUtils.getCharacterCacheKey(single.ch[i].id, single.ch[i].mood))
+                try {
+                    // get the image from the cache.
+                    IMAGE = this.loadedImageCharacters.get(EngineUtils.getCharacterCacheKey(single.ch[i].id, single.ch[i].mood))
+                } catch(error) {
+                    throw new NovelError("Could not get Character of novel.")
+                }
                 // Resize Image.
                 IMAGE.resize({width: 270, fit: sharp.fit.contain})
                 // Grayscale the image if the character image is not the one talking.
                 if (single.txt.speaker != i) IMAGE.grayscale(true); else IMAGE.grayscale(false);
                 // Push the image into the composite array.
                 IMGARR.push(IMAGE)
+                i++;
             }
 
             // Final output block.                           
@@ -114,14 +120,18 @@ export default class NovelCore extends EngineBase {
             // Set the built parameter with the Message Attachment.
             // Log end time.
             console.timeEnd("BUILD_" + i);
-            
             // return
             return new MessageAttachment(await CANVAS.toBuffer(), CUSTOM_ID);
         }
 
         // Finally the default normal display.
         console.log("normal")
-        IMAGE = this.loadedImageCharacters.get(EngineUtils.getCharacterCacheKey(single.ch[0].id, single.ch[0].mood))
+        // get the image from the cache.
+        try {
+            IMAGE = this.loadedImageCharacters.get(EngineUtils.getCharacterCacheKey(single.ch[0].id, single.ch[0].mood))
+        } catch(error) {
+            throw new NovelError("Could not get Character of novel. (Normal)")
+        }
         IMAGE.resize({width: 290, fit: sharp.fit.contain})
         // if it is a monologue, since the 'mc' is talking we gray out the ch.
         if (single.txt.speaker == "monologue") IMAGE.grayscale(true)
