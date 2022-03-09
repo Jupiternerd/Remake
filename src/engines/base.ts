@@ -99,6 +99,7 @@ export default class EngineBase extends EventEmitter {
         // If we have to use the skin that the user has set.
         if (capsule.useSkin) {
             skinBuffer = this.user.getSkinOfTomo(capsule.id);
+            // If the user has no skin set we use the default. If they do we use their id.
             skinBuffer = (skinBuffer >= 0 ? skinBuffer : skinBuffer = BASIC.pointers.skin);
         } else skinBuffer = BASIC.pointers.skin;
         // Get the skins frmo the db.
