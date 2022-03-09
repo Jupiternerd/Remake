@@ -25,17 +25,4 @@ export default class NovelCore extends EngineBase {
              ["bg", "ch", "backable", "type"]
             );   
     }
-
-    public async prepareAssets() {
-        
-
-    }
-
-
-
-
-    
-
-
-
 }

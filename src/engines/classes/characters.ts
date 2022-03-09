@@ -1,6 +1,6 @@
 //imp
 
-import { CharacterBasic, CharacterInteractions, CharacterSkins } from "../../types/models/characters";
+import { CharacterBasic, CharacterInteractions, CharacterSkins, TemporaryMoodTypeStrings } from "../../types/models/characters";
 import Queries from "../../utilities/mongodb/queries";
 import UniBase from "./base";
 
@@ -29,8 +29,8 @@ export default class Character extends UniBase{
      * Desc | gets skin from db 
      * @returns characterSkins
      */
-    async setSkinFromDB(id: number = this.id as number) {
-        this.skins = await Queries.character(id, "skins") as CharacterSkins;
+    async getSkinFromDB(id: number = this.id as number) {
+        await Character.getSkinFromDB(id);
     }
 
     /**
@@ -38,8 +38,19 @@ export default class Character extends UniBase{
      * Desc | gets interaction from db
      */
     async setInteractionFromDB(id: number = this.id as number) {
-        this.interactions= await Queries.character(id, "interactions") as CharacterInteractions;
+        await Character.getInteractionFromDB(id);
     }
+    /**
+     * Name | getInteractionFromMood
+     * Desc | gets the interaction variant from mood.
+     * @param id | original id of the tomo.
+     * @param {TemporaryMoodTypeStrings} mood | string mood.
+     * @returns {CharacterInteractions} Interaction
+     */
+     async getInteractionFromMood(id: number = this.id as number, mood: TemporaryMoodTypeStrings): Promise<CharacterInteractions> {
+         return await Character.getInteractionFromMood(id, mood);
+    }
+    
 
     /** Overloads */
 
@@ -57,5 +68,17 @@ export default class Character extends UniBase{
      */
     static async getInteractionFromDB(id: number): Promise<CharacterInteractions> {
         return await Queries.character(id, "interactions") as CharacterInteractions;
+    }
+
+    /**
+     * Name | getInteractionFromMood
+     * Desc | gets the interaction variant from mood.
+     * @param id | original id of the tomo.
+     * @param {TemporaryMoodTypeStrings} mood | string mood.
+     * @returns {CharacterInteractions} Interaction
+     */
+    static async getInteractionFromMood(id: number, mood: TemporaryMoodTypeStrings): Promise<CharacterInteractions> {
+        const VARIANT = await Queries.characterBasicVariant(id, mood) 
+        return await Queries.character(VARIANT.pointers.interaction, "interactions") as CharacterInteractions
     }
 }

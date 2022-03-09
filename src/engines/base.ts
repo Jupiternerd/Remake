@@ -98,17 +98,18 @@ export default class EngineBase extends EventEmitter {
             // return if we already have the id.
             if (this.cachedCharacters.has(capsule.id) && this.loadedImageCharacters.has(KEY)) return;
             // query block.
-            const BASIC = await Queries.character(capsule.id, "basic") as CharacterBasic; // Store basic data for use later.
-            const SKINS = await Queries.character(capsule.useSkin ? this.user.getSkinOfTomo(capsule.id) : BASIC.pointers.interaction, "skins") as CharacterSkins;
-
+            const BASIC: CharacterBasic = await Queries.character(capsule.id, "basic") as CharacterBasic; // Store basic data for use later.
+            const SKINS: CharacterSkins = await Queries.character(capsule.useSkin ? this.user.getSkinOfTomo(capsule.id) : BASIC.pointers.skin, "skins") as CharacterSkins;
+            // Interaction query is a bit tricky.         if the mood is normal (the current basic)                we just get it's interactions               :            we have to go through the character class where it 
+            // fetches us the data from the Query.            
+            const INTERACTION: CharacterInteractions = capsule.mood == "normal" ? await Queries.character(capsule.id, "interactions") as CharacterInteractions : await Character.getInteractionFromMood(capsule.id, capsule.mood);
+            
             // Check if the basic we got is original.             If it is undefined, then we assume its the original.
             if (BASIC.pointers.original != BASIC._id && BASIC.pointers.original != undefined) throw new EngineError("Base", "Pointer for Character is not Original.")
 
             // set the cache.
             this.cachedCharacters.set(capsule.id, 
-                new Character(capsule.id, BASIC, SKINS,
-                    await Queries.character(BASIC.pointers.interaction, "interactions") as CharacterInteractions
-                    )
+                new Character(capsule.id, BASIC, SKINS, INTERACTION)
             )
             // Image cache.
             this.loadedImageCharacters.set(KEY, await loadImage(AssetManagement.convertToPhysicalLink("characters", SKINS.moods[EngineUtils.convertStrToMoodNumber(capsule.mood)])))

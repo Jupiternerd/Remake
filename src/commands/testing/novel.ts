@@ -49,7 +49,7 @@ class Novel extends Commands {
         ]
         const novel = new NovelCore(interaction, multiples)
         novel.on("ready", () => {
-            console.log(novel.loadedImageBackgrounds)
+            console.log(novel.cachedCharacters.get(0).interactions.base.greetings[0])
         })
         interaction.reply("Logged");
     }

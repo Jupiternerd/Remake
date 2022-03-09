@@ -4,6 +4,7 @@ import { basic, FixedLengthArray } from "../local/static";
 export interface CharacterBasic extends basic {
     description: string,
     pointers: {
+        variant?: TemporaryMoodTypeStrings
         original?: number
         skin?: number
         interaction: number

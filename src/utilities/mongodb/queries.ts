@@ -3,7 +3,7 @@
 import { Redis } from "ioredis";
 import { basic } from "../../types/local/static";
 import { BackgroundBasic } from "../../types/models/backgrounds";
-import { CharacterBasic, CharacterInteractions, CharacterSkins } from "../../types/models/characters";
+import { CharacterBasic, CharacterInteractions, CharacterSkins, TemporaryMoodTypeStrings } from "../../types/models/characters";
 import { Item } from "../../types/models/items";
 import { StatisticsUser, UniverseUser } from "../../types/models/users";
 import { UniBaseNotFoundError, UserNotFoundError } from "../errors/errors";
@@ -57,6 +57,34 @@ export default class Queries {
             // send back the payload.
             return payload;
         }
+    }
+
+    public static async characterBasicVariant(originalId: number, mood: TemporaryMoodTypeStrings) {
+        let payload: CharacterBasic, cache: string, redis: Redis = Square.memory(), key: string = `chv_${originalId.toString()}`
+
+        // try and see if we can get the cache, if not we can just get the data from mongodb it self.
+        try {
+            cache = await redis.get(key)
+            if (cache) {
+                //parse it.
+                payload = JSON.parse(cache) as CharacterBasic;
+                return payload;
+            }
+
+            payload = await Mango.DB_CHARACTERS.collection<CharacterBasic>("basic").findOne({'pointers.original': originalId, 'pointers.variant': mood})
+            if (!payload) throw new UniBaseNotFoundError(originalId, "variant")
+
+            //store in redis.
+            redis.set(key, JSON.stringify(payload))
+            redis.expire(key, EXPIRATION)
+
+        } catch(error) {
+            console.error(error);
+        } finally {
+            // send back the payload.
+            return payload;
+        }
+
     }
 
     /**
