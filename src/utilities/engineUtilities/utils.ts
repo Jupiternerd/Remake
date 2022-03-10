@@ -70,7 +70,7 @@ export class EngineUtils {
      * @param str | string you want to convert to int.
      * @returns Temporary Mood State that is in int format.
      */
-    public static convertStrToMoodNumber(str: TemporaryMoodTypeStrings) {
+    public static convertStrToMoodNumber(str: TemporaryMoodTypeStrings): number {
         return TemporaryMoodType[str] as number;
     }
 
@@ -80,7 +80,7 @@ export class EngineUtils {
      * @param int | int that you want to convert to string.
      * @returns Temporary Mood State that is in str format.
      */
-    public static convertNumberToMoodStr(int: number) {
+    public static convertNumberToMoodStr(int: number): TemporaryMoodTypeStrings {
         if (int > Object.keys(TemporaryMoodType).length / 2) return; // Since int is larger than the enums.
         return TemporaryMoodType[int] as TemporaryMoodTypeStrings;
     }
@@ -92,8 +92,8 @@ export class EngineUtils {
      * @param mood | mood that you want to retrieve @default normal
      * @returns {string} of key.
      */
-    public static getCharacterCacheKey(id: number, mood: TemporaryMoodTypeStrings) {
-        return `${id}_${mood}`
+    public static getCharacterCacheKey(id: number, mood: TemporaryMoodTypeStrings): string {
+        return `${id}_${mood}`;
     }
 
     /**
@@ -103,7 +103,7 @@ export class EngineUtils {
      * @param bool | if you want the blurred version or not.
      * @returns {string} of key.
      */
-     public static getBackgroundCacheKey(id: number, bool: boolean = false) {
-        return `${id}_${bool}`
+     public static getBackgroundCacheKey(id: number, bool: boolean = false): string {
+        return `${id}_${bool}`;
     }
 }

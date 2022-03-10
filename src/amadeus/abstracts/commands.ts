@@ -79,6 +79,7 @@ export default abstract class Commands {
             return false;
         };
 
+        // Main server check.
         if (this.mainOnly) {
             interaction.reply("This command does not work here.")
         }
