@@ -96,10 +96,10 @@ export default class NovelCore extends EngineBase {
             // Define constant variables for use later.
             const POSITIONX: Array<number> = [30, 390], POSITIONY: number = 130;
             // For compositing images.
-            let IMGARR: Array<Sharp> = []
+            let IMGARR: Array<{input: Buffer, left: number, top: number}> = []
 
             // Loop block. Resize, grayscale.
-            for (let i = 0; i < 2;) {
+            for (let i = 0; i < 2; i++) {
                 // load the image.
                 try {
                     // get the image from the cache.
@@ -112,12 +112,14 @@ export default class NovelCore extends EngineBase {
                 // Grayscale the image if the character image is not the one talking.
                 if (single.txt.speaker != i) IMAGE.grayscale(true); else IMAGE.grayscale(false);
                 // Push the image into the composite array.
-                IMGARR.push(IMAGE)
-                i++;
+                IMGARR.push({
+                    input: await IMAGE.toBuffer(),
+                    left: POSITIONX[i],
+                    top: POSITIONY
+                })
             }
-
             // Final output block.                           
-            CANVAS.composite([{ input: await IMGARR[0].toBuffer(), left: POSITIONX[0], top: POSITIONY}, { input: await IMGARR[1].toBuffer(), left: POSITIONX[1], top: POSITIONY}])
+            CANVAS.composite(IMGARR)
             // Set the built parameter with the Message Attachment.
             // Log end time.
             console.timeEnd("BUILD_" + i);
