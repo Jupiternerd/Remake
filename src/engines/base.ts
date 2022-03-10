@@ -62,6 +62,7 @@ export default class EngineBase extends EventEmitter {
         this.cachedBackgrounds = new Map();
         this.cachedCharacters = new Map();
 
+        // Background Image size
         this.X = settings.x,
         this.Y = settings.y,
 

@@ -13,7 +13,7 @@ import { NovelSingle } from "../../types/models/stories";
  */
 class Novel extends Commands {
     constructor() {
-        super("novel", // name 
+        super("novella", // name 
         "runs novel",
         {
             ownerOnly: true

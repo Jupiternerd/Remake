@@ -40,8 +40,9 @@ export default class NovelCore extends EngineBase {
                 ]
             })
         }
-
     }
+
+    
 
     /**
      * Name | buildSinglet
