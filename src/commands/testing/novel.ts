@@ -202,15 +202,28 @@ class Novel extends Commands {
         },
         {
             "txt": {
-                "content": "12th Node. Rest of the remaining nodes will be to test the speed of loading the nodes. Duet dispaly mode will only be used with Monologue speaker option.",
+                "content": "12th Node. Testing Timed special type. (Nine seconds)",
                 "speaker": "monologue"
             },
+            "type": {
+                "display": "normal",
+                "special": {
+                    "type": "timed",
+                    "wait": 9000
+                }
+            }
         },
         {
             "txt": {
-                "content": "13th Node.",
+                "content": "13th Node. Rest of the remaining nodes will be to test the speed of loading the nodes. Duet dispaly mode will only be used with Monologue speaker option.",
                 "speaker": "monologue"
             },
+            "type": {
+                "display": "normal",
+                "special": {
+                    "type": "normal"
+                }
+            }
         },
         {
             "txt": {

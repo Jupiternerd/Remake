@@ -74,6 +74,15 @@ export default class NovelCore extends EngineBase {
     }
 
     /**
+     * @name _clearMenuActionRows
+     * @description clears the actionrows.
+     */
+    private async _clearMenuActionRows() {
+        // clear everything in the components.
+        if (this.message) await this.interaction.editReply({components: []})
+    }
+
+    /**
      * @name _action
      * @description provides actionRow.
      * @returns MessageActionRow[]
@@ -85,12 +94,12 @@ export default class NovelCore extends EngineBase {
             case "selection":
                 return await this._selectInteractRow();
             case "timed":
-                return;
+                await this._timedInteract()
+                return [];
             default:
                 return await this._normalInteractRow();
         }
     }
-
     /**
      * @name start
      * @description starts the cog, sets the page and create collecctors.
@@ -157,7 +166,7 @@ export default class NovelCore extends EngineBase {
         let single = this.multiples[i] as NovelSingle, IMAGE: Sharp, CANVAS: Sharp, iC: number = 0;
 
         // Set custom novel id.
-        const CUSTOM_ID = "NOVEL" + "_" + single.i + "_" + single.type.display.toUpperCase() + "_"+ "_USERID_" + this.interaction.user.id + "." + "webp", QUALITY = {quality: 55} // file name.
+        const CUSTOM_ID = "NOVEL" + "_" + single.i + "_" + single.type.display.toUpperCase() + "_"+ "_USERID_" + this.interaction.user.id + "." + "webp", QUALITY = {quality: 55, alphaQuality: 80} // file name.
 
         // redundant filters. So we don't waste power on drawing the same image.
         const SIMILAR_NODE: NovelSingle = this.multiples.find((node: NovelSingle) => 
@@ -184,7 +193,7 @@ export default class NovelCore extends EngineBase {
         }
         // Since this is a wallpaper display, it only will show the background.
         if (single.type.display === "wallpaper") {
-            console.log("wallpaper")
+            //console.log("wallpaper")
             // set the property to show that it is built and attach the MessageAttachment.
             //console.timeEnd("BUILD_" + i);
             // return built image.
@@ -192,7 +201,7 @@ export default class NovelCore extends EngineBase {
         }
         // duet display.
         if (single.type.display === "duet") {
-            console.log("duet")
+            //console.log("duet")
             // edge cases.
             if (single.ch.length != 2) throw new NovelError("Duet characters more than two in array.")
             // Define constant variables for use later.
@@ -229,7 +238,7 @@ export default class NovelCore extends EngineBase {
         }
 
         // Finally the default normal display.
-        console.log("normal")
+        //console.log("normal")
         // get the image from the cache.
         try {
             // Since ic will always be 0, we don't have to just put in 0.
@@ -421,11 +430,16 @@ export default class NovelCore extends EngineBase {
 
     /**
      * @name _timedInteract
-     * @description functino that gets caled when the interaction gets called.
+     * @description functiom that gets caled when the interaction gets called.
      * @param button number that got passed.
      */
     private async _timedInteract(button?: number): Promise<void> {
-
+        // clear all the things in the action rows.
+        await this._clearMenuActionRows();
+        // Get the timeout.
+        const TIMEOUT: number = this.multiples[this.index].type?.special?.wait || 5000;
+        // wait out the timeout. Then call the setPage.
+        setTimeout(async () => await this.setPage(this.index + 1), TIMEOUT)
     }
 
     /**
