@@ -1,10 +1,11 @@
 //imports
 
-import { ButtonInteraction, CollectorFilter, CommandInteraction, Interaction, InteractionCollector, InteractionType, Message, MessageActionRow, MessageAttachment, MessageButton, MessageButtonOptions, MessageComponentInteraction, MessageComponentType, SelectMenuInteraction, WebhookEditMessageOptions } from "discord.js";
+import { SelectMenuOption } from "@discordjs/builders";
+import { ButtonInteraction, CollectorFilter, CommandInteraction, Interaction, InteractionCollector, InteractionType, Message, MessageActionRow, MessageAttachment, MessageButton, MessageButtonOptions, MessageComponentInteraction, MessageComponentType, MessageSelectMenu, MessageSelectMenuOptions, SelectMenuInteraction, WebhookEditMessageOptions } from "discord.js";
 import { MessageButtonStyles } from "discord.js/typings/enums";
 import sharp, { Sharp } from "sharp";
-import { NovelSingle } from "../../types/models/stories";
-import { EngineUtils } from "../../utilities/engineUtilities/utils";
+import { NovelScript, NovelSingle } from "../../types/models/stories";
+import { EngineUtils, StringUtils } from "../../utilities/engineUtilities/utils";
 import { NovelError } from "../../utilities/errors/errors";
 import EngineBase from "../base";
 import Character from "../classes/characters";
@@ -26,6 +27,8 @@ export default class NovelCore extends EngineBase {
     // index for keeping track of our location in the multipes.
     public index: number = 0;
     declare multiples: Array<NovelSingle>
+    // internal tracker for selection.
+    protected selection: number
     public constructor(
         interaction: CommandInteraction,
         multiples: Array<NovelSingle>,
@@ -47,37 +50,39 @@ export default class NovelCore extends EngineBase {
      * 
      */
     public async prepareSlides() {
-        
         // built the slides.
-        for (let SINGLES of this.multiples as Array<NovelSingle>) {
-            console.log(SINGLES.i)
-            SINGLES.built = await this._buildSinglet(SINGLES.i)
-        }
+        for (let SINGLES of this.multiples as Array<NovelSingle>) SINGLES.built = await this._buildSinglet(SINGLES.i);
         // set ready.
         this.ready()
     }
 
     private _characterSpeakString(): string {
         // Get the current slide.
-        const CURRENT: NovelSingle = this.multiples[this.index];
+        const CURRENT: NovelSingle = this.multiples[this.index], SANITIZED_CONTENT: string = StringUtils.periodTheString(CURRENT.txt.content)
         // Edge case.
-        if (CURRENT.txt.speaker == "monologue") return CURRENT.txt.content;
+        if (CURRENT.txt.speaker == "monologue") return `>>> ${SANITIZED_CONTENT}`;
+        if (CURRENT.txt.speaker == "user") return `>>> You • ${SANITIZED_CONTENT}`
         // Get the character from our cache.
         const CHARACTER: Character = this.cachedCharacters.get(CURRENT.ch[CURRENT.txt.speaker].id);
         // format and return the string.
-        return `>>> ${CHARACTER.basic.emoji} ${CHARACTER.basic.name} • ` + CURRENT.txt.content;
+        return `>>> ${CHARACTER.basic.emoji} ${CHARACTER.basic.name} • ` + SANITIZED_CONTENT;
     }
 
+    /**
+     * @name _action
+     * @description provides actionRow.
+     * @returns MessageActionRow[]
+     */
     private async _action(): Promise<MessageActionRow[]> {
         switch(this.multiples[this.index].type.special?.type) {
             case "normal":
-                return await this._normalInteractButtons();
+                return await this._normalInteractRow();
             case "selection":
-                return;
+                return await this._selectInteractRow();
             case "timed":
                 return;
             default:
-                return await this._normalInteractButtons();
+                return await this._normalInteractRow();
         }
     }
     public async start() {
@@ -89,16 +94,29 @@ export default class NovelCore extends EngineBase {
             this._collectButton();
         }
         
-        if (!this.selectCollector) this._createCollector("SELECT_MENU");
+        if (!this.selectCollector) {
+            this.selectCollector = this._createCollector("SELECT_MENU") as InteractionCollector<SelectMenuInteraction>
+            this._collectSelect();
+        }
 
     }
-    public async setPage(to: number = this.index) {
+    /**
+     * @name setPage
+     * @description sets the page to the to parameter.
+     * @param to index you want to travel to.
+     * @returns void
+     */
+    public async setPage(to: number) {
         // Edge cases.
         if (to < 0 || to > this.multiples.length - 1) return;
         // call function to declare that the page is changing
         this.pageChange(this.multiples[to])
         // set this as new index.
         this.index = to;
+        console.log(this.index + "Page changed")
+
+        //console.log(this.multiples[this.index].type.special)
+
         // configure the payload.
         const payload: WebhookEditMessageOptions = {
             files: [ this.multiples[this.index].built ? 
@@ -107,10 +125,13 @@ export default class NovelCore extends EngineBase {
             attachments: [],
             components: await this._action(),
         }
+        // incase the interaction is replied, we then just edit the reply.
         if (this.interaction.replied) await this.interaction.editReply(payload);
+        // if its not replied we repl.
         else this.interaction.reply(payload)
-
+        // prevent overflow error.
         if (to == this.multiples.length - 1) return this.end();
+        // since user has shown activity, we refresh CD.
         this.refreshCoolDown()
     }
 
@@ -121,11 +142,12 @@ export default class NovelCore extends EngineBase {
      */
     private async _buildSinglet(i: number = 0): Promise<MessageAttachment> {
         // timer
-        console.time("BUILD_" + i);
+        //console.time("BUILD_" + i);
 
         // variables.
         let single = this.multiples[i] as NovelSingle, IMAGE: Sharp, CANVAS: Sharp, iC: number = 0;
-        console.log(single.txt)
+
+        // Set custom novel id.
         const CUSTOM_ID = "NOVEL" + "_" + single.i + "_" + single.type.display.toUpperCase() + "_"+ "_USERID_" + this.interaction.user.id + "." + "webp", QUALITY = {quality: 65} // file name.
 
         // redundant filters. So we don't waste power on drawing the same image.
@@ -139,8 +161,8 @@ export default class NovelCore extends EngineBase {
         // if we do find one.
         if (SIMILAR_NODE) {
             single.built = SIMILAR_NODE.built;
-            console.log("Found Similar Node");
-            console.timeEnd("BUILD_" + i);
+            //console.log("Found Similar Node");
+            //console.timeEnd("BUILD_" + i);
             return single.built;
         }
         // try to get bg.
@@ -155,7 +177,7 @@ export default class NovelCore extends EngineBase {
         if (single.type.display === "wallpaper") {
             console.log("wallpaper")
             // set the property to show that it is built and attach the MessageAttachment.
-            console.timeEnd("BUILD_" + i);
+            //console.timeEnd("BUILD_" + i);
             // return built image.
             return new MessageAttachment(await CANVAS.webp(QUALITY).toBuffer(), CUSTOM_ID);
         }
@@ -180,7 +202,6 @@ export default class NovelCore extends EngineBase {
                 }
                 // Resize Image.
                 IMAGE.resize({width: 270, fit: sharp.fit.contain})
-                console.log(single.txt.speaker + "INDEX AT" + i)
                 // Grayscale the image if the character image is not the one talking.
                 if (single.txt.speaker == iC) IMAGE.grayscale(false); else IMAGE.grayscale(true);
                 // Push the image into the composite array.
@@ -193,7 +214,7 @@ export default class NovelCore extends EngineBase {
             // Final output block.                           
             CANVAS.composite(IMGARR)
             // Log end time.
-            console.timeEnd("BUILD_" + i);
+            //console.timeEnd("BUILD_" + i);
             // return
             return new MessageAttachment(await CANVAS.webp(QUALITY).toBuffer(), CUSTOM_ID);
         }
@@ -209,11 +230,11 @@ export default class NovelCore extends EngineBase {
         }
         IMAGE.resize({width: 290, fit: sharp.fit.contain})
         // if it is a monologue, since the 'mc' is talking we gray out the ch.
-        if (single.txt.speaker == "monologue") IMAGE.grayscale(true); else IMAGE.grayscale(false);
+        if (single.txt.speaker == "monologue" || single.txt.speaker == "user") IMAGE.grayscale(true); else IMAGE.grayscale(false);
         // overlay the image ontop of the background. 
         CANVAS.composite([{input: await IMAGE.toBuffer(), gravity: sharp.gravity.south}]) // Gravity to south so there is no space in the bottom.
         // complete the timer.
-        console.timeEnd("BUILD_" + i);
+        //console.timeEnd("BUILD_" + i);
         // return the attachment.
         return new MessageAttachment(await CANVAS.webp(QUALITY).toBuffer(), CUSTOM_ID);
     }
@@ -250,46 +271,64 @@ export default class NovelCore extends EngineBase {
      * @description | collects the button component and processes the request.
      */
     private async _collectButton(): Promise<void> {
-        // Get current index.
-        const CURRENT: NovelSingle = this.multiples[this.index]
-
         // edge cases.
         if (!this.buttonCollector) throw new NovelError("There is no button collector attached to the message. (collectButton)");
 
         // once the collector gets something and makes it through the filter:
         this.buttonCollector.on("collect", (buttonInteraction: ButtonInteraction) => {
+            // Get current index.
+            const CURRENT: NovelSingle = this.multiples[this.index]            
             // Extract button # from the customID.
             const BUTTON = parseInt(buttonInteraction.customId.match(/(\d{1,1})/g)[0]);
-
             // Edge cases.
             if (!CURRENT.type?.hasOwnProperty("special")) return this._normalInteract(BUTTON);
-            
+    
             // Switch case pointing towards the special type respective functions.
             switch(CURRENT.type.special.type) {
                 case "normal": 
+                // normal
                     this._normalInteract(BUTTON);
                     break;
                 case "selection":
+                // select menu
                     this._selectInteract(BUTTON);
                     break;
                 case "timed":
+                // no buttons or select, just time.
                     this._timedInteract(BUTTON);
                     break;
                 default:
+                // normal
                     this._normalInteract(BUTTON);
                     break;
             }
         })
     }
 
+    /**
+     * @name _collectSelect
+     * @description collects the select menu selection.
+     */
+    private async _collectSelect(): Promise<void> {
+        // edge case.
+        if (!this.selectCollector) throw new NovelError("There is no select collector attached to the message. (colelctSelect)");
+        // collection.
+        this.selectCollector.on("collect", async (selectInteraction: SelectMenuInteraction) => {
+            // set this as the selection.
+            this.selection = parseInt(selectInteraction.values[0]);
+            // edit the message to reflect the selection.
+            this.interaction.editReply({components: await this._selectInteractRow()})
+        })
+    }
+
     /** Interaction type functions (normal, timed, selection) */
 
     /**
-     * @name _normalInteractButtons
+     * @name _normalInteractRow
      * @description capsulizes normal buttons to be used in components.
      * @returns {Array<MessageActionRow>} Array of message action row.
      */
-    private async _normalInteractButtons(): Promise<Array<MessageActionRow>> {
+    private async _normalInteractRow(): Promise<Array<MessageActionRow>> {
         // define return and iterator.
         let ret: Array<MessageActionRow> = [];
         // buttonRow.
@@ -320,6 +359,43 @@ export default class NovelCore extends EngineBase {
         return ret;
     }
 
+    /**
+     * @name _selectInteractRow
+     * @description Provides select menu and buttons.
+     * @returns {Array<MessageActionRow>} Messagae action rows
+     */
+    private async _selectInteractRow(): Promise<Array<MessageActionRow>> {
+        // Define 
+        let row: Array<MessageActionRow> = [], BUTTONROW = new MessageActionRow(), SELECTROW = new MessageActionRow()
+        // Button
+        const BUTTON: MessageButtonOptions = 
+            {
+                customId: "NOVEL.button_" + "2" + "_user_" + this.interaction.user.id,
+                label: "Confirm",
+                style: MessageButtonStyles.SUCCESS
+            },
+        // Select Menu
+        SELECT_MENU: MessageSelectMenuOptions = {
+            // If this single has it's own default place holder. If not provide our own.
+            // Also if there is a selection we will put the selection as the label.
+            placeholder: this.selection == undefined ? (this.multiples[this.index].type.special.default ? this.multiples[this.index].type.special.default : "Select an option") : this.multiples[this.index].type.special.choices[this.selection].label,
+            customId: "NOVEL.select_" + "0" + "_user_" + this.interaction.user.id,
+            options: this.multiples[this.index].type.special.choices
+        }
+        // Add the components to their respective rows.
+        BUTTONROW.addComponents(new MessageButton(BUTTON))
+        SELECTROW.addComponents(new MessageSelectMenu(SELECT_MENU))
+        // Push all the rows into the array to send back.
+        row.push(SELECTROW, BUTTONROW)
+        // Return.
+        return row;
+    }
+
+    /**
+     * @name _normalInteract
+     * @description function that gets called when interaction gets called.
+     * @param button number that got passed to the bot.
+     */
     private async _normalInteract(button?: number): Promise<void> {
         switch(button) {
             // This is the back button.
@@ -332,18 +408,50 @@ export default class NovelCore extends EngineBase {
                 break;
             default:
                 break;
-
         }
-
     }
 
+    /**
+     * @name _timedInteract
+     * @description functino that gets caled when the interaction gets called.
+     * @param button number that got passed.
+     */
     private async _timedInteract(button?: number): Promise<void> {
 
     }
 
-    private async _selectInteract(button?: number): Promise<void> {
-
+    /**
+     * @name _selectInteract
+     * @description functino that gets caled when the interaction gets called.
+     * @param button number that got passed.
+     */
+    private async _selectInteract(BUTTON?: number): Promise<void> {
+        // If the user has made a choice and the button is equal to the state we set at the begining (confirm button)
+        if (BUTTON == 2 && this.selection != undefined) { // User has confirmed their selection.
+            // Get the route (script or index) of the selected option.
+            const ROUTE = this.multiples[this.index].type.special.choices[this.selection].route;
+            // If the route is a number, we assume they want to travel to that index in the novel.
+            if (typeof ROUTE == "number") return await this.setPage(ROUTE);
+            // If the route is a script (string), we leave the parseScript function to handle it.
+            return await this._parseScript(ROUTE);
+        }
     }
 
+    /** Utility Methods */
+
+    /**
+     * @name _parseScript
+     * @description parses the novel script and points it to.
+     * @param {NovelScript} script the script you want to parse.
+     * @returns void
+     */
+    private async _parseScript(script: NovelScript) {
+        switch (script) {
+            // If the script says to go back.
+            case "back": return await this.setPage(this.index - 1);
+            // forward.
+            case "next": return await this.setPage(this.index + 1);
+        }
+    }
 
 }

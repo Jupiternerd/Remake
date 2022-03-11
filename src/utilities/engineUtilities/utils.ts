@@ -49,7 +49,7 @@ export class StringUtils {
      * @param string you want to capitalize
      * @returns string 
      */
-    static async capitalizeFirstLetter(string: string): Promise<string> {
+    static capitalizeFirstLetter(string: string): string {
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
     
@@ -59,7 +59,7 @@ export class StringUtils {
      * @param string you want to period.
      * @returns string
      */
-    static async periodTheString(string: string): Promise<string> {
+    static periodTheString(string: string): string {
         return (string.endsWith('.') && !string.endsWith("?" || "!") ? string : string + '.');
     }
 }

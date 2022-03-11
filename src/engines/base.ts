@@ -171,14 +171,14 @@ export default class EngineBase extends EventEmitter {
 
         // loop
         for (singlet of this.multiples) {
+            // index is optional but will be required later on so we substitute it with the internal iterator.
+            if (singlet.i == undefined) singlet.i = i;
+            
             // loop variables.
             let indexSwap: number = (i > 0 ? i - 1 : 0), swappedMultiple: BaseSingle = this.multiples[indexSwap];
 
             // if there are any undefined variables, we replace them with the ones from before.
             for (const property of this.requiredKeyPositions) if (!singlet.hasOwnProperty(property)) singlet[property] = swappedMultiple[property];
-
-            // index is optional but will be required later on so we substitute it with the internal iterator.
-            if (singlet.i == undefined) singlet.i = i;
 
             // since there is only one bg we can just give the handler just that.
             await this.injectBackground(singlet.bg)

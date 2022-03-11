@@ -1,5 +1,5 @@
-import { APIButtonComponent, APIButtonComponentWithCustomId } from "discord-api-types";
-import { MessageAttachment, MessageSelectMenuOptions } from "discord.js";
+import { MessageAttachment, MessageButtonOptions, MessageSelectMenuOptions, MessageSelectOption, MessageSelectOptionData } from "discord.js";
+import { RawMessageSelectMenuInteractionData } from "discord.js/typings/rawDataTypes";
 import { basic } from "../local/static";
 import { TemporaryMoodTypeStrings } from "./characters";
 
@@ -23,9 +23,15 @@ export interface BaseSingle {
     ch?: Array<CharacterCapsule>
 }
 
+export type NovelScript = "next" | "back";
+
+export interface SelectMenuChoices extends MessageSelectOptionData {
+    route: number | NovelScript
+}
+
 export interface NovelSingle extends BaseSingle {
     txt?: {
-        speaker: number | "monologue"
+        speaker: number | "monologue" | "user"
         content: string
     }
     type?: {
@@ -33,9 +39,8 @@ export interface NovelSingle extends BaseSingle {
         special?: {
             type?: SpecialTypes
             wait?: number,
-            choices?: Array<MessageSelectMenuOptions>
-            default?: string,
-            button?: APIButtonComponentWithCustomId
+            choices?: Array<SelectMenuChoices>
+            default?: string
         }
     }
     built?: MessageAttachment
