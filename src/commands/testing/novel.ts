@@ -208,25 +208,25 @@ class Novel extends Commands {
         },
         {
             "txt": {
-                "content": "13th Node. Rest of the remaining nodes will be to test the speed of loading the nodes. Duet dispaly mode will only be used with Monologue speaker option.",
+                "content": "13th Node.",
                 "speaker": "monologue"
             },
         },
         {
             "txt": {
-                "content": "14th Node. Rest of the remaining nodes will be to test the speed of loading the nodes. Duet dispaly mode will only be used with Monologue speaker option.",
+                "content": "14th Node.",
                 "speaker": "monologue"
             },
         },
         {
             "txt": {
-                "content": "15th Node. Rest of the remaining nodes will be to test the speed of loading the nodes. Duet dispaly mode will only be used with Monologue speaker option.",
+                "content": "15th Node.",
                 "speaker": "monologue"
             },
         },
         {
             "txt": {
-                "content": "END Node. END",
+                "content": "END Node.",
                 "speaker": "monologue"
             },
         }
