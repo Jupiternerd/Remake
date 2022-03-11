@@ -1,7 +1,5 @@
 //imports
-
-import { SelectMenuOption } from "@discordjs/builders";
-import { ButtonInteraction, CollectorFilter, CommandInteraction, Interaction, InteractionCollector, InteractionType, Message, MessageActionRow, MessageAttachment, MessageButton, MessageButtonOptions, MessageComponentInteraction, MessageComponentType, MessageSelectMenu, MessageSelectMenuOptions, SelectMenuInteraction, WebhookEditMessageOptions } from "discord.js";
+import { ButtonInteraction, CollectorFilter, CommandInteraction, InteractionCollector, Message, MessageActionRow, MessageAttachment, MessageButton, MessageButtonOptions, MessageComponentInteraction, MessageComponentType, MessageSelectMenu, MessageSelectMenuOptions, SelectMenuInteraction, WebhookEditMessageOptions } from "discord.js";
 import { MessageButtonStyles } from "discord.js/typings/enums";
 import sharp, { Sharp } from "sharp";
 import { NovelScript, NovelSingle } from "../../types/models/stories";
@@ -284,7 +282,6 @@ export default class NovelCore extends EngineBase {
     private async _collectButton(): Promise<void> {
         // edge cases.
         if (!this.buttonCollector) throw new NovelError("There is no button collector attached to the message. (collectButton)");
-
         // once the collector gets something and makes it through the filter:
         this.buttonCollector.on("collect", (buttonInteraction: ButtonInteraction) => {
             // Get current index.
