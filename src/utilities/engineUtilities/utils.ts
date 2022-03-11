@@ -1,6 +1,7 @@
 // author = shokkunn
 
 import { TemporaryMoodType, TemporaryMoodTypeStrings } from "../../types/models/characters";
+import { ItemInUser } from "../../types/models/users";
 
 // Constants
 const EMOJI_CONSTANTS = {

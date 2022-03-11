@@ -48,19 +48,17 @@ export default abstract class Commands {
 
     /**
      * @override
-     * Name | execute
-     * Desc | entry point of executing a function.
+     * @Name | execute
+     * @Desc | entry point of executing a function.
      * @param bot custom client of the bot.
      * @param interaction of the slash command.
      */
-    async execute(bot: Custom_Client, interaction: CommandInteraction): Promise<void> {
-        throw new Error("Command not implemented.");
-    }
+    abstract execute(bot: Custom_Client, interaction: CommandInteraction): void;
 
     /**
      * @override
-     * Name | check
-     * Desc | function that checks if the command can be ran with the current interaction or bot config.
+     * @Name | check
+     * @Desc | function that checks if the command can be ran with the current interaction or bot config.
      * @param bot 
      * @param interaction 
      * @returns 
@@ -106,8 +104,8 @@ export default abstract class Commands {
     /** @Helpful Functions */
 
     /**
-     * Name | isUserInCoolDown
-     * Desc | Check if the user is in cooldown.
+     * @Name | isUserInCoolDown
+     * @Desc | Check if the user is in cooldown.
      * @returns {boolean} true if they are in cd, false is not.
      * @param {Interaction} interaction of the command that got invoked.
      */
@@ -118,8 +116,8 @@ export default abstract class Commands {
     }
 
     /**
-     * Name | addUserToCoolDown
-     * Desc | adds user to cooldown.
+     * @Name | addUserToCoolDown
+     * @Desc | adds user to cooldown.
      * @param {Interaction} interaction of the command that got invoked
      * @param {string} command name of the command that you want to set as time outed.
      * @param {int} time in ms

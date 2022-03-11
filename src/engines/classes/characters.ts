@@ -6,14 +6,14 @@ import UniBase from "./base";
 
 // author = shokkunn
 
-export default class Character extends UniBase{
+export default class Character extends UniBase {
     // define
     basic: CharacterBasic
     skins: CharacterSkins
     interactions: CharacterInteractions
     /**
-     * Name | Character
-     * Desc | encapsulates character data in a class.
+     * @Name | Character
+     * @Desc | encapsulates character data in a class.
      * @param skins 
      * @param interactions 
      */
@@ -23,59 +23,76 @@ export default class Character extends UniBase{
         this.skins = skins ? skins : null;
         this.interactions = interactions ? interactions : null;
     }
+
+    /** Getters */
+
+    get giftReactions() {
+        return this.interactions ? this.interactions.gifts : null;
+    }
+
+    get hungerReactions() {
+        return this.interactions?.gifts?.hunger ? this.interactions.gifts.hunger : null;
+    }
+
+    get baseReactions() {
+        return this.interactions?.base ? this.interactions.base : null;
+    }
+
     /**
      * Name | GetSkinFromDB
      * Desc | gets skin from db 
      * @returns characterSkins
      */
-    async getSkinFromDB(id: number = this.id as number) {
+    public async getSkinFromDB(id: number = this._id as number) {
         await Character.getSkinFromDB(id);
     }
     /**
-     * Name | SetInteractionFromDB
-     * Desc | gets interaction from db
+     * @Name | SetInteractionFromDB
+     * @Desc | gets interaction from db
      */
-    async setInteractionFromDB(id: number = this.id as number) {
+    public async setInteractionFromDB(id: number = this._id as number) {
         await Character.getInteractionFromDB(id);
     }
     /**
-     * Name | getInteractionFromMood
-     * Desc | gets the interaction variant from mood.
+     * @Name | getInteractionFromMood
+     * @Desc | gets the interaction variant from mood.
      * @param id | original id of the tomo.
      * @param {TemporaryMoodTypeStrings} mood | string mood.
      * @returns {CharacterInteractions} Interaction
      */
-     async getInteractionFromMood(id: number = this.id as number, mood: TemporaryMoodTypeStrings): Promise<CharacterInteractions> {
+    public async getInteractionFromMood(id: number = this._id as number, mood: TemporaryMoodTypeStrings): Promise<CharacterInteractions> {
          return await Character.getInteractionFromMood(id, mood);
     }
 
     /** Overloads */
 
     /**
-     * Name | SetInteractionFromDB
-     * Desc | gets interaction from db
+     * @Name | SetInteractionFromDB
+     * @Desc | gets interaction from db
      */
-    static async getSkinFromDB(id: number): Promise<CharacterSkins> {
+    public static async getSkinFromDB(id: number): Promise<CharacterSkins> {
         return await Queries.character(id, "skins") as CharacterSkins;
     }
 
     /**
-     * Name | SetInteractionFromDB
-     * Desc | gets interaction from db
+     * @Name | SetInteractionFromDB
+     * @Desc | gets interaction from db
      */
-    static async getInteractionFromDB(id: number): Promise<CharacterInteractions> {
+    public static async getInteractionFromDB(id: number): Promise<CharacterInteractions> {
         return await Queries.character(id, "interactions") as CharacterInteractions;
     }
 
     /**
-     * Name | getInteractionFromMood
-     * Desc | gets the interaction variant from mood.
+     * @Name | getInteractionFromMood
+     * @Desc | gets the interaction variant from mood.
      * @param id | original id of the tomo.
      * @param {TemporaryMoodTypeStrings} mood | string mood.
      * @returns {CharacterInteractions} Interaction
      */
-    static async getInteractionFromMood(id: number, mood: TemporaryMoodTypeStrings): Promise<CharacterInteractions> {
+    public static async getInteractionFromMood(id: number, mood: TemporaryMoodTypeStrings): Promise<CharacterInteractions> {
         const VARIANT = await Queries.characterBasicVariant(id, mood) 
-        return await Queries.character(VARIANT.pointers.interaction, "interactions") as CharacterInteractions
+        return await Queries.character(VARIANT.pointers.interaction, "interactions") as CharacterInteractions;
     }
+
+    /** Novel */
 }

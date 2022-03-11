@@ -26,53 +26,44 @@ class Novel extends Commands {
         const multiples: Array<NovelSingle> = [ 
             {
                 type: {
-                    display: "duet"
+                    display: "duet",
+                    special: {
+                        type: "normal"
+                    }
                 },
-                backable: false,
+                backable: true,
                 bg: {
                     id: 0,
                     blurred: true
                 },
                 ch: [{
                     id: 0,
-                    useSkin: false,
-                    mood: "happy"
+                    mood: "normal"
                 }, {
                     id: 0,
-                    useSkin: false,
                     mood: "happy"
                 }],
                 txt: {
-                    speaker: 1,
-                    content: "Hi!"
+                    speaker: 0,
+                    content: "Oh my god William is SO HOT!!!!!!!!!!!"
                 }
             },
             {
                 type: {
                     display: "duet"
                 },
-                backable: false,
-                ch: [{
-                    id: 0,
-                    useSkin: false,
-                    mood: "happy"
-                }, {
-                    id: 0,
-                    useSkin: false,
-                    mood: "normal"
-                }],
                 txt: {
-                    speaker: 0,
-                    content: "Hi!"
+                    speaker: 1,
+                    content: "OMG IKRR!"
                 }
             }
             
         ]
         const novel = new NovelCore(interaction, multiples)
         novel.once("ready", () => {
-            novel.stageTwo()
+            //console.log(novel.multiples[1].ch)
+            novel.start()
         })
-        interaction.reply("Logged");
     }
 }
 

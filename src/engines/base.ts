@@ -1,8 +1,8 @@
 //imports
-import { CommandInteraction } from "discord.js";
+import { ButtonInteraction, CommandInteraction, InteractionCollector, Message, SelectMenuInteraction } from "discord.js";
 import { EventEmitter } from "events";
-import { CharacterBasic, CharacterInteractions, CharacterSkins, TemporaryMoodType } from "../types/models/characters";
-import { BackgroundCapsule, BaseSingle, CharacterCapsule } from "../types/models/stories";
+import { CharacterBasic, CharacterInteractions, CharacterSkins } from "../types/models/characters";
+import { BackgroundCapsule, BaseSingle, CharacterCapsule, NovelSingle } from "../types/models/stories";
 import { UniverseUser } from "../types/models/users";
 import AssetManagement from "../utilities/assetManagement/assetUtililties";
 import { EngineUtils } from "../utilities/engineUtilities/utils";
@@ -32,8 +32,14 @@ export default class EngineBase extends EventEmitter {
 
     // settings
     public useSkins: boolean = false;
+    public timeout: number;
     public X: number;
     public Y: number;
+
+    // user Interaction objects
+    public buttonCollector: InteractionCollector<ButtonInteraction>;
+    public selectCollector: InteractionCollector<SelectMenuInteraction>
+    public message: Message<boolean>
 
     // iterables
     public multiples: Array<BaseSingle>
@@ -46,8 +52,9 @@ export default class EngineBase extends EventEmitter {
         settings: {
             x: number,
             y: number,
+            timeout: number;
         },
-        multiples: Array<BaseSingle>,
+        multiples: Array<BaseSingle & NovelSingle>,
         keys: Array<string> = ["bg", "ch"]
         ) {
         super();
@@ -62,7 +69,10 @@ export default class EngineBase extends EventEmitter {
         this.cachedBackgrounds = new Map();
         this.cachedCharacters = new Map();
 
-        // Background Image size
+        // settings
+        this.timeout = settings.timeout;
+
+        // background Image size
         this.X = settings.x,
         this.Y = settings.y,
 
@@ -71,21 +81,32 @@ export default class EngineBase extends EventEmitter {
 
     /** Emitters */
     
-    public async ready() {
+    protected ready() {
         this.emit("ready");
     }
 
-    public async pause() {
+    protected timedOut() {
+        this.emit("timedOut");
+    }
+
+    protected pageChange(...args: any) {
+        this.emit("pageChange", ...args)
+    }
+    protected loaded() {
+        this.emit("loaded");
+    }
+
+    protected pause() {
         this.emit("pause");
     }
 
-    public async end() {
+    protected end() {
         this.emit("end")
     }
 
     /**
-     * Name | injectCharacter
-     * Desc | used in and outside the obj, this is to add character caches.
+     * @Name | injectCharacter
+     * @Desc | used in and outside the obj, this is to add character caches.
      * @param {CharacterCapsule[]} ch | Array of character capsules you want to cache inside the engine.
      */
     public async injectCharacter(capsule: CharacterCapsule) {
@@ -119,8 +140,8 @@ export default class EngineBase extends EventEmitter {
         this.loadedImageCharacters.set(KEY, sharp(AssetManagement.convertToPhysicalLink("characters", SKINS.moods[EngineUtils.convertStrToMoodNumber(capsule.mood)])))
     }
     /**
-     * Name | injectBackground
-     * Desc | used in and outside the obj, this is to add bg caches.
+     * @Name | injectBackground
+     * @Desc | used in and outside the obj, this is to add bg caches.
      * @param {BackgroundCapsule} capsule that you want to inject into the engine.
      */
     public async injectBackground(capsule: BackgroundCapsule) {
@@ -139,8 +160,8 @@ export default class EngineBase extends EventEmitter {
         this.loadedImageBackgrounds.set(EngineUtils.getBackgroundCacheKey(capsule.id, capsule.blurred), BGSHARP)
     }
     /**
-     * Name | cacheAssets
-     * Desc | prepare Assets.
+     * @Name | cacheAssets
+     * @Desc | prepare Assets.
      */
     public async cacheAssets() {
         // defining variables.
@@ -150,7 +171,6 @@ export default class EngineBase extends EventEmitter {
 
         // loop
         for (singlet of this.multiples) {
-            console.log(i)
             // loop variables.
             let indexSwap: number = (i > 0 ? i - 1 : 0), swappedMultiple: BaseSingle = this.multiples[indexSwap];
 
@@ -170,7 +190,7 @@ export default class EngineBase extends EventEmitter {
             i++;
         }
         // On next processor tick we declare everything as ready.
-        process.nextTick(async () => await this.ready());
+        process.nextTick(async () => await this.loaded());
     }
     
 }

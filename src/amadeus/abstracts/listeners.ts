@@ -21,9 +21,7 @@ export default abstract class Listener {
      * @param bot | custom client of the bot.
      * @param args ...any
      */
-    async execute(bot: Custom_Client, ...args: any) {
-        throw new Error("Listener not implemented.");
-    }
+    abstract execute(bot: Custom_Client, ...args: any): void;
 
 
 }

@@ -145,6 +145,10 @@ export default class Queries {
         }
     }
 
+    public static async updateUser(id: string, collection: "universe" | "statistics", payload: UniverseUser | StatisticsUser): Promise<void> {
+        Mango.DB_USERS.collection(collection).updateOne({_id: id}, payload);
+    }
+
     public static async item(id: number): Promise<Item> {
          // define variables
          let payload: Item, cache: string, redis: Redis = Square.memory(), key: string = `item_${id.toString()}`

@@ -1,11 +1,13 @@
 //imports
 
-import { CommandInteraction, MessageAttachment } from "discord.js";
+import { ButtonInteraction, CollectorFilter, CommandInteraction, Interaction, InteractionCollector, InteractionType, Message, MessageActionRow, MessageAttachment, MessageButton, MessageButtonOptions, MessageComponentInteraction, MessageComponentType, SelectMenuInteraction, WebhookEditMessageOptions } from "discord.js";
+import { MessageButtonStyles } from "discord.js/typings/enums";
 import sharp, { Sharp } from "sharp";
 import { NovelSingle } from "../../types/models/stories";
 import { EngineUtils } from "../../utilities/engineUtilities/utils";
 import { NovelError } from "../../utilities/errors/errors";
 import EngineBase from "../base";
+import Character from "../classes/characters";
 
 // author = shokkunn
 
@@ -14,7 +16,17 @@ import EngineBase from "../base";
  * Desc | Novel engine.
  */
 export default class NovelCore extends EngineBase {
-    constructor(
+    // filter for every interaction component.
+    protected _filter: CollectorFilter<[unknown]> = async (buttonInteraction: MessageComponentInteraction) => {
+        // defer update.
+        await buttonInteraction.deferUpdate();
+        // we only want to know if the interactor is the same as the user.
+        return buttonInteraction.user.id === this.interaction.user.id;
+    }
+    // index for keeping track of our location in the multipes.
+    public index: number = 0;
+    declare multiples: Array<NovelSingle>
+    public constructor(
         interaction: CommandInteraction,
         multiples: Array<NovelSingle>,
         ) {
@@ -22,47 +34,106 @@ export default class NovelCore extends EngineBase {
             {
                 x: 724,
                 y: 480,
-
+                timeout: 80000
             },
              multiples,
              ["bg", "ch", "backable", "type"]
-            );   
+            );
+        // When all assets have been loaded, run this:
+        this.on("loaded", () => this.prepareSlides())
     }
-
-    public async stageTwo() {
-        for (let SINGLES of this.multiples as Array<NovelSingle>) {
-            //console.log(SINGLES)
-            SINGLES.built = await this.buildSinglet(SINGLES.i)
-            await this.interaction.channel.send({
-                attachments: [],
-                files: [
-                    SINGLES.built
-                ]
-            })
-        }
-    }
-
-
 
     /**
-     * Name | buildSinglet
-     * Desc | Makes the prepared assets of singles into Images.
+     * 
+     */
+    public async prepareSlides() {
+        
+        // built the slides.
+        for (let SINGLES of this.multiples as Array<NovelSingle>) {
+            console.log(SINGLES.i)
+            SINGLES.built = await this._buildSinglet(SINGLES.i)
+        }
+        // set ready.
+        this.ready()
+    }
+
+    private _characterSpeakString(): string {
+        // Get the current slide.
+        const CURRENT: NovelSingle = this.multiples[this.index];
+        // Edge case.
+        if (CURRENT.txt.speaker == "monologue") return CURRENT.txt.content;
+        // Get the character from our cache.
+        const CHARACTER: Character = this.cachedCharacters.get(CURRENT.ch[CURRENT.txt.speaker].id);
+        // format and return the string.
+        return `>>> ${CHARACTER.basic.emoji} ${CHARACTER.basic.name} • ` + CURRENT.txt.content;
+    }
+
+    private async _action(): Promise<MessageActionRow[]> {
+        switch(this.multiples[this.index].type.special?.type) {
+            case "normal":
+                return await this._normalInteractButtons();
+            case "selection":
+                return;
+            case "timed":
+                return;
+            default:
+                return await this._normalInteractButtons();
+        }
+    }
+    public async start() {
+        await this.setPage(0)
+        this.message = await this.interaction.fetchReply() as Message<boolean>;
+
+        if (!this.buttonCollector) {
+            this.buttonCollector = this._createCollector("BUTTON") as InteractionCollector<ButtonInteraction>;
+            this._collectButton();
+        }
+        
+        if (!this.selectCollector) this._createCollector("SELECT_MENU");
+
+    }
+    public async setPage(to: number = this.index) {
+        // Edge cases.
+        if (to < 0 || to > this.multiples.length - 1) return;
+        // call function to declare that the page is changing
+        this.pageChange(this.multiples[to])
+        // set this as new index.
+        this.index = to;
+        // configure the payload.
+        const payload: WebhookEditMessageOptions = {
+            files: [ this.multiples[this.index].built ? 
+            this.multiples[this.index].built : await this._buildSinglet(this.index) ],
+            content: this._characterSpeakString(),
+            attachments: [],
+            components: await this._action(),
+        }
+        if (this.interaction.replied) await this.interaction.editReply(payload);
+        else this.interaction.reply(payload)
+
+        if (to == this.multiples.length - 1) return this.end();
+        this.refreshCoolDown()
+    }
+
+    /**
+     * @Name | buildSinglet
+     * @Desc | Makes the prepared assets of singles into Images.
      * @param i | Index to build.
      */
-    private async buildSinglet(i: number = 0): Promise<MessageAttachment> {
+    private async _buildSinglet(i: number = 0): Promise<MessageAttachment> {
         // timer
         console.time("BUILD_" + i);
 
         // variables.
-        let single = this.multiples[i] as NovelSingle, IMAGE: Sharp, CANVAS: Sharp
-        const CUSTOM_ID = "NOVEL" + "_" + single.i + "_" + single.type.display.toUpperCase() + "_"+ "_USERID_" + this.interaction.user.id + "." + "jpeg"; // file name.
+        let single = this.multiples[i] as NovelSingle, IMAGE: Sharp, CANVAS: Sharp, iC: number = 0;
+        console.log(single.txt)
+        const CUSTOM_ID = "NOVEL" + "_" + single.i + "_" + single.type.display.toUpperCase() + "_"+ "_USERID_" + this.interaction.user.id + "." + "webp", QUALITY = {quality: 65} // file name.
 
         // redundant filters. So we don't waste power on drawing the same image.
         const SIMILAR_NODE: NovelSingle = this.multiples.find((node: NovelSingle) => 
             (node.built != undefined) && // is it built?
             (node.type.display === single.type.display) && // if there are nodes that have the same display type.
             (node.ch === single.ch) && // same characters.
-            (node.txt.speaker === node.txt.speaker) && // same speaker.
+            (node.txt.speaker === single.txt.speaker) && // same speaker.
             (node.bg.id === single.bg.id)) // and same background.
 
         // if we do find one.
@@ -86,7 +157,7 @@ export default class NovelCore extends EngineBase {
             // set the property to show that it is built and attach the MessageAttachment.
             console.timeEnd("BUILD_" + i);
             // return built image.
-            return new MessageAttachment(await CANVAS.toBuffer(), CUSTOM_ID);
+            return new MessageAttachment(await CANVAS.webp(QUALITY).toBuffer(), CUSTOM_ID);
         }
         // duet display.
         if (single.type.display === "duet") {
@@ -99,50 +170,180 @@ export default class NovelCore extends EngineBase {
             let IMGARR: Array<{input: Buffer, left: number, top: number}> = []
 
             // Loop block. Resize, grayscale.
-            for (let i = 0; i < 2; i++) {
+            for (iC = 0; iC < 2; iC++) {
                 // load the image.
                 try {
                     // get the image from the cache.
-                    IMAGE = this.loadedImageCharacters.get(EngineUtils.getCharacterCacheKey(single.ch[i].id, single.ch[i].mood))
+                    IMAGE = this.loadedImageCharacters.get(EngineUtils.getCharacterCacheKey(single.ch[iC].id, single.ch[iC].mood))
                 } catch(error) {
-                    throw new NovelError("Could not get Character of novel.")
+                    throw new NovelError("Could not get Character of novel. (Duet)")
                 }
                 // Resize Image.
                 IMAGE.resize({width: 270, fit: sharp.fit.contain})
+                console.log(single.txt.speaker + "INDEX AT" + i)
                 // Grayscale the image if the character image is not the one talking.
-                if (single.txt.speaker != i) IMAGE.grayscale(true); else IMAGE.grayscale(false);
+                if (single.txt.speaker == iC) IMAGE.grayscale(false); else IMAGE.grayscale(true);
                 // Push the image into the composite array.
                 IMGARR.push({
-                    input: await IMAGE.toBuffer(),
-                    left: POSITIONX[i],
+                    input: await IMAGE.webp(QUALITY).toBuffer(),
+                    left: POSITIONX[iC],
                     top: POSITIONY
                 })
             }
             // Final output block.                           
             CANVAS.composite(IMGARR)
-            // Set the built parameter with the Message Attachment.
             // Log end time.
             console.timeEnd("BUILD_" + i);
             // return
-            return new MessageAttachment(await CANVAS.toBuffer(), CUSTOM_ID);
+            return new MessageAttachment(await CANVAS.webp(QUALITY).toBuffer(), CUSTOM_ID);
         }
 
         // Finally the default normal display.
         console.log("normal")
         // get the image from the cache.
         try {
+            // Since ic will always be 0, we don't have to just put in 0.
             IMAGE = this.loadedImageCharacters.get(EngineUtils.getCharacterCacheKey(single.ch[0].id, single.ch[0].mood))
         } catch(error) {
             throw new NovelError("Could not get Character of novel. (Normal)")
         }
         IMAGE.resize({width: 290, fit: sharp.fit.contain})
         // if it is a monologue, since the 'mc' is talking we gray out the ch.
-        if (single.txt.speaker == "monologue") IMAGE.grayscale(true)
-        // overlay the image ontop of the background.          So there is no space in the bottom.
-        CANVAS.composite([{input: await IMAGE.toBuffer(), gravity: sharp.gravity.south}])
+        if (single.txt.speaker == "monologue") IMAGE.grayscale(true); else IMAGE.grayscale(false);
+        // overlay the image ontop of the background. 
+        CANVAS.composite([{input: await IMAGE.toBuffer(), gravity: sharp.gravity.south}]) // Gravity to south so there is no space in the bottom.
         // complete the timer.
         console.timeEnd("BUILD_" + i);
         // return the attachment.
-        return new MessageAttachment(await CANVAS.toBuffer(), CUSTOM_ID);
+        return new MessageAttachment(await CANVAS.webp(QUALITY).toBuffer(), CUSTOM_ID);
     }
+
+    /** Interaction with User */
+
+    /**
+     * @Name | refreshCoolDown
+     * @Desc | refreshes cool down on the interaction collectors. 
+     * Everytime the user clicks the button so that they don't get timed out.
+     */
+    public refreshCoolDown(): void {
+        // Call the resetTimer function on the collectors.
+        this.buttonCollector ? this.buttonCollector.resetTimer() : null;
+        this.selectCollector ? this.selectCollector.resetTimer() : null;
+    }
+
+    /**
+     * @Name | createCollector
+     * @Desc | creates a collector from desired specs.
+     * @param {MessageComponentType} type the component you want to create.
+     * @param {CollectorFilter} filter function that filters what you want to create.
+     * @returns {InteractionCollector<MessageComponentInteraction | ButtonInteraction | SelectMenuInteraction>} your desired collector.
+     */
+    private _createCollector(type: MessageComponentType, filter: CollectorFilter<[unknown]> = this._filter): InteractionCollector<MessageComponentInteraction | ButtonInteraction | SelectMenuInteraction> {
+        return this.message.createMessageComponentCollector({
+            filter,
+            componentType: type,
+            time: this.timeout // variable set in constructor.
+        })
+    }
+    /**
+     * @name collectButton
+     * @description | collects the button component and processes the request.
+     */
+    private async _collectButton(): Promise<void> {
+        // Get current index.
+        const CURRENT: NovelSingle = this.multiples[this.index]
+
+        // edge cases.
+        if (!this.buttonCollector) throw new NovelError("There is no button collector attached to the message. (collectButton)");
+
+        // once the collector gets something and makes it through the filter:
+        this.buttonCollector.on("collect", (buttonInteraction: ButtonInteraction) => {
+            // Extract button # from the customID.
+            const BUTTON = parseInt(buttonInteraction.customId.match(/(\d{1,1})/g)[0]);
+
+            // Edge cases.
+            if (!CURRENT.type?.hasOwnProperty("special")) return this._normalInteract(BUTTON);
+            
+            // Switch case pointing towards the special type respective functions.
+            switch(CURRENT.type.special.type) {
+                case "normal": 
+                    this._normalInteract(BUTTON);
+                    break;
+                case "selection":
+                    this._selectInteract(BUTTON);
+                    break;
+                case "timed":
+                    this._timedInteract(BUTTON);
+                    break;
+                default:
+                    this._normalInteract(BUTTON);
+                    break;
+            }
+        })
+    }
+
+    /** Interaction type functions (normal, timed, selection) */
+
+    /**
+     * @name _normalInteractButtons
+     * @description capsulizes normal buttons to be used in components.
+     * @returns {Array<MessageActionRow>} Array of message action row.
+     */
+    private async _normalInteractButtons(): Promise<Array<MessageActionRow>> {
+        // define return and iterator.
+        let ret: Array<MessageActionRow> = [];
+        // buttonRow.
+        const BUTTONROW = new MessageActionRow();
+        // define the buttons for the message action row.
+        const BUTTONS: MessageButtonOptions[] = [
+            // Go back button.
+            {
+                customId: "NOVEL.button_" + "0" + "_user_" + this.interaction.user.id,
+                disabled: (this.index > 0 ? false : true) || !(this.multiples[this.index].backable),
+                label: "Back",
+                style: MessageButtonStyles.PRIMARY
+            },
+            // Next Button.
+            {
+                customId: "NOVEL.button_" + "1" + "_user_" + this.interaction.user.id,
+                disabled: (this.index >= this.multiples.length - 1 ? true : false),
+                label: "Next",
+                style: MessageButtonStyles.PRIMARY,
+            },
+            // Exit button. Holding off until I decide what to add.
+        ]
+        // Add the buttons to the button row.
+        for (const button of BUTTONS) BUTTONROW.addComponents(new MessageButton(button))
+        // Finally push the buttonrow to the action row.
+        ret.push(BUTTONROW);
+        // Return.
+        return ret;
+    }
+
+    private async _normalInteract(button?: number): Promise<void> {
+        switch(button) {
+            // This is the back button.
+            case 0:
+                this.setPage(this.index - 1)
+                break;
+            // Next button.
+            case 1:
+                this.setPage(this.index + 1)
+                break;
+            default:
+                break;
+
+        }
+
+    }
+
+    private async _timedInteract(button?: number): Promise<void> {
+
+    }
+
+    private async _selectInteract(button?: number): Promise<void> {
+
+    }
+
+
 }

@@ -1,3 +1,4 @@
+import { APIButtonComponent, APIButtonComponentWithCustomId } from "discord-api-types";
 import { MessageAttachment, MessageSelectMenuOptions } from "discord.js";
 import { basic } from "../local/static";
 import { TemporaryMoodTypeStrings } from "./characters";
@@ -8,7 +9,7 @@ export type SpecialTypes = "selection" | "timed" | "normal";
 export interface CharacterCapsule {
     id: number,
     useSkin?: boolean,
-    mood: TemporaryMoodTypeStrings
+    mood?: TemporaryMoodTypeStrings
 }
 
 export interface BackgroundCapsule {
@@ -33,6 +34,8 @@ export interface NovelSingle extends BaseSingle {
             type?: SpecialTypes
             wait?: number,
             choices?: Array<MessageSelectMenuOptions>
+            default?: string,
+            button?: APIButtonComponentWithCustomId
         }
     }
     built?: MessageAttachment

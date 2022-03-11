@@ -17,7 +17,7 @@ const default_intents: number[] = [
     Intents.FLAGS.GUILD_MEMBERS,
 ]
 
-// Author = Shokkunn
+// author = shokkunn
 
 export default class Custom_Client extends Client {
     // declare variables.
@@ -56,7 +56,7 @@ export default class Custom_Client extends Client {
 
     /**
      * @Name | driveThroughLocalFiles
-     * Description | This function recursively loops through the files in the directory, ignoring folders and spitting back file paths.
+     * @Description | This function recursively loops through the files in the directory, ignoring folders and spitting back file paths.
      * @param {string} path | String that leads to the path.
      * @param {function} callback | Function that is called when a file is found.
      * @param {function} filter | Function that is ran before a callback is passed. Passes the file name. ie: "file.js"
@@ -83,7 +83,7 @@ export default class Custom_Client extends Client {
     
     /**
      * @Name | verifyLocalAssets
-     * Description | This function checks if ./assets exists and has files.
+     * @Description | This function checks if ./assets exists and has files.
      */
     async verifyLocalAssets(): Promise<void> {
         // keep count of how many files are in the directories.
@@ -105,7 +105,7 @@ export default class Custom_Client extends Client {
 
     /**
      * @Name | loadModules
-     * Desc | Loads the command using the driveThroughLocalFiles function, if it is a js file we require it and init it.
+     * @Desc | Loads the command using the driveThroughLocalFiles function, if it is a js file we require it and init it.
      * @param {string} path
      */
     async loadModules(path: string = "./src/commands/") {

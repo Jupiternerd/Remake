@@ -9,11 +9,14 @@ export interface ChInUser extends basic {
     skinToUse: number | null
 }
 
+export interface ItemInUser extends basic {
+    amount: number
+}
 
 
 export interface UniverseUser extends basic {
     inventory: {
-        transferable: Array<Item>
+        transferable: Array<ItemInUser>
         intransferable: {
             bgs: Array<number>
             chs: Array<ChInUser>
