@@ -43,19 +43,26 @@ export default class NovelCore extends EngineBase {
              ["bg", "ch", "backable", "type"]
             );
         // When all assets have been loaded, run this:
-        this.on("loaded", () => this.prepareSlides())
+        this.on("loaded", () => this.prepareNodes())
     }
 
     /**
-     * 
+     * @name prepareNodes
+     * @description loops through the nodes to build them.
+     * @emits ready when it has built everything.
      */
-    public async prepareSlides() {
-        // built the slides.
+    public async prepareNodes() {
+        // built the nodes.
         for (let SINGLES of this.multiples as Array<NovelSingle>) SINGLES.built = await this._buildSinglet(SINGLES.i);
         // set ready.
         this.ready()
     }
 
+    /**
+     * @name _characterSpeakString
+     * @description prettifies the message content to send back to the user.
+     * @returns {string} of message content.
+     */
     private _characterSpeakString(): string {
         // Get the current slide.
         const CURRENT: NovelSingle = this.multiples[this.index], SANITIZED_CONTENT: string = StringUtils.periodTheString(CURRENT.txt.content)
@@ -85,20 +92,28 @@ export default class NovelCore extends EngineBase {
                 return await this._normalInteractRow();
         }
     }
+
+    /**
+     * @name start
+     * @description starts the cog, sets the page and create collecctors.
+     */
     public async start() {
         await this.setPage(0)
         this.message = await this.interaction.fetchReply() as Message<boolean>;
-
+        // if we don't have any button collectors initialized.
         if (!this.buttonCollector) {
+            // create and set that collector.
             this.buttonCollector = this._createCollector("BUTTON") as InteractionCollector<ButtonInteraction>;
+            // listen to it.
             this._collectButton();
         }
-        
+        // if we don't have any select collectors initialized.
         if (!this.selectCollector) {
+            // create that collector.
             this.selectCollector = this._createCollector("SELECT_MENU") as InteractionCollector<SelectMenuInteraction>
+            // listen to it.
             this._collectSelect();
         }
-
     }
     /**
      * @name setPage
@@ -113,10 +128,6 @@ export default class NovelCore extends EngineBase {
         this.pageChange(this.multiples[to])
         // set this as new index.
         this.index = to;
-        console.log(this.index + "Page changed")
-
-        //console.log(this.multiples[this.index].type.special)
-
         // configure the payload.
         const payload: WebhookEditMessageOptions = {
             files: [ this.multiples[this.index].built ? 
@@ -148,7 +159,7 @@ export default class NovelCore extends EngineBase {
         let single = this.multiples[i] as NovelSingle, IMAGE: Sharp, CANVAS: Sharp, iC: number = 0;
 
         // Set custom novel id.
-        const CUSTOM_ID = "NOVEL" + "_" + single.i + "_" + single.type.display.toUpperCase() + "_"+ "_USERID_" + this.interaction.user.id + "." + "webp", QUALITY = {quality: 65} // file name.
+        const CUSTOM_ID = "NOVEL" + "_" + single.i + "_" + single.type.display.toUpperCase() + "_"+ "_USERID_" + this.interaction.user.id + "." + "webp", QUALITY = {quality: 55} // file name.
 
         // redundant filters. So we don't waste power on drawing the same image.
         const SIMILAR_NODE: NovelSingle = this.multiples.find((node: NovelSingle) => 
@@ -423,7 +434,7 @@ export default class NovelCore extends EngineBase {
     /**
      * @name _selectInteract
      * @description functino that gets caled when the interaction gets called.
-     * @param button number that got passed.
+     * @param BUTTON number that got passed.
      */
     private async _selectInteract(BUTTON?: number): Promise<void> {
         // If the user has made a choice and the button is equal to the state we set at the begining (confirm button)
