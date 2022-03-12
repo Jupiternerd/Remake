@@ -2,7 +2,7 @@
 import { ButtonInteraction, CommandInteraction, InteractionCollector, Message, SelectMenuInteraction } from "discord.js";
 import { EventEmitter } from "events";
 import { CharacterBasic, CharacterInteractions, CharacterSkins } from "../types/models/characters";
-import { BackgroundCapsule, BaseSingle, CharacterCapsule, DialogueScript, NovelSingle } from "../types/models/stories";
+import { BackgroundCapsule, BaseSingle, CharacterCapsule, NovelSingle } from "../types/models/stories";
 import { UniverseUser } from "../types/models/users";
 import AssetManagement from "../utilities/assetManagement/assetUtililties";
 import { EngineUtils } from "../utilities/engineUtilities/utils";
