@@ -167,7 +167,7 @@ export default class NovelCore extends EngineBase {
         let single = this.multiples[i] as NovelSingle, IMAGE: Sharp, CANVAS: Sharp, iC: number = 0;
 
         // Set custom novel id.
-        const CUSTOM_ID = "NOVEL" + "_" + single.i + "_" + single.type.display.toUpperCase() + "_"+ "_USERID_" + this.interaction.user.id + "." + "webp", QUALITY = {quality: 55, alphaQuality: 80} // file name.
+        const CUSTOM_ID = "NOVEL" + "_" + single.i + "_" + single.type.display.toUpperCase() + "_"+ "_USERID_" + this.interaction.user.id + "." + "webp", QUALITY = {quality: 30, alphaQuality: 40} // file name.
 
         // redundant filters. So we don't waste power on drawing the same image.
         const SIMILAR_NODE: NovelSingle = this.multiples.find((node: NovelSingle) => 
@@ -452,6 +452,8 @@ export default class NovelCore extends EngineBase {
         if (BUTTON == 2 && this.selection != undefined) { // User has confirmed their selection.
             // Get the route (script or index) of the selected option.
             const ROUTE = this.multiples[this.index].type.special.choices[this.selection].route;
+            // clear the selection.
+            this.selection = undefined;            
             // If the route is a number, we assume they want to travel to that index in the novel.
             if (typeof ROUTE == "number") return await this.setPage(ROUTE);
             // If the route is a script (string), we leave the parseScript function to handle it.
