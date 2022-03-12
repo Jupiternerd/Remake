@@ -96,10 +96,9 @@ export default class Custom_Client extends Client {
                 // count the files in those folders.
                 countArr[i]++;
             });
-            // add one so that it goes from "backgrounds" -> "characters";
+            // add one so that it goes from "backgrounds"o -> "characters";
             i++;
         }
-
         console.info("Backgrounds: " + countArr[0] + "\nCharacters: " + countArr[1] + "\n") // log the output.
     }
 
