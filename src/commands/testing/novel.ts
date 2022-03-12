@@ -154,7 +154,7 @@ class Novel extends Commands {
         },
         {
             "txt": {
-                "content": "Tenth Node. Rest of the remaining nodes will be to test the speed of loading the nodes. Duet dispaly mode will only be used with Monologue speaker option.",
+                "content": "10th Node. Next tests script parsing. Should be a greeting.",
                 "speaker": "monologue"
             },
             "ch": [
@@ -178,21 +178,9 @@ class Novel extends Commands {
         },
         {
             "txt": {
-                "content": "11th Node. Rest of the remaining nodes will be to test the speed of loading the nodes. Duet dispaly mode will only be used with Monologue speaker option.",
-                "speaker": "monologue"
+                "content": "$greetings",
+                "speaker": 0
             },
-            "ch": [
-                {
-                    "id":0,
-                    "mood": "normal",
-                    "useSkin": false
-                },
-                {
-                    "id":0,
-                    "mood": "normal",
-                    "useSkin": false
-                }
-            ],
             "type": {
                 "display": "duet",
                 "special": {
@@ -202,14 +190,14 @@ class Novel extends Commands {
         },
         {
             "txt": {
-                "content": "12th Node. Testing Timed special type. (Nine seconds)",
+                "content": "12th Node. Testing Timed special type. (Five seconds)",
                 "speaker": "monologue"
             },
             "type": {
                 "display": "normal",
                 "special": {
                     "type": "timed",
-                    "wait": 9000
+                    "wait": 5000
                 }
             }
         },

@@ -2,8 +2,8 @@
 import { ButtonInteraction, CollectorFilter, CommandInteraction, InteractionCollector, Message, MessageActionRow, MessageAttachment, MessageButton, MessageButtonOptions, MessageComponentInteraction, MessageComponentType, MessageSelectMenu, MessageSelectMenuOptions, SelectMenuInteraction, WebhookEditMessageOptions } from "discord.js";
 import { MessageButtonStyles } from "discord.js/typings/enums";
 import sharp, { Sharp } from "sharp";
-import { NovelScript, NovelSingle } from "../../types/models/stories";
-import { EngineUtils, StringUtils } from "../../utilities/engineUtilities/utils";
+import { DialogueScript, NovelScript, NovelSingle } from "../../types/models/stories";
+import { EngineUtils, MathUtils, StringUtils } from "../../utilities/engineUtilities/utils";
 import { NovelError } from "../../utilities/errors/errors";
 import EngineBase from "../base";
 import Character from "../classes/characters";
@@ -63,12 +63,13 @@ export default class NovelCore extends EngineBase {
      */
     private _characterSpeakString(): string {
         // Get the current slide.
-        const CURRENT: NovelSingle = this.multiples[this.index], SANITIZED_CONTENT: string = StringUtils.periodTheString(CURRENT.txt.content)
+        const CURRENT: NovelSingle = this.multiples[this.index]
         // Edge case.
-        if (CURRENT.txt.speaker == "monologue") return `>>> ${SANITIZED_CONTENT}`;
-        if (CURRENT.txt.speaker == "user") return `>>> You • ${SANITIZED_CONTENT}`
-        // Get the character from our cache.
-        const CHARACTER: Character = this.cachedCharacters.get(CURRENT.ch[CURRENT.txt.speaker].id);
+        if (CURRENT.txt.speaker == "monologue") return `>>> ${StringUtils.periodTheString(CURRENT.txt.content)}`;
+        if (CURRENT.txt.speaker == "user") return `>>> You • ${StringUtils.periodTheString(CURRENT.txt.content)}`
+        // Parse the script.
+        const CHARACTER: Character = this.cachedCharacters.get(CURRENT.ch[CURRENT.txt.speaker].id),
+        SANITIZED_CONTENT: string = StringUtils.periodTheString(CURRENT.txt.content.startsWith("$") ? this._parseDialogue(CURRENT.txt.content as DialogueScript) : CURRENT.txt.content)
         // format and return the string.
         return `>>> ${CHARACTER.basic.emoji} ${CHARACTER.basic.name} • ` + SANITIZED_CONTENT;
     }
@@ -385,8 +386,7 @@ export default class NovelCore extends EngineBase {
         // Define 
         let row: Array<MessageActionRow> = [], BUTTONROW = new MessageActionRow(), SELECTROW = new MessageActionRow()
         // Button
-        const BUTTON: MessageButtonOptions = 
-            {
+        const BUTTON: MessageButtonOptions = {
                 customId: "NOVEL.button_" + "2" + "_user_" + this.interaction.user.id,
                 label: "Confirm",
                 style: MessageButtonStyles.SUCCESS
@@ -473,6 +473,24 @@ export default class NovelCore extends EngineBase {
             case "back": return await this.setPage(this.index - 1);
             // forward.
             case "next": return await this.setPage(this.index + 1);
+        }
+    }
+    /**
+     * @name _parseDialgue
+     * @description gets a string and character. Then sees if the string is a script. Then 
+     * @param script that you want to parse.
+     * @returns the appropriate response.
+     */
+    private _parseDialogue(script: DialogueScript) {
+        // delete the $ in the begining.
+        script = script.substring(1) as DialogueScript;
+        // get the character to get reference of script.
+        const CHARACTER = this.cachedCharacters.get(this.multiples[this.index].ch[this.multiples[this.index].txt.speaker].id);
+        // switch case to get the dialogue.
+        switch(script) {
+            case "farewells": return CHARACTER.baseReactions.farewells[MathUtils.randIntFromZero(CHARACTER.baseReactions.farewells.length)]
+            case "greetings": return CHARACTER.baseReactions.greetings[MathUtils.randIntFromZero(CHARACTER.baseReactions.greetings.length)]
+            default: return script;
         }
     }
 

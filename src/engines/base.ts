@@ -2,7 +2,7 @@
 import { ButtonInteraction, CommandInteraction, InteractionCollector, Message, SelectMenuInteraction } from "discord.js";
 import { EventEmitter } from "events";
 import { CharacterBasic, CharacterInteractions, CharacterSkins } from "../types/models/characters";
-import { BackgroundCapsule, BaseSingle, CharacterCapsule, NovelSingle } from "../types/models/stories";
+import { BackgroundCapsule, BaseSingle, CharacterCapsule, DialogueScript, NovelSingle } from "../types/models/stories";
 import { UniverseUser } from "../types/models/users";
 import AssetManagement from "../utilities/assetManagement/assetUtililties";
 import { EngineUtils } from "../utilities/engineUtilities/utils";
@@ -173,7 +173,7 @@ export default class EngineBase extends EventEmitter {
         for (singlet of this.multiples) {
             // index is optional but will be required later on so we substitute it with the internal iterator.
             if (singlet.i == undefined) singlet.i = i;
-            
+
             // loop variables.
             let indexSwap: number = (i > 0 ? i - 1 : 0), swappedMultiple: BaseSingle = this.multiples[indexSwap];
 
@@ -190,7 +190,6 @@ export default class EngineBase extends EventEmitter {
             i++;
         }
         // On next processor tick we declare everything as ready.
-        process.nextTick(async () => await this.loaded());
+        process.nextTick(() => this.loaded());
     }
-    
 }

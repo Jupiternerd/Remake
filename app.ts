@@ -5,6 +5,9 @@ import Custom_Client from "./src/amadeus/client/client";
 require("dotenv").config();
 // Author = Shokkunn
 
+// Time log
+require('log-timestamp')
+
 // Initiazlie the client
 new Custom_Client(
     {

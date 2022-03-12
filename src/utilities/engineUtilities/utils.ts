@@ -1,7 +1,9 @@
 // author = shokkunn
 
+import Character from "../../engines/classes/characters";
 import { TemporaryMoodType, TemporaryMoodTypeStrings } from "../../types/models/characters";
-import { ItemInUser } from "../../types/models/users";
+import { DialogueScript } from "../../types/models/stories"
+import { EngineError } from "../errors/errors";
 
 // Constants
 const EMOJI_CONSTANTS = {
@@ -37,7 +39,7 @@ export class MathUtils {
      * Desc | returns a number from 0 to the max.
      * @param max number that's the ceiling.
      */
-    static async randIntFromZero(max: number): Promise<number> {
+    static randIntFromZero(max: number): number {
         return (Math.floor(Math.random() * max))
     }
 }

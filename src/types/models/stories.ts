@@ -1,5 +1,4 @@
-import { MessageAttachment, MessageButtonOptions, MessageSelectMenuOptions, MessageSelectOption, MessageSelectOptionData } from "discord.js";
-import { RawMessageSelectMenuInteractionData } from "discord.js/typings/rawDataTypes";
+import { MessageAttachment, MessageSelectOptionData } from "discord.js";
 import { basic } from "../local/static";
 import { TemporaryMoodTypeStrings } from "./characters";
 
@@ -24,6 +23,7 @@ export interface BaseSingle {
 }
 
 export type NovelScript = "next" | "back";
+export type DialogueScript = "greetings" | "farewells";
 
 export interface SelectMenuChoices extends MessageSelectOptionData {
     route: number | NovelScript
@@ -32,7 +32,7 @@ export interface SelectMenuChoices extends MessageSelectOptionData {
 export interface NovelSingle extends BaseSingle {
     txt?: {
         speaker: number | "monologue" | "user"
-        content: string
+        content: string | DialogueScript
     }
     type?: {
         display?: DisplayTypes
