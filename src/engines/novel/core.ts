@@ -167,7 +167,7 @@ export default class NovelCore extends EngineBase {
         let single = this.multiples[i] as NovelSingle, IMAGE: Sharp, CANVAS: Sharp, iC: number = 0;
 
         // Set custom novel id.
-        const CUSTOM_ID = "NOVEL" + "_" + single.i + "_" + single.type.display.toUpperCase() + "_"+ "_USERID_" + this.interaction.user.id + "." + "webp", QUALITY = {quality: 30, alphaQuality: 40} // file name.
+        const CUSTOM_ID = "NOVEL" + "_" + single.i + "_" + single.type.display.toUpperCase() + "_"+ "_USERID_" + this.interaction.user.id + "." + "webp", QUALITY = {quality: 24, alphaQuality: 40} // file name.
 
         // redundant filters. So we don't waste power on drawing the same image.
         const SIMILAR_NODE: NovelSingle = this.multiples.find((node: NovelSingle) => 
