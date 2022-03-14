@@ -4,6 +4,7 @@ import client from "../../amadeus/client/client";
 import Commands from "../../amadeus/abstracts/commands";
 import NovelCore from "../../engines/novel/core";
 import { NovelSingle } from "../../types/models/stories";
+import sharp from "sharp";
 
 
 // author = Shokkunn
@@ -235,10 +236,16 @@ class Novel extends Commands {
             
         ]
         const novel = new NovelCore(interaction, multiples)
+        console.time("One")
         novel.once("ready", () => {
             //console.log(novel.multiples[1].ch)
+            console.timeEnd("One")
             novel.start()
+            
+            console.log(sharp.concurrency())
         })
+
+        
     }
 }
 
