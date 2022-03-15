@@ -6,10 +6,13 @@ import { Item } from "./items";
 // author = shokkunn
 
 export interface ChInUser extends basic {
-    skinToUse: number | null
+    skinToUse: number | null,
+    bgToUse: number | null,
+    
 }
 
-export interface ItemInUser extends basic {
+export interface ItemInUser {
+    _id: number,
     amount: number
 }
 
@@ -23,8 +26,6 @@ export interface UniverseUser extends basic {
             skins: Array<number>
         }
     }
-
-
 }
 
 export interface StatisticsUser extends basic {

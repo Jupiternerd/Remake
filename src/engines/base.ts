@@ -1,5 +1,5 @@
 //imports
-import { ButtonInteraction, CommandInteraction, InteractionCollector, Message, SelectMenuInteraction } from "discord.js";
+import { ButtonInteraction, CollectorFilter, CommandInteraction, InteractionCollector, Message, MessageAttachment, MessageComponentInteraction, MessageComponentType, SelectMenuInteraction } from "discord.js";
 import { EventEmitter } from "events";
 import { CharacterBasic, CharacterInteractions, CharacterSkins } from "../types/models/characters";
 import { BackgroundCapsule, BaseSingle, CharacterCapsule, NovelSingle } from "../types/models/stories";
@@ -41,6 +41,13 @@ export default class EngineBase extends EventEmitter {
     public selectCollector: InteractionCollector<SelectMenuInteraction>
     public message: Message<boolean>
 
+    // function to filter interaction
+    protected _filter: CollectorFilter<[unknown]> = async (buttonInteraction: MessageComponentInteraction) => {
+        // defer update.
+        await buttonInteraction.deferUpdate();
+        // we only want to know if the interactor is the same as the user.
+        return buttonInteraction.user.id === this.interaction.user.id;
+    }
     // iterables
     public multiples: Array<BaseSingle>
 
@@ -103,7 +110,31 @@ export default class EngineBase extends EventEmitter {
     protected end() {
         this.emit("end")
     }
-
+    /**
+     * @Name | refreshCoolDown
+     * @Desc | refreshes cool down on the interaction collectors. 
+     * Everytime the user clicks the button so that they don't get timed out.
+     */
+    public refreshCoolDown(): void {
+        // Call the resetTimer function on the collectors.
+        this.buttonCollector ? this.buttonCollector.resetTimer() : null;
+        this.selectCollector ? this.selectCollector.resetTimer() : null;
+    }
+    
+    /**
+     * @Name | createCollector
+     * @Desc | creates a collector from desired specs.
+     * @param {MessageComponentType} type the component you want to create.
+     * @param {CollectorFilter} filter function that filters what you want to create.
+     * @returns {InteractionCollector<MessageComponentInteraction | ButtonInteraction | SelectMenuInteraction>} your desired collector.
+     */
+     protected _createCollector(type: MessageComponentType, filter: CollectorFilter<[unknown]> = this._filter): InteractionCollector<MessageComponentInteraction | ButtonInteraction | SelectMenuInteraction> {
+        return this.message.createMessageComponentCollector({
+            filter,
+            componentType: type,
+            time: this.timeout // variable set in constructor.
+        })
+    } 
     /**
      * @Name | injectCharacter
      * @Desc | used in and outside the obj, this is to add character caches.
@@ -178,7 +209,7 @@ export default class EngineBase extends EventEmitter {
             let indexSwap: number = (i > 0 ? i - 1 : 0), swappedMultiple: BaseSingle = this.multiples[indexSwap];
 
             // if there are any undefined variables, we replace them with the ones from before.
-            for (const property of this.requiredKeyPositions) if (!singlet.hasOwnProperty(property)) singlet[property] = swappedMultiple[property];
+            for (const PROPERTY of this.requiredKeyPositions) if (!singlet.hasOwnProperty(PROPERTY)) singlet[PROPERTY] = swappedMultiple[PROPERTY];
 
             // since there is only one bg we can just give the handler just that.
             await this.injectBackground(singlet.bg)

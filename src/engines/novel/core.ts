@@ -1,5 +1,5 @@
 //imports
-import { ButtonInteraction, CollectorFilter, CommandInteraction, InteractionCollector, Message, MessageActionRow, MessageAttachment, MessageButton, MessageButtonOptions, MessageComponentInteraction, MessageComponentType, MessageSelectMenu, MessageSelectMenuOptions, SelectMenuInteraction, WebhookEditMessageOptions } from "discord.js";
+import { ButtonInteraction, CommandInteraction, InteractionCollector, Message, MessageActionRow, MessageAttachment, MessageButton, MessageButtonOptions, MessageSelectMenu, MessageSelectMenuOptions, SelectMenuInteraction, WebhookEditMessageOptions } from "discord.js";
 import { MessageButtonStyles } from "discord.js/typings/enums";
 import sharp, { Sharp } from "sharp";
 import { DialogueScript, NovelScript, NovelSingle } from "../../types/models/stories";
@@ -15,13 +15,6 @@ import Character from "../classes/characters";
  * Desc | Novel engine.
  */
 export default class NovelCore extends EngineBase {
-    // filter for every interaction component.
-    protected _filter: CollectorFilter<[unknown]> = async (buttonInteraction: MessageComponentInteraction) => {
-        // defer update.
-        await buttonInteraction.deferUpdate();
-        // we only want to know if the interactor is the same as the user.
-        return buttonInteraction.user.id === this.interaction.user.id;
-    }
     // index for keeping track of our location in the multipes.
     public index: number = 0;
     declare multiples: Array<NovelSingle>
@@ -41,7 +34,7 @@ export default class NovelCore extends EngineBase {
              ["bg", "ch", "backable", "type"]
             );
         // When all assets have been loaded, run this:
-        this.on("loaded", () => this.prepareNodes())
+        this.once("loaded", async () => this.prepareNodes())
     }
 
     /**
@@ -55,111 +48,12 @@ export default class NovelCore extends EngineBase {
         // set ready.
         this.ready()
     }
-
-    /**
-     * @name _characterSpeakString
-     * @description prettifies the message content to send back to the user.
-     * @returns {string} of message content.
-     */
-    private _characterSpeakString(): string {
-        // Get the current slide.
-        const CURRENT: NovelSingle = this.multiples[this.index]
-        // Edge case.
-        if (CURRENT.txt.speaker == "monologue") return `>>> ${StringUtils.periodTheString(CURRENT.txt.content)}`;
-        if (CURRENT.txt.speaker == "user") return `>>> You • ${StringUtils.periodTheString(CURRENT.txt.content)}`
-        // Parse the script.
-        const CHARACTER: Character = this.cachedCharacters.get(CURRENT.ch[CURRENT.txt.speaker].id),
-        SANITIZED_CONTENT: string = StringUtils.periodTheString(CURRENT.txt.content.startsWith("$") ? this._parseDialogue(CURRENT.txt.content as DialogueScript) : CURRENT.txt.content)
-        // format and return the string.
-        return `>>> ${CHARACTER.basic.emoji} ${CHARACTER.basic.name} • ` + SANITIZED_CONTENT;
-    }
-
-    /**
-     * @name _clearMenuActionRows
-     * @description clears the actionrows.
-     */
-    private async _clearMenuActionRows() {
-        // clear everything in the components.
-        if (this.message) await this.interaction.editReply({components: []})
-    }
-
-    /**
-     * @name _action
-     * @description provides actionRow.
-     * @returns MessageActionRow[]
-     */
-    private async _action(): Promise<MessageActionRow[]> {
-        switch(this.multiples[this.index].type.special?.type) {
-            case "normal":
-                return await this._normalInteractRow();
-            case "selection":
-                return await this._selectInteractRow();
-            case "timed":
-                await this._timedInteract()
-                return [];
-            default:
-                return await this._normalInteractRow();
-        }
-    }
-    /**
-     * @name start
-     * @description starts the cog, sets the page and create collecctors.
-     */
-    public async start() {
-        await this.setPage(0)
-        this.message = await this.interaction.fetchReply() as Message<boolean>;
-        // if we don't have any button collectors initialized.
-        if (!this.buttonCollector) {
-            // create and set that collector.
-            this.buttonCollector = this._createCollector("BUTTON") as InteractionCollector<ButtonInteraction>;
-            // listen to it.
-            this._collectButton();
-        }
-        // if we don't have any select collectors initialized.
-        if (!this.selectCollector) {
-            // create that collector.
-            this.selectCollector = this._createCollector("SELECT_MENU") as InteractionCollector<SelectMenuInteraction>
-            // listen to it.
-            this._collectSelect();
-        }
-    }
-    /**
-     * @name setPage
-     * @description sets the page to the to parameter.
-     * @param to index you want to travel to.
-     * @returns void
-     */
-    public async setPage(to: number) {
-        // Edge cases.
-        if (to < 0 || to > this.multiples.length - 1) return;
-        // call function to declare that the page is changing
-        this.pageChange(this.multiples[to])
-        // set this as new index.
-        this.index = to;
-        // configure the payload.
-        const payload: WebhookEditMessageOptions = {
-            files: [ this.multiples[this.index].built ? 
-            this.multiples[this.index].built : await this._buildSinglet(this.index) ],
-            content: this._characterSpeakString(),
-            attachments: [],
-            components: await this._action(),
-        }
-        // incase the interaction is replied, we then just edit the reply.
-        if (this.interaction.replied) await this.interaction.editReply(payload);
-        // if its not replied we repl.
-        else this.interaction.reply(payload)
-        // prevent overflow error.
-        if (to == this.multiples.length - 1) return this.end();
-        // since user has shown activity, we refresh CD.
-        this.refreshCoolDown()
-    }
-
     /**
      * @Name | buildSinglet
      * @Desc | Makes the prepared assets of singles into Images.
      * @param i | Index to build.
      */
-    private async _buildSinglet(i: number = 0): Promise<MessageAttachment> {
+     protected async _buildSinglet(i: number = 0): Promise<MessageAttachment> {
         // timer
         //console.time("BUILD_" + i);
 
@@ -256,35 +150,107 @@ export default class NovelCore extends EngineBase {
         //console.timeEnd("BUILD_" + i);
         // return the attachment.
         return new MessageAttachment(await CANVAS.webp(QUALITY).toBuffer(), CUSTOM_ID);
+    }  
+
+    /**
+     * @name _characterSpeakString
+     * @description prettifies the message content to send back to the user.
+     * @returns {string} of message content.
+     */
+    private _characterSpeakString(): string {
+        // Get the current slide.
+        const CURRENT: NovelSingle = this.multiples[this.index]
+        // Edge case.
+        if (CURRENT.txt.speaker == "monologue") return `>>> ${StringUtils.periodTheString(CURRENT.txt.content)}`;
+        if (CURRENT.txt.speaker == "user") return `>>> You • ${StringUtils.periodTheString(CURRENT.txt.content)}`
+        // Parse the script.
+        const CHARACTER: Character = this.cachedCharacters.get(CURRENT.ch[CURRENT.txt.speaker].id),
+        SANITIZED_CONTENT: string = StringUtils.periodTheString(CURRENT.txt.content.startsWith("$") ? this._parseDialogue(CURRENT.txt.content as DialogueScript) : CURRENT.txt.content)
+        // format and return the string.
+        return `>>> ${CHARACTER.basic.emoji} ${CHARACTER.basic.name} • ` + SANITIZED_CONTENT;
+    }
+
+    /**
+     * @name _clearMenuActionRows
+     * @description clears the actionrows.
+     */
+    private async _clearMenuActionRows() {
+        // clear everything in the components.
+        if (this.message) await this.interaction.editReply({components: []})
+    }
+
+    /**
+     * @name _action
+     * @description provides actionRow.
+     * @returns MessageActionRow[]
+     */
+    private async _action(): Promise<MessageActionRow[]> {
+        switch(this.multiples[this.index].type.special?.type) {
+            case "normal":
+                return await this._normalInteractRow();
+            case "selection":
+                return await this._selectInteractRow();
+            case "timed":
+                await this._timedInteract()
+                return [];
+            default:
+                return await this._normalInteractRow();
+        }
+    }
+    /**
+     * @name start
+     * @description starts the cog, sets the page and create collecctors.
+     */
+    public async start() {
+        await this.setPage(0)
+        this.message = await this.interaction.fetchReply() as Message<boolean>;
+        // if we don't have any button collectors initialized.
+        if (!this.buttonCollector) {
+            // create and set that collector.
+            this.buttonCollector = this._createCollector("BUTTON") as InteractionCollector<ButtonInteraction>;
+            // listen to it.
+            this._collectButton();
+        }
+        // if we don't have any select collectors initialized.
+        if (!this.selectCollector) {
+            // create that collector.
+            this.selectCollector = this._createCollector("SELECT_MENU") as InteractionCollector<SelectMenuInteraction>
+            // listen to it.
+            this._collectSelect();
+        }
+    }
+    /**
+     * @name setPage
+     * @description sets the page to the to parameter.
+     * @param to index you want to travel to.
+     * @returns void
+     */
+    public async setPage(to: number) {
+        // Edge cases.
+        if (to < 0 || to > this.multiples.length - 1) return;
+        // call function to declare that the page is changing
+        this.pageChange(this.multiples[to])
+        // set this as new index.
+        this.index = to;
+        // configure the payload.
+        const payload: WebhookEditMessageOptions = {
+            files: [ this.multiples[this.index].built ? 
+            this.multiples[this.index].built : await this._buildSinglet(this.index) ],
+            content: this._characterSpeakString(),
+            attachments: [],
+            components: await this._action(),
+        }
+        // incase the interaction is replied, we then just edit the reply.
+        if (this.interaction.replied) await this.interaction.editReply(payload);
+        // if its not replied we repl.
+        else await this.interaction.reply(payload);
+        // prevent overflow error.
+        if (to == this.multiples.length - 1) return this.end();
+        // since user has shown activity, we refresh CD.
+        this.refreshCoolDown()
     }
 
     /** Interaction with User */
-
-    /**
-     * @Name | refreshCoolDown
-     * @Desc | refreshes cool down on the interaction collectors. 
-     * Everytime the user clicks the button so that they don't get timed out.
-     */
-    public refreshCoolDown(): void {
-        // Call the resetTimer function on the collectors.
-        this.buttonCollector ? this.buttonCollector.resetTimer() : null;
-        this.selectCollector ? this.selectCollector.resetTimer() : null;
-    }
-
-    /**
-     * @Name | createCollector
-     * @Desc | creates a collector from desired specs.
-     * @param {MessageComponentType} type the component you want to create.
-     * @param {CollectorFilter} filter function that filters what you want to create.
-     * @returns {InteractionCollector<MessageComponentInteraction | ButtonInteraction | SelectMenuInteraction>} your desired collector.
-     */
-    private _createCollector(type: MessageComponentType, filter: CollectorFilter<[unknown]> = this._filter): InteractionCollector<MessageComponentInteraction | ButtonInteraction | SelectMenuInteraction> {
-        return this.message.createMessageComponentCollector({
-            filter,
-            componentType: type,
-            time: this.timeout // variable set in constructor.
-        })
-    }
     /**
      * @name collectButton
      * @description | collects the button component and processes the request.
