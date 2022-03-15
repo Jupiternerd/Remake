@@ -46,7 +46,7 @@ export default class NovelCore extends EngineBase {
     public async prepareNodes() {
         // built the nodes.
         for (let SINGLES of this.multiples as Array<NovelSingle>) {
-            if (SINGLES.i >= this.LIMIT) return;
+            if (SINGLES.i >= this.LIMIT) throw new NovelError("Multiples limit reached. (prepareNodes)");
             SINGLES.built = await this._buildSinglet(SINGLES.i);
         }
         // set ready.

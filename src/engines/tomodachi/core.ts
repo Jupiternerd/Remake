@@ -5,6 +5,7 @@ import { MessageButtonStyles } from "discord.js/typings/enums";
 import sharp from "sharp";
 import { BaseSingle } from "../../types/models/stories";
 import { EngineUtils } from "../../utilities/engineUtilities/utils";
+import { EngineError, NovelError } from "../../utilities/errors/errors";
 import EngineBase from "../base";
 import NovelCore from "../novel/core";
 
@@ -34,7 +35,7 @@ export default class TomoCore extends EngineBase {
         // set a limit incase it passes us like a lot of singles.
         for (const singlet of this.multiples) {
             // if limit reached, return.
-            if (singlet.i >= this.LIMIT) return;
+            if (singlet.i >= this.LIMIT) throw new EngineError("Tomo", "Limit reached on Tomo multiples. (_prepareNodes)");
             // build.
             singlet.built = await this._buildNode(singlet.i);
         }
@@ -61,15 +62,15 @@ export default class TomoCore extends EngineBase {
         // Returning as Message attachment.
         return new MessageAttachment(await BACKGROUND.webp(QUALITY).toBuffer(), CUSTOM_ID)
     }
-
+    
     private async _action(): Promise<Array<MessageActionRow>> {
         // Define 
-        let row: Array<MessageActionRow> = [], BUTTONROW = new MessageActionRow(), SELECTROW = new MessageActionRow()
+        let row: Array<MessageActionRow> = [], BUTTONROW = new MessageActionRow()//, SELECTROW = new MessageActionRow()
         // Button
         const BUTTONS: MessageButtonOptions[] = [{
                 customId: "TOMO.button_" + "0" + "_user_" + this.interaction.user.id,
                 label: "Info",
-                style: MessageButtonStyles.SECONDARY
+                style: MessageButtonStyles.SUCCESS
             }, {
                 customId: "TOMO.button_" + "1" + "_user_" + this.interaction.user.id,
                 label: "Interact",

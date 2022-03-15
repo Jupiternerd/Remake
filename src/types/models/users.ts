@@ -5,10 +5,15 @@ import { Item } from "./items";
 
 // author = shokkunn
 
+export interface StatsInUser {
+    level: number,
+    exp: number
+}
+
 export interface ChInUser extends basic {
     skinToUse: number | null,
     bgToUse: number | null,
-    
+    stats: StatsInUser
 }
 
 export interface ItemInUser {
