@@ -9,6 +9,9 @@ export interface CharacterBasic extends basic {
         skin?: number
         interaction: number
     }
+    stories: {
+        base: Array<number>
+    }
 }
 export enum TemporaryMoodType {
     normal,
@@ -50,7 +53,7 @@ export interface CharacterSkins extends basic {
 }
 
 export interface CharacterInteractions extends basic {
-    pointer: number
+    pointers: number,
     base: {
         greetings: Array<string>
         farewells: Array<string>
@@ -71,3 +74,4 @@ export interface CharacterInteractions extends basic {
 
     }
 }
+

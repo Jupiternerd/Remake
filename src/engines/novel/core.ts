@@ -17,6 +17,7 @@ import Character from "../classes/characters";
 export default class NovelCore extends EngineBase {
     // index for keeping track of our location in the multipes.
     public index: number = 0;
+    private LIMIT: number = 40;
     declare multiples: Array<NovelSingle>
     // internal tracker for selection.
     protected selection: number
@@ -44,7 +45,10 @@ export default class NovelCore extends EngineBase {
      */
     public async prepareNodes() {
         // built the nodes.
-        for (let SINGLES of this.multiples as Array<NovelSingle>) SINGLES.built = await this._buildSinglet(SINGLES.i);
+        for (let SINGLES of this.multiples as Array<NovelSingle>) {
+            if (SINGLES.i >= this.LIMIT) return;
+            SINGLES.built = await this._buildSinglet(SINGLES.i);
+        }
         // set ready.
         this.ready()
     }

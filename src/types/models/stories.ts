@@ -20,6 +20,7 @@ export interface BaseSingle {
     i?: number;
     bg?: BackgroundCapsule,
     ch?: Array<CharacterCapsule>
+    built?: MessageAttachment
 }
 
 export type NovelScript = "next" | "back";
@@ -43,7 +44,6 @@ export interface NovelSingle extends BaseSingle {
             default?: string
         }
     }
-    built?: MessageAttachment
     backable?: boolean;
 }
 
