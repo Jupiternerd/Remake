@@ -1,6 +1,8 @@
 //imp
 
 import { CharacterBasic, CharacterInteractions, CharacterSkins, TemporaryMoodTypeStrings } from "../../types/models/characters";
+import { Story } from "../../types/models/stories";
+import { MathUtils } from "../../utilities/engineUtilities/utils";
 import Queries from "../../utilities/mongodb/queries";
 import UniBase from "./base";
 
@@ -64,6 +66,26 @@ export default class Character extends UniBase {
          return await Character.getInteractionFromMood(id, mood);
     }
 
+    /**
+     * 
+     * @param id of the character
+     * @param mood mood you want to get
+     * @param type 
+     * @returns 
+     */
+    public async getStoryFromDB(id: number = this._id as number, mood: TemporaryMoodTypeStrings, type: "base" | "interact" | "gift"): Promise<Story> {
+        console.log("AAAAAAAAAAAAAAAAAAAAAAAA")
+        // edge case.
+        if (mood == "current") return;
+        
+        
+        if (mood != "normal" && this.basic.pointers.original == this._id) {
+            const VARIANT = await Queries.characterBasicVariant(id, mood);
+            return Queries.story(VARIANT.stories[type][MathUtils.randIntFromZero(VARIANT.stories[type].length)])
+        }
+        return await Queries.story(this.basic.stories[type][MathUtils.randIntFromZero(this.basic.stories[type].length)])
+    }
+
     /** Overloads */
 
     /**
@@ -93,6 +115,7 @@ export default class Character extends UniBase {
         const VARIANT = await Queries.characterBasicVariant(id, mood) 
         return await Queries.character(VARIANT.pointers.interaction, "interactions") as CharacterInteractions;
     }
+
 
     /** Novel */
 }

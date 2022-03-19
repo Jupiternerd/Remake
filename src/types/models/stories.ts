@@ -54,5 +54,5 @@ export interface NovelSingle extends BaseSingle {
 }
 
 export interface Story extends basic {
-    mutiples: Array<NovelSingle>
+    multiples: Array<NovelSingle>
 }

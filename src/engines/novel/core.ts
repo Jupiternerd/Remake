@@ -270,6 +270,8 @@ export default class NovelCore extends EngineBase {
             const BUTTON = parseInt(buttonInteraction.customId.match(/(\d{1,1})/g)[0]);
             // Edge cases.
             if (!CURRENT.type?.hasOwnProperty("special")) return this._normalInteract(BUTTON);
+            // Emit button pressed event
+            this.emit("buttonEvent", BUTTON, this.index);
     
             // Switch case pointing towards the special type respective functions.
             switch(CURRENT.type.special.type) {
@@ -304,6 +306,8 @@ export default class NovelCore extends EngineBase {
         this.selectCollector.on("collect", async (selectInteraction: SelectMenuInteraction) => {
             // set this as the selection.
             this.selection = parseInt(selectInteraction.values[0]);
+            // emit event.
+            this.emit("selectEvent", this.selection, this.index);
             // edit the message to reflect the selection.
             this.interaction.editReply({components: await this._selectInteractRow()})
         })
@@ -420,6 +424,8 @@ export default class NovelCore extends EngineBase {
     private async _selectInteract(BUTTON?: number): Promise<void> {
         // If the user has made a choice and the button is equal to the state we set at the begining (confirm button)
         if (BUTTON == 2 && this.selection != undefined) { // User has confirmed their selection.
+            // call that the user has made a selection.
+            this.emit("userSelectionConfirmed", this.index, this.selection);          
             // Get the route (script or index) of the selected option.
             const ROUTE = this.multiples[this.index].type.special.choices[this.selection].route;
             // clear the selection.
@@ -464,6 +470,16 @@ export default class NovelCore extends EngineBase {
             case "greetings": return CHARACTER.baseReactions.greetings[MathUtils.randIntFromZero(CHARACTER.baseReactions.greetings.length)]
             default: return script;
         }
+    }
+    
+    /**
+     * @name appendToMultiples
+     * @description appends more novel singles to the array.
+     * @param {NovelSingle} multiple that you want to append to the array.
+     */
+    public async appendToMultiples(multiple: Array<NovelSingle>) {
+        this.multiples.concat(multiple)
+        await this.cacheAssets();
     }
 
 }

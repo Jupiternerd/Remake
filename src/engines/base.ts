@@ -199,7 +199,6 @@ export default class EngineBase extends EventEmitter {
         var i: number = 0, singlet: BaseSingle
         // grab user.
         this.user = new Users(this.interaction.user.id, await Queries.user(this.interaction.user.id, "universe") as UniverseUser);
-
         // loop
         for (singlet of this.multiples) {
             // index is optional but will be required later on so we substitute it with the internal iterator.
