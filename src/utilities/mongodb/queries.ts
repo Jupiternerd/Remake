@@ -5,6 +5,7 @@ import { basic } from "../../types/local/static";
 import { BackgroundBasic } from "../../types/models/backgrounds";
 import { CharacterBasic, CharacterInteractions, CharacterSkins, TemporaryMoodTypeStrings } from "../../types/models/characters";
 import { Item } from "../../types/models/items";
+import { Story } from "../../types/models/stories";
 import { StatisticsUser, UniverseUser } from "../../types/models/users";
 import { UniBaseNotFoundError, UserNotFoundError } from "../errors/errors";
 import Square from "../redis/square";
@@ -177,5 +178,35 @@ export default class Queries {
              // send back the payload.
              return payload;
          }
+    }
+
+    public static async story(id: number): Promise<Story> {
+        // define variables
+        let payload: Story, cache: string, redis: Redis = Square.memory(), key: string = `story_${id.toString()}`
+
+        // try and see if we can get the cache, if not we can just get the data from mongodb it self.
+        try {
+            cache = await redis.get(key);
+            // if there is a cache
+            if (cache) {
+                // parse it.
+                payload = JSON.parse(cache) as Story;
+                return payload; // return it.
+            }
+
+            // if there is no cache.
+            payload = await Mango.DB_STATIC.collection<basic>("multiples").findOne({_id: id}) as Story;
+            if (!payload) throw new UniBaseNotFoundError(id, "multiples")
+
+            // store the payload in redis.
+            redis.set(key, JSON.stringify(payload))
+            redis.expire(key, EXPIRATION)
+
+        } catch(error) {
+            console.error(error);
+        } finally {
+            // send back the payload.
+            return payload;
+        }
     }
 }

@@ -2,7 +2,7 @@
 
 import Character from "../../engines/classes/characters";
 import { TemporaryMoodType, TemporaryMoodTypeStrings } from "../../types/models/characters";
-import { DialogueScript } from "../../types/models/stories"
+import { CapsuleMood, DialogueScript } from "../../types/models/stories"
 import { EngineError } from "../errors/errors";
 
 // Constants

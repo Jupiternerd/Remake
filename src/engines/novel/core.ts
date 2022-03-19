@@ -427,7 +427,7 @@ export default class NovelCore extends EngineBase {
             // If the route is a number, we assume they want to travel to that index in the novel.
             if (typeof ROUTE == "number") return await this.setPage(ROUTE);
             // If the route is a script (string), we leave the parseScript function to handle it.
-            return await this._parseScript(ROUTE);
+            if (typeof ROUTE == "string") return await this._parseScript(ROUTE);
         }
     }
 

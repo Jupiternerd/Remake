@@ -1,13 +1,17 @@
 //imps
 
 import { basic } from "../local/static";
-import { Item } from "./items";
 
 // author = shokkunn
-
+export interface MoodInUser {
+    current: number,
+    meter: number,
+    meterxp: number
+}
 export interface StatsInUser {
     level: number,
-    exp: number
+    xp: number,
+    mood: MoodInUser
 }
 
 export interface ChInUser extends basic {

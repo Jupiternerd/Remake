@@ -46,7 +46,7 @@ export default class TomoCore extends EngineBase {
      */
     private async _buildNode(i: number): Promise<MessageAttachment> {
         // Constant variables.
-        const CURRENT = this.multiples[i],  QUALITY = {quality: 24, alphaQuality: 40}, CUSTOM_ID = "TOMO" + "_" + i + "_" + "_USERID_" + this.interaction.user.id + "." + "webp",
+        const CURRENT = this.multiples[i],  QUALITY: sharp.WebpOptions = {quality: 24, alphaQuality: 40}, CUSTOM_ID = "TOMO" + "_" + i + "_" + "_USERID_" + this.interaction.user.id + "." + "webp",
         // Get background.
         BACKGROUND = this.loadedImageBackgrounds.get(EngineUtils.getBackgroundCacheKey(CURRENT.bg.id, CURRENT.bg.blurred)),
         // Get characer.
@@ -77,7 +77,7 @@ export default class TomoCore extends EngineBase {
                 style: MessageButtonStyles.PRIMARY
             }, {
                 customId: "TOMO.button_" + "2" + "_user_" + this.interaction.user.id,
-                label: "",
+                label: "Danger",
                 style: MessageButtonStyles.SECONDARY
             }]/*,
             

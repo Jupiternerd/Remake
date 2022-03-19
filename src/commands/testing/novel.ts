@@ -5,7 +5,9 @@ import Commands from "../../amadeus/abstracts/commands";
 import NovelCore from "../../engines/novel/core";
 import { NovelSingle } from "../../types/models/stories";
 import sharp from "sharp";
-
+import Square from "../../utilities/redis/square";
+import Mango from "../../utilities/mongodb/mango";
+import Queries from "../../utilities/mongodb/queries";
 
 // author = Shokkunn
 
@@ -235,15 +237,60 @@ class Novel extends Commands {
 
             
         ]
+        const header: Array<NovelSingle> = [
+            {
+                "backable": false,
+                "bg": {
+                    "blurred": false,
+                    "id": 0
+                },
+                "ch": [
+                    {
+                        "id": 0,
+                        "mood": "current",
+                        "useSkin": true
+                    }
+                ],
+                "txt": {
+                    "content": "$greetings",
+                    "speaker": 0
+                },
+                "type": {
+                    "display": "normal",
+                    "special": {
+                        "type": "selection",
+                        "default": "So many choices...",
+                        "choices": [
+                            {
+                            "label": "Gift",
+                            "emoji": "🎁",
+                            "value": "0",
+                            "description": "Gift something."
+                            },
+                            {
+                            "label": "Talk",
+                            "emoji": "💬",
+                            "value": "1",
+                            "description": "Talk about something."
+                            }                            
+                        ]
+                        
+                    }
+                }
+            }
+        ]
+        
+        const stuff = await Queries.story(0)
+        /*
         const novel = new NovelCore(interaction, multiples)
         console.time("One")
         novel.once("ready", () => {
-            //console.log(novel.multiples[1].ch)
             console.timeEnd("One")
             novel.start()
-            
+
             console.log(sharp.concurrency())
-        })
+        })*/
+        console.log(stuff)
 
         
     }

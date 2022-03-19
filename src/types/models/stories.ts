@@ -4,11 +4,13 @@ import { TemporaryMoodTypeStrings } from "./characters";
 
 export type DisplayTypes = "wallpaper" | "duet" | "normal";
 export type SpecialTypes = "selection" | "timed" | "normal";
+export type InteractionTypes = "gift" | "interact";
+export type CapsuleMood = TemporaryMoodTypeStrings | "current"
 
-export interface CharacterCapsule {
+export type CharacterCapsule = {
     id: number,
     useSkin?: boolean,
-    mood?: TemporaryMoodTypeStrings
+    mood?: CapsuleMood
 }
 
 export interface BackgroundCapsule {
@@ -27,7 +29,7 @@ export type NovelScript = "next" | "back";
 export type DialogueScript = "greetings" | "farewells";
 
 export interface SelectMenuChoices extends MessageSelectOptionData {
-    route: number | NovelScript
+    route?: number | NovelScript | Array<number> 
 }
 
 export interface NovelSingle extends BaseSingle {
@@ -38,10 +40,14 @@ export interface NovelSingle extends BaseSingle {
     type?: {
         display?: DisplayTypes
         special?: {
-            type?: SpecialTypes
+            type?: SpecialTypes | InteractionTypes
             wait?: number,
             choices?: Array<SelectMenuChoices>
             default?: string
+        }
+        points?: {
+            subtract?: number,
+            add?: number
         }
     }
     backable?: boolean;

@@ -10,7 +10,9 @@ export interface CharacterBasic extends basic {
         interaction: number
     }
     stories: {
-        base: Array<number>
+        base?: Array<number>
+        interact: Array<number>
+        gift: Array<number>
     }
 }
 export enum TemporaryMoodType {
@@ -21,7 +23,7 @@ export enum TemporaryMoodType {
     flustered,
     hungry
 }
-export type TemporaryMoodTypeStrings = keyof typeof TemporaryMoodType;
+export type TemporaryMoodTypeStrings = keyof typeof TemporaryMoodType | "current";
 
 export enum AdvancementMoodType {
     hate,
