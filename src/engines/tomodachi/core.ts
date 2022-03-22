@@ -119,14 +119,14 @@ export default class TomoCore extends EngineBase {
 
         STORY = await Queries.story(CHARACTER.basic.stories.base[0]);
         
-        //let SELECTED_STORY: Story;
+        let SELECTED_STORY: Story;
 
         this.coreHandler = new NovelCore(this.interaction, STORY.multiples);
 
         this.coreHandler.once("ready", () => {
             this.coreHandler.start();
         })
-        /*
+        
 
         //console.log(EngineUtils.convertNumberToMoodStr(this.chInUser[index].stats.mood.current))
 
@@ -150,7 +150,7 @@ export default class TomoCore extends EngineBase {
             
 
         })
-        */
+        
 
         console.log("_interact")
 
@@ -233,7 +233,7 @@ export default class TomoCore extends EngineBase {
             }, {
                 customId: "TOMO.button_" + "2" + "_user_" + this.interaction.user.id,
                 label: "Danger",
-                style: MessageButtonStyles.SECONDARY
+                style: MessageButtonStyles.DANGER
             }]/*,
             
         // Select Menu
