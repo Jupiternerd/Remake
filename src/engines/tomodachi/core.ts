@@ -29,7 +29,7 @@ export default class TomoCore extends EngineBase {
             interaction,
             {
                 x: 564,
-                y: 670,
+                y: 700,
                 timeout: 60000, 
             },
             multiples
