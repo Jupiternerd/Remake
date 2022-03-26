@@ -472,26 +472,18 @@ export default class NovelCore extends EngineBase {
             default: return script;
         }
     }
-
-    private _redoLastAction() {
-
-    }
     
     /**
      * @name appendToMultiples
      * @description appends more novel singles to the array.
      * @param {NovelSingle} multiple that you want to append to the array.
      */
-    public async appendToMultiples(multiple: Array<NovelSingle>) {
+    public async appendToMultiples(multiple: Array<NovelSingle>, moveToAppended: boolean = false) {
         // replace current arr with new one.
         this.multiples = this.multiples.concat(multiple)
         // recache assets.
         await this.cacheAssets();
-
-        this.setPage(this.multiples[this.index + 1].i)
-        console.log(this.multiples)
-
-        
+        // set the page to the new appended multiples.
+        moveToAppended ? this.setPage(this.multiples[this.index + 1].i) : null;
     }
-
 }

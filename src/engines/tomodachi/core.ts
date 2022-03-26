@@ -147,7 +147,7 @@ export default class TomoCore extends EngineBase {
             }
 
             //console.log(SELECTED_STORY);
-            this.coreHandler.appendToMultiples(SELECTED_STORY.multiples)
+            this.coreHandler.appendToMultiples(SELECTED_STORY.multiples, true)
             
 
         })
