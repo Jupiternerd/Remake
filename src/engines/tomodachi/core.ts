@@ -127,11 +127,8 @@ export default class TomoCore extends EngineBase {
             this.coreHandler.start();
         })
         
-
-        //console.log(EngineUtils.convertNumberToMoodStr(this.chInUser[index].stats.mood.current))
-        
         this.coreHandler.once("userSelectionConfirmed", async (i, selection) => {
-            // edge case.
+            // edge cases.
             if (i != 0) throw new EngineError("Tomo", "Novel gave event \'userSelectionConfirmed\' at another index that is not \'0\'. ")
             
             switch (selection) {
@@ -146,10 +143,9 @@ export default class TomoCore extends EngineBase {
 
             }
 
-            //console.log(SELECTED_STORY);
-            this.coreHandler.appendToMultiples(SELECTED_STORY.multiples, true)
+            await this.coreHandler.insertToMultiples(SELECTED_STORY.multiples);
+            this.coreHandler.setPage(this.coreHandler.multiples[this.coreHandler.index + 1].i)
             
-
         })
         
         

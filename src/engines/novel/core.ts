@@ -474,16 +474,20 @@ export default class NovelCore extends EngineBase {
     }
     
     /**
-     * @name appendToMultiples
+     * @name isnertToMultiples
      * @description appends more novel singles to the array.
      * @param {NovelSingle} multiple that you want to append to the array.
+     * @param {number} index to the index you want to insert to. Defaults to OG multiple length.
+     * @param {boolean} destroy if a multiple occupies the index position, destroy?
      */
-    public async appendToMultiples(multiple: Array<NovelSingle>, moveToAppended: boolean = false) {
-        // replace current arr with new one.
-        this.multiples = this.multiples.concat(multiple)
-        // recache assets.
+    public async insertToMultiples(multiple: Array<NovelSingle>, index: number = this.multiples.length - 1, destroy: boolean = false) {
+        // check if the index is the same as length.
+        if (index >= this.multiples.length - 1) this.multiples = this.multiples.concat(multiple); 
+        else {
+            // if the index is less, that means we have to insert it.
+            for (const SINGLET of multiple) this.multiples.splice(index, (destroy ? 1 : 0), SINGLET);
+        }
+        // recache.
         await this.cacheAssets();
-        // set the page to the new appended multiples.
-        return moveToAppended ? this.setPage(this.multiples[this.index + 1].i) : null;
     }
 }
