@@ -44,7 +44,7 @@ export default class EngineBase extends EventEmitter {
     // function to filter interaction
     protected _filter: CollectorFilter<[unknown]> = async (buttonInteraction: MessageComponentInteraction) => {
         // defer update.
-        await buttonInteraction.deferUpdate();
+        buttonInteraction.deferred ? null : await buttonInteraction.deferUpdate()
         // we only want to know if the interactor is the same as the user.
         return buttonInteraction.user.id === this.interaction.user.id;
     }
@@ -128,10 +128,11 @@ export default class EngineBase extends EventEmitter {
      * @param {CollectorFilter} filter function that filters what you want to create.
      * @returns {InteractionCollector<MessageComponentInteraction | ButtonInteraction | SelectMenuInteraction>} your desired collector.
      */
-     protected _createCollector(type: MessageComponentType, filter: CollectorFilter<[unknown]> = this._filter): InteractionCollector<MessageComponentInteraction | ButtonInteraction | SelectMenuInteraction> {
+     protected _createCollector(type: MessageComponentType, limit: number = null, filter: CollectorFilter<[unknown]> = this._filter): InteractionCollector<MessageComponentInteraction | ButtonInteraction | SelectMenuInteraction> {
         return this.message.createMessageComponentCollector({
             filter,
             componentType: type,
+            max: limit,
             time: this.timeout // variable set in constructor.
         })
     } 

@@ -182,7 +182,8 @@ export default class Queries {
 
     public static async story(id: number): Promise<Story> {
         // define variables
-        let payload: Story, cache: string, redis: Redis = Square.memory(), key: string = `story_${id.toString()}`
+        let payload: Story, cache: string, redis: Redis = Square.memory(), key: string = `story_${id.toString()}`;
+        console.log("ID passed along: " + id)
 
         // try and see if we can get the cache, if not we can just get the data from mongodb it self.
         try {

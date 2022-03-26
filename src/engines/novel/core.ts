@@ -425,6 +425,7 @@ export default class NovelCore extends EngineBase {
         // If the user has made a choice and the button is equal to the state we set at the begining (confirm button)
         if (BUTTON == 2 && this.selection != undefined) { // User has confirmed their selection.
             // call that the user has made a selection.
+            console.log("userSelectionConfirmed")
             this.emit("userSelectionConfirmed", this.index, this.selection);          
             // Get the route (script or index) of the selected option.
             const ROUTE = this.multiples[this.index].type.special.choices[this.selection].route;
@@ -471,6 +472,10 @@ export default class NovelCore extends EngineBase {
             default: return script;
         }
     }
+
+    private _redoLastAction() {
+
+    }
     
     /**
      * @name appendToMultiples
@@ -478,8 +483,15 @@ export default class NovelCore extends EngineBase {
      * @param {NovelSingle} multiple that you want to append to the array.
      */
     public async appendToMultiples(multiple: Array<NovelSingle>) {
-        this.multiples.concat(multiple)
+        // replace current arr with new one.
+        this.multiples = this.multiples.concat(multiple)
+        // recache assets.
         await this.cacheAssets();
+
+        this.setPage(this.multiples[this.index + 1].i)
+        console.log(this.multiples)
+
+        
     }
 
 }

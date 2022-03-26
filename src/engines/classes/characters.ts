@@ -74,7 +74,6 @@ export default class Character extends UniBase {
      * @returns 
      */
     public async getStoryFromDB(id: number = this._id as number, mood: TemporaryMoodTypeStrings, type: "base" | "interact" | "gift"): Promise<Story> {
-        console.log("AAAAAAAAAAAAAAAAAAAAAAAA")
         // edge case.
         if (mood == "current") return;
         

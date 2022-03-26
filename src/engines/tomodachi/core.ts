@@ -48,7 +48,7 @@ export default class TomoCore extends EngineBase {
         // if we don't have any button collectors initialized.
         if (!this.buttonCollector) {
             // create and set that collector.
-            this.buttonCollector = this._createCollector("BUTTON") as InteractionCollector<ButtonInteraction>;
+            this.buttonCollector = this._createCollector("BUTTON", 1) as InteractionCollector<ButtonInteraction>;
             // listen to it.
             this._collectButton();
         }
@@ -129,11 +129,10 @@ export default class TomoCore extends EngineBase {
         
 
         //console.log(EngineUtils.convertNumberToMoodStr(this.chInUser[index].stats.mood.current))
-
+        
         this.coreHandler.once("userSelectionConfirmed", async (i, selection) => {
             // edge case.
             if (i != 0) throw new EngineError("Tomo", "Novel gave event \'userSelectionConfirmed\' at another index that is not \'0\'. ")
-            console.log(selection)
             
             switch (selection) {
                 // gift
@@ -146,10 +145,13 @@ export default class TomoCore extends EngineBase {
                     break;
 
             }
+
+            //console.log(SELECTED_STORY);
             this.coreHandler.appendToMultiples(SELECTED_STORY.multiples)
             
 
         })
+        
         
 
         console.log("_interact")
@@ -164,11 +166,12 @@ export default class TomoCore extends EngineBase {
         // edge cases.
         if (!this.buttonCollector) throw new EngineError("Tomo", "There is no button collector attached to the message. (collectButton)");
         // once the collector gets something and makes it through the filter:
-        this.buttonCollector.on("collect", (buttonInteraction: ButtonInteraction) => {
+        this.buttonCollector.once("collect", (buttonInteraction: ButtonInteraction) => {
             // Extract button # from the customID.
             const BUTTON = parseInt(buttonInteraction.customId.match(/(\d{1,1})/g)[0]);
             // Emit button pressed event
             this.emit("buttonEvent", BUTTON, this.index);
+            console.log(BUTTON)
             
             switch (BUTTON) {
                 // 0 is info.
