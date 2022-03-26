@@ -484,8 +484,14 @@ export default class NovelCore extends EngineBase {
         // check if the index is the same as length.
         if (index >= this.multiples.length - 1) this.multiples = this.multiples.concat(multiple); 
         else {
+            // iterator.
+            let i = index;
             // if the index is less, that means we have to insert it.
-            for (const SINGLET of multiple) this.multiples.splice(index, (destroy ? 1 : 0), SINGLET);
+            for (const SINGLET of multiple) { 
+                if (i >= multiple.length) break;
+                this.multiples.splice(i, (destroy ? 1 : 0), SINGLET); 
+                i++;
+            }
         }
         // recache.
         await this.cacheAssets();
