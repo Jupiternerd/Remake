@@ -223,15 +223,18 @@ export default class TomoCore extends EngineBase {
         // Button
         const BUTTONS: MessageButtonOptions[] = [{
                 customId: "TOMO.button_" + "0" + "_user_" + this.interaction.user.id,
-                label: "Info",
-                style: MessageButtonStyles.SUCCESS
+                //label: "Info",
+                emoji: "🔎",
+                style: MessageButtonStyles.SECONDARY
             }, {
                 customId: "TOMO.button_" + "1" + "_user_" + this.interaction.user.id,
                 label: "Interact",
+                emoji: "♥️",
                 style: MessageButtonStyles.PRIMARY
             }, {
                 customId: "TOMO.button_" + "2" + "_user_" + this.interaction.user.id,
-                label: "Danger",
+                //label: "Danger",
+                emoji: "🛑",
                 style: MessageButtonStyles.DANGER
             }]/*,
             
