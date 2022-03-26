@@ -11,9 +11,9 @@ export default class Background extends UniBase {
      * Desc | encapsulates basic background class.
      * @param basic 
      */
-    basic: BackgroundBasic
+    declare basic: BackgroundBasic
     constructor(id: number, basic: BackgroundBasic) {
-        super(id)
+        super(id, basic)
         this.basic = basic;
     }
 

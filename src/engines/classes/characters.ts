@@ -10,7 +10,7 @@ import UniBase from "./base";
 
 export default class Character extends UniBase {
     // define
-    basic: CharacterBasic
+    declare basic: CharacterBasic
     skins: CharacterSkins
     interactions: CharacterInteractions
     /**
@@ -20,7 +20,7 @@ export default class Character extends UniBase {
      * @param interactions 
      */
     constructor(id: number, basic?: CharacterBasic, skins?: CharacterSkins, interactions?: CharacterInteractions) {
-        super(id)
+        super(id, basic)
         this.basic = basic ? basic : null;
         this.skins = skins ? skins : null;
         this.interactions = interactions ? interactions : null;

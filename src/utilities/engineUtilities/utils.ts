@@ -1,6 +1,7 @@
 // author = shokkunn
 
 import Character from "../../engines/classes/characters";
+import { BaseGrade } from "../../types/local/static";
 import { TemporaryMoodType, TemporaryMoodTypeStrings } from "../../types/models/characters";
 import { CapsuleMood, DialogueScript } from "../../types/models/stories"
 import { EngineError } from "../errors/errors";
@@ -108,5 +109,9 @@ export class EngineUtils {
      */
      public static getBackgroundCacheKey(id: number, bool: boolean = false): string {
         return `${id}_${bool}`;
+    }
+
+    public static convertNumberToRarity(int: number) {
+        return BaseGrade[int]
     }
 }

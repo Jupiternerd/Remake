@@ -12,6 +12,7 @@ import { EngineError } from "../../utilities/errors/errors";
 import Queries from "../../utilities/mongodb/queries";
 import EngineBase from "../base";
 import Character from "../classes/characters";
+import ItemClass from "../classes/items";
 import NovelCore from "../novel/core";
 
 // author = shokkunn
@@ -109,57 +110,63 @@ export default class TomoCore extends EngineBase {
 
     }
 
-    private async __fill_Select_With_Inventory(INVENTORY: Array<Item>) {
+    private async __fill_Select_With_Inventory(INVENTORY: Array<ItemClass>) {
         // declare.
-        let z: number = 0, i: number = 0;
+        let i: number = 0, invI: number = 0, maxPerColumn = 2, columnAmount = Math.ceil(INVENTORY.length / maxPerColumn);
         // init the array(s).
         this.invInGroups = [];
-        let innerArray: Array<SelectItemMenuChoices> = [
-            {
-                "label": "Next",
-                "emoji": "⬅️",
-                "value": "i+1",
-            },
-            {
-                "emoji": "➡️",
-                "label": "Back",
-                "value": "i-1"
+        let innerArray: Array<SelectItemMenuChoices> = [];
+        console.log(columnAmount)
+        // main loop
+        for (let j: number = 0; j < columnAmount; j++) {
+            i = 0;
+            // default next and back reset for each column.
+            innerArray = [];
+            
+            if (j < columnAmount - 1) {
+                innerArray.push({
+                    "label": "Next",
+                    "emoji": "➡️",
+                    "value": "$i+1",
+                })
             }
-        ];
-        // for every 20 loops
-        while (z <= 20) {
+            if (j > 0) {
+                innerArray.push({
+                    "label": "Back",
+                    "emoji": "⬅️",
+                    "value": "$i-1",
+                })
+            }        
+            
             // for every 23 items since 25 is the max and we need 2 slots for moving.
-            while (i <= 23) {
+            while (i < maxPerColumn) {
                 // to stop out of bound error.
-                if (INVENTORY.length - 1 < i) break;
+                if (INVENTORY.length - 1 < invI) break;
                 // get the current item in iteration.
-                const CUR_ITEM = INVENTORY[i];
-                // if the item is not giftable.
-                if (CUR_ITEM.giftable == false) break;
-                console.log(CUR_ITEM.name)
+                const CUR_ITEM = INVENTORY[invI];
+                // next item cycle.
+                invI++;
                  // push item into array.
                 innerArray.push({
-                    "label": CUR_ITEM?.name || "???",
-                    "description": CUR_ITEM?.description || "???",
-                    "item": CUR_ITEM,
-                    "emoji": CUR_ITEM?.emoji || "📦",
-                    "value": i.toString()
+                    "label": CUR_ITEM?.basic.name || "???",
+                    "description": CUR_ITEM?.basic.description || "???",
+                    "item": CUR_ITEM.basic,
+                    "emoji": CUR_ITEM?.basic.emoji || "📦",
+                    "value": CUR_ITEM._id.toString()
                 })
+                console.log("Added to cart: " + CUR_ITEM.basic.name)
                 i++;
             }
-            // push the rows into the column.
-            this.invInGroups.push(innerArray);            
-            // since there would be 23 in each loop, if we exceed or match the total (i * 23) we break.
-            if (i * 23 >= INVENTORY.length) break;
-            z++
-        }     
-        console.log(this.invInGroups);
+            // push the rows into the column if it's not just the defaults.       
+            this.invInGroups.push(innerArray);  
+        }
+        
     }
 
     private async __gift(CHARACTER: Character) {
         // first, we populate the inventory (with data from item db)
         const INVENTORY = await this.user.populateTransferableInventory()
-        this.__fill_Select_With_Inventory(INVENTORY)
+        this.__fill_Select_With_Inventory(INVENTORY.filter(i => i.giftable == true))
 
     }
 

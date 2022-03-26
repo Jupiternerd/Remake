@@ -4,6 +4,7 @@ import { Item } from "../../types/models/items";
 import { StatisticsUser, UniverseUser } from "../../types/models/users";
 import Queries from "../../utilities/mongodb/queries";
 import UniBase from "./base";
+import ItemClass from "./items";
 
 // author = shokkunn
 
@@ -86,8 +87,6 @@ export default class Users extends UniBase {
      * @param amount amount of the item.
      */
     public addToTransferableInventory(id: number, amount: number = 1) {
-        // check if it is stackable.
-
         const find: number = this.hasItemInTransferableInv(id)
         // if it does not exist, add it.
         if (find < 0) this.universe.inventory.transferable.push({_id: id, amount: amount});
@@ -116,9 +115,9 @@ export default class Users extends UniBase {
      */
     public async populateTransferableInventory() {
         console.log(this.inventory.transferable)
-        let ret: Array<Item> = [];
+        let ret: Array<ItemClass> = [];
         for (const iterable of this.inventory.transferable) {
-            ret.push(await Queries.item(iterable._id))
+            ret.push(new ItemClass(await Queries.item(iterable._id)))
         }
         return ret;
     }
