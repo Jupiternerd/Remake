@@ -208,7 +208,7 @@ export default class TomoCore extends EngineBase {
 
         // Image manipulation phase.
         BACKGROUND.resize({ width: this.X, height: this.Y})
-        FOREGROUND.resize({width: 290, fit: sharp.fit.contain})
+        FOREGROUND.resize({width: 400, fit: sharp.fit.contain})
 
         // Overlaying Image phase.
         BACKGROUND.composite([{input: await FOREGROUND.toBuffer(), gravity: sharp.gravity.south}])
