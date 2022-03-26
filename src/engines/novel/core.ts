@@ -488,7 +488,7 @@ export default class NovelCore extends EngineBase {
             let i = index;
             // if the index is less, that means we have to insert it.
             for (const SINGLET of multiple) { 
-                if (i >= multiple.length) break;
+                if (i >= this.multiples.length + multiple.length) break;
                 this.multiples.splice(i, (destroy ? 1 : 0), SINGLET); 
                 i++;
             }
