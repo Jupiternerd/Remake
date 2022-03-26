@@ -485,10 +485,10 @@ export default class NovelCore extends EngineBase {
         if (index >= this.multiples.length - 1) this.multiples = this.multiples.concat(multiple); 
         else {
             // iterator.
-            let i = index;
+            let i = index, limit = this.multiples.length + multiple.length;
             // if the index is less, that means we have to insert it.
             for (const SINGLET of multiple) { 
-                if (i >= this.multiples.length + multiple.length) break;
+                if (i >= limit) break;
                 this.multiples.splice(i, (destroy ? 1 : 0), SINGLET); 
                 i++;
             }
