@@ -86,6 +86,8 @@ export default class Users extends UniBase {
      * @param amount amount of the item.
      */
     public addToTransferableInventory(id: number, amount: number = 1) {
+        // check if it is stackable.
+
         const find: number = this.hasItemInTransferableInv(id)
         // if it does not exist, add it.
         if (find < 0) this.universe.inventory.transferable.push({_id: id, amount: amount});
@@ -105,6 +107,20 @@ export default class Users extends UniBase {
      */
     public async populateBackground() {
         return this.bgs.map(async (item) => await Queries.background(item))
+    }
+
+    /**
+     * @name populateTransferableInventory
+     * @description | populates User inentory
+     * @returns mapped transferable array
+     */
+    public async populateTransferableInventory() {
+        console.log(this.inventory.transferable)
+        let ret: Array<Item> = [];
+        for (const iterable of this.inventory.transferable) {
+            ret.push(await Queries.item(iterable._id))
+        }
+        return ret;
     }
 
     /**

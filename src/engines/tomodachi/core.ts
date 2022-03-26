@@ -4,10 +4,11 @@ import { ButtonInteraction, CommandInteraction, InteractionCollector, Message, M
 import { MessageButtonStyles } from "discord.js/typings/enums";
 import sharp from "sharp";
 import { CharacterInteractions } from "../../types/models/characters";
-import { BaseSingle, NovelSingle, Story } from "../../types/models/stories";
-import { ChInUser } from "../../types/models/users";
+import { Item } from "../../types/models/items";
+import { BaseSingle, SelectItemMenuChoices, Story } from "../../types/models/stories";
+import { ChInUser, ItemInUser } from "../../types/models/users";
 import { EngineUtils } from "../../utilities/engineUtilities/utils";
-import { EngineError, NovelError } from "../../utilities/errors/errors";
+import { EngineError } from "../../utilities/errors/errors";
 import Queries from "../../utilities/mongodb/queries";
 import EngineBase from "../base";
 import Character from "../classes/characters";
@@ -20,6 +21,9 @@ export default class TomoCore extends EngineBase {
     private LIMIT: number = 8;
     private coreHandler: NovelCore;
     private chInUser: Array<ChInUser>;
+
+    // gifting globals.
+    private invInGroups: Array<Array<SelectItemMenuChoices>> 
     constructor (
         interaction: CommandInteraction,
         multiples: Array<BaseSingle>,
@@ -105,6 +109,60 @@ export default class TomoCore extends EngineBase {
 
     }
 
+    private async __fill_Select_With_Inventory(INVENTORY: Array<Item>) {
+        // declare.
+        let z: number = 0, i: number = 0;
+        // init the array(s).
+        this.invInGroups = [];
+        let innerArray: Array<SelectItemMenuChoices> = [
+            {
+                "label": "Next",
+                "emoji": "⬅️",
+                "value": "i+1",
+            },
+            {
+                "emoji": "➡️",
+                "label": "Back",
+                "value": "i-1"
+            }
+        ];
+        // for every 20 loops
+        while (z <= 20) {
+            // for every 23 items since 25 is the max and we need 2 slots for moving.
+            while (i <= 23) {
+                // to stop out of bound error.
+                if (INVENTORY.length - 1 < i) break;
+                // get the current item in iteration.
+                const CUR_ITEM = INVENTORY[i];
+                // if the item is not giftable.
+                if (CUR_ITEM.giftable == false) break;
+                console.log(CUR_ITEM.name)
+                 // push item into array.
+                innerArray.push({
+                    "label": CUR_ITEM?.name || "???",
+                    "description": CUR_ITEM?.description || "???",
+                    "item": CUR_ITEM,
+                    "emoji": CUR_ITEM?.emoji || "📦",
+                    "value": i.toString()
+                })
+                i++;
+            }
+            // push the rows into the column.
+            this.invInGroups.push(innerArray);            
+            // since there would be 23 in each loop, if we exceed or match the total (i * 23) we break.
+            if (i * 23 >= INVENTORY.length) break;
+            z++
+        }     
+        console.log(this.invInGroups);
+    }
+
+    private async __gift(CHARACTER: Character) {
+        // first, we populate the inventory (with data from item db)
+        const INVENTORY = await this.user.populateTransferableInventory()
+        this.__fill_Select_With_Inventory(INVENTORY)
+
+    }
+
     private async _interact(index: number = this.index) {
         // declare
         
@@ -134,7 +192,8 @@ export default class TomoCore extends EngineBase {
             switch (selection) {
                 // gift
                 case 0:
-                    SELECTED_STORY = await CHARACTER.getStoryFromDB(CHARACTER._id as number, EngineUtils.convertNumberToMoodStr(this.chInUser[index].stats.mood.current), "gift")
+                   // SELECTED_STORY = await CHARACTER.getStoryFromDB(CHARACTER._id as number, EngineUtils.convertNumberToMoodStr(this.chInUser[index].stats.mood.current), "gift")
+                    this.__gift(CHARACTER)
                     break;
                 // talk
                 case 1:
@@ -143,8 +202,8 @@ export default class TomoCore extends EngineBase {
 
             }
 
-            await this.coreHandler.insertToMultiples(SELECTED_STORY.multiples);
-            this.coreHandler.setPage(this.coreHandler.multiples[this.coreHandler.index + 1].i)
+           // await this.coreHandler.insertToMultiples(SELECTED_STORY.multiples);
+           // this.coreHandler.setPage(this.coreHandler.multiples[this.coreHandler.index + 1].i)
             
         })
         
@@ -224,17 +283,17 @@ export default class TomoCore extends EngineBase {
         const BUTTONS: MessageButtonOptions[] = [{
                 customId: "TOMO.button_" + "0" + "_user_" + this.interaction.user.id,
                 //label: "Info",
-                emoji: "🔎",
+                emoji: "<a:haruhi:957218560441196554>",
                 style: MessageButtonStyles.SECONDARY
             }, {
                 customId: "TOMO.button_" + "1" + "_user_" + this.interaction.user.id,
                 label: "Interact",
-                emoji: "♥️",
+                emoji: "<a:haruhi:957218560441196554>",
                 style: MessageButtonStyles.PRIMARY
             }, {
                 customId: "TOMO.button_" + "2" + "_user_" + this.interaction.user.id,
                 //label: "Danger",
-                emoji: "🛑",
+                emoji: "<a:haruhi:957218560441196554>",
                 style: MessageButtonStyles.DANGER
             }]/*,
             
