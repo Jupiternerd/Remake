@@ -484,6 +484,6 @@ export default class NovelCore extends EngineBase {
         // recache assets.
         await this.cacheAssets();
         // set the page to the new appended multiples.
-        moveToAppended ? this.setPage(this.multiples[this.index + 1].i) : null;
+        return moveToAppended ? this.setPage(this.multiples[this.index + 1].i) : null;
     }
 }
