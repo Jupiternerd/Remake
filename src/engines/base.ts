@@ -6,7 +6,7 @@ import { BackgroundCapsule, BaseSingle, CharacterCapsule, NovelSingle } from "..
 import { UniverseUser } from "../types/models/users";
 import AssetManagement from "../utilities/assetManagement/assetUtililties";
 import { EngineUtils } from "../utilities/engineUtilities/utils";
-import { EngineError } from "../utilities/errors/errors";
+import { EngineError, UniBaseNotFoundError } from "../utilities/errors/errors";
 import Queries from "../utilities/mongodb/queries";
 import Background from "./classes/backgrounds";
 import Character from "./classes/characters";
@@ -198,8 +198,13 @@ export default class EngineBase extends EventEmitter {
     public async cacheAssets() {
         // defining variables.
         var i: number = 0, singlet: BaseSingle
-        // grab user.
-        this.user = new Users(this.interaction.user.id, await Queries.user(this.interaction.user.id, "universe") as UniverseUser);
+        try {
+            // grab user.
+            this.user = new Users(this.interaction.user.id, await Queries.user(this.interaction.user.id, "universe") as UniverseUser);
+        } catch(e) {
+            // throw err.
+            throw new EngineError("Base", "User not found in DB. Are they initialized? (cacheAssets)");
+        }
         // loop
         for (singlet of this.multiples) {
             // index is optional but will be required later on so we substitute it with the internal iterator.
