@@ -167,6 +167,8 @@ export default class TomoCore extends EngineBase {
         // first, we populate the inventory (with data from item db)
         const INVENTORY = await this.user.populateTransferableInventory()
         await this.__fill_Select_With_Inventory(INVENTORY.filter(i => i.giftable == true))
+
+        // second, we 
         
 
     }

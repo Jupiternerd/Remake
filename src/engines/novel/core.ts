@@ -5,6 +5,7 @@ import sharp, { Sharp } from "sharp";
 import { DialogueScript, NovelScript, NovelSingle } from "../../types/models/stories";
 import { EngineUtils, MathUtils, StringUtils } from "../../utilities/engineUtilities/utils";
 import { NovelError } from "../../utilities/errors/errors";
+import Square from "../../utilities/redis/square";
 import EngineBase from "../base";
 import Character from "../classes/characters";
 
@@ -59,15 +60,30 @@ export default class NovelCore extends EngineBase {
      */
      protected async _buildSinglet(i: number = 0): Promise<MessageAttachment> {
         // timer
-        //console.time("BUILD_" + i);
+        console.time("BUILD_" + i);
 
         // variables.
-        let single = this.multiples[i] as NovelSingle, IMAGE: Sharp, CANVAS: Sharp, iC: number = 0;
+        let single = this.multiples[i] as NovelSingle, IMAGE: Sharp, CANVAS: Sharp, iC: number = 0, BUFFER: Buffer;
 
         // Set custom novel id.
+        let IMAGE_BUFFER_KEY = "NOVEL_BUFFER" + "_" + single.bg + "_";
+        if (single.type.display == "duet") IMAGE_BUFFER_KEY += `${single.ch[0].id}_${single.ch[0].mood}_DUET_${single.ch[1].id}_${single.ch[1].mood}`;
+        if (single.type.display == "normal") IMAGE_BUFFER_KEY += `${single.ch[0].id}_${single.ch[0].mood}`;
+        if (single.type.display == "wallpaper") IMAGE_BUFFER_KEY += "WALLPAPER";
         const CUSTOM_ID = "NOVEL" + "_" + single.i + "_" + single.type.display.toUpperCase() + "_"+ "_USERID_" + this.interaction.user.id + "." + "webp", QUALITY = {quality: 24, alphaQuality: 40} // file name.
+        
+        // First redundant filter, if we have the same image in the redis buffer. (Only works with no skin)
+        if (single.ch[0].useSkin == false) {
+            BUFFER = await Square.memory().getBuffer(IMAGE_BUFFER_KEY);
+            if (BUFFER) {
+                // if we have a buffer
+                single.built = new MessageAttachment(BUFFER, CUSTOM_ID);
+                console.timeEnd("BUILD_" + i)
+                return single.built;
+            }
+        }
 
-        // redundant filters. So we don't waste power on drawing the same image.
+        // More redundant filters. So we don't waste power on drawing the same image.
         const SIMILAR_NODE: NovelSingle = this.multiples.find((node: NovelSingle) => 
             (node.built != undefined) && // is it built?
             (node.type.display === single.type.display) && // if there are nodes that have the same display type.
@@ -151,9 +167,11 @@ export default class NovelCore extends EngineBase {
         // overlay the image ontop of the background. 
         CANVAS.composite([{input: await IMAGE.toBuffer(), gravity: sharp.gravity.south}]) // Gravity to south so there is no space in the bottom.
         // complete the timer.
-        //console.timeEnd("BUILD_" + i);
+        BUFFER = await CANVAS.webp(QUALITY).toBuffer()
+        console.timeEnd("BUILD_" + i);
+        Square.memory().setBuffer(IMAGE_BUFFER_KEY, BUFFER);
         // return the attachment.
-        return new MessageAttachment(await CANVAS.webp(QUALITY).toBuffer(), CUSTOM_ID);
+        return new MessageAttachment(BUFFER, CUSTOM_ID);
     }  
 
     /**
