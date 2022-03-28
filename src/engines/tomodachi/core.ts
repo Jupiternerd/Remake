@@ -175,7 +175,7 @@ export default class TomoCore extends EngineBase {
         // declare
         
         let CHARACTER = this.cachedCharacters.get(this.multiples[index].ch[0].id);
-        let STORY: Story;
+        let STORY: Story, SELECTED_STORY: Story;
 
         // if its not a normal mood.
         if (this.chInUser[index].stats.mood.current != 0) {
@@ -184,8 +184,6 @@ export default class TomoCore extends EngineBase {
         };
 
         STORY = await Queries.story(CHARACTER.basic.stories.base[0]);
-        
-        let SELECTED_STORY: Story;
 
         this.coreHandler = new NovelCore(this.interaction, STORY.multiples);
 
@@ -210,8 +208,8 @@ export default class TomoCore extends EngineBase {
 
             }
 
-           // await this.coreHandler.insertToMultiples(SELECTED_STORY.multiples);
-           // this.coreHandler.setPage(this.coreHandler.multiples[this.coreHandler.index + 1].i)
+            //await this.coreHandler.insertToMultiples(SELECTED_STORY.multiples);
+            //this.coreHandler.setPage(this.coreHandler.multiples[this.coreHandler.index + 1].i)
             
         })
         
