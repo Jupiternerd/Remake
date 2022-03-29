@@ -124,9 +124,9 @@ export default class Users extends UniBase {
 
             } finally {
                 ret.push(temp);
-                return ret;
             }
         }
+        return ret;
     }
 
     /**

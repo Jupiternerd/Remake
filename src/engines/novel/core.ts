@@ -33,7 +33,7 @@ export default class NovelCore extends EngineBase {
                 timeout: 80000
             },
              multiples,
-             ["bg", "ch", "backable", "type"]
+             ["bg", "ch", "backable", "type", "txt"]
             );
         // When all assets have been loaded, run this:
         this.once("loaded", async () => this.prepareNodes())
@@ -67,8 +67,6 @@ export default class NovelCore extends EngineBase {
 
         // variables.
         let single = this.multiples[i] as NovelSingle, IMAGE: Sharp, CANVAS: Sharp, iC: number = 0, BUFFER: Buffer;
-
-        console.log(single);
 
         // Set custom novel id.
         let IMAGE_BUFFER_KEY = "NOVEL_BUFFER" + "_" + single.bg + "_";
@@ -332,7 +330,7 @@ export default class NovelCore extends EngineBase {
             // emit event.
             this.emit("selectEvent", this.selection, this.index);
             // edit the message to reflect the selection.
-            this.interaction.editReply({components: await this._selectInteractRow()})
+            //this.interaction.editReply({components: await this._selectInteractRow()})
         })
     }
 
@@ -392,7 +390,8 @@ export default class NovelCore extends EngineBase {
         SELECT_MENU: MessageSelectMenuOptions = {
             // If this single has it's own default place holder. If not provide our own.
             // Also if there is a selection we will put the selection as the label.
-            placeholder: this.selection == undefined ? (this.multiples[this.index].type.special.default ? this.multiples[this.index].type.special.default : "Select an option") : this.multiples[this.index].type.special.choices[this.selection].label,
+            placeholder: this.multiples[this.index].type.special.default ? this.multiples[this.index].type.special.default : "Select an option",
+            //this.selection == undefined ? (this.multiples[this.index].type.special.default ? this.multiples[this.index].type.special.default : "Select an option") : this.multiples[this.index].type.special.choices[this.selection].label,
             customId: "NOVEL.select_" + "0" + "_user_" + this.interaction.user.id,
             options: this.multiples[this.index].type.special.choices
         }
@@ -448,7 +447,6 @@ export default class NovelCore extends EngineBase {
         // If the user has made a choice and the button is equal to the state we set at the begining (confirm button)
         if (BUTTON == 2 && this.selection != undefined) { // User has confirmed their selection.
             // call that the user has made a selection.
-            console.log("userSelectionConfirmed")
             this.emit("userSelectionConfirmed", this.index, this.selection);          
             // Get the route (script or index) of the selected option.
             const ROUTE = this.multiples[this.index].type.special.choices[this.selection].route;
@@ -478,6 +476,8 @@ export default class NovelCore extends EngineBase {
             case "back": return await this.setPage(this.index - 1);
             // forward.
             case "next": return await this.setPage(this.index + 1);
+            // default
+            default: return;
         }
     }
     /**
@@ -519,7 +519,5 @@ export default class NovelCore extends EngineBase {
                 i++;
             }
         }
-        // recache.
-        await this.cacheAssets();
     }
 }

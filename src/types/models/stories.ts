@@ -26,15 +26,14 @@ export interface BaseSingle {
     ch?: Array<CharacterCapsule>
     built?: MessageAttachment
 }
-
-export type NovelScript = "next" | "back";
+export type NovelScript = "next" | "back" | "nextInventoryPage" | "backInventoryPage" | "findInventoryPage";
 export type DialogueScript = "greetings" | "farewells";
 
 export interface SelectMenuChoices extends MessageSelectOptionData {
     route?: number | NovelScript | Array<number> 
 }
 
-export interface SelectItemMenuChoices extends MessageSelectOptionData {
+export interface SelectItemMenuChoices extends SelectMenuChoices {
     item?: Item
 }
 

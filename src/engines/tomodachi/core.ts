@@ -25,6 +25,7 @@ export default class TomoCore extends EngineBase {
 
     // gifting globals.
     private invInGroups: Array<Array<SelectItemMenuChoices>> 
+    private currentInvIndex: number;
     constructor (
         interaction: CommandInteraction,
         multiples: Array<BaseSingle>,
@@ -112,11 +113,10 @@ export default class TomoCore extends EngineBase {
 
     private async __fill_Select_With_Inventory(INVENTORY: Array<ItemClass>) {
         // declare.
-        let i: number = 0, invI: number = 0, maxPerColumn = 2, columnAmount = Math.ceil(INVENTORY.length / maxPerColumn);
+        let i: number = 0, invI: number = 0, maxPerColumn = 1, columnAmount = Math.ceil(INVENTORY.length / maxPerColumn), totalMax: number = 0;
         // init the array(s).
         this.invInGroups = [];
         let innerArray: Array<SelectItemMenuChoices> = [];
-        console.log(columnAmount)
         // main loop
         for (let j: number = 0; j < columnAmount; j++) {
             i = 0;
@@ -125,21 +125,27 @@ export default class TomoCore extends EngineBase {
             
             if (j < columnAmount - 1) {
                 innerArray.push({
-                    "label": "Next",
+                    "label": `Next Inventory Page ${j + 1}/${columnAmount}`,
                     "emoji": "➡️",
-                    "value": "$i+1",
+                    "value": i.toString(),
+                    "route": "nextInventoryPage"
                 })
+                i++;
             }
             if (j > 0) {
                 innerArray.push({
-                    "label": "Back",
+                    "label": `Go Back Inventory Page ${j + 1}/${columnAmount}`,
                     "emoji": "⬅️",
-                    "value": "$i-1",
+                    "value": i.toString(),
+                    "route": "backInventoryPage"
                 })
+                i++;
             }        
             
             // for every 23 items since 25 is the max and we need 2 slots for moving.
-            while (i < maxPerColumn) {
+            totalMax = (maxPerColumn + i);
+            while (i < (totalMax)) {
+                console.log(i + "<" + totalMax)
                 // to stop out of bound error.
                 if (INVENTORY.length - 1 < invI) break;
                 // get the current item in iteration.
@@ -152,7 +158,8 @@ export default class TomoCore extends EngineBase {
                     "description": CUR_ITEM?.basic.description || "???",
                     "item": CUR_ITEM.basic,
                     "emoji": CUR_ITEM?.basic.emoji || "📦",
-                    "value": CUR_ITEM._id.toString()
+                    "route": null,
+                    "value": i.toString()
                 })
                 console.log("Added to cart: " + CUR_ITEM.basic.name)
                 i++;
@@ -170,17 +177,83 @@ export default class TomoCore extends EngineBase {
      */
     private async __gift(CHARACTER: Character) {
         // first, we populate the inventory (with data from item db)
-        const INVENTORY = await this.user.populateTransferableInventory()
-        await this.__fill_Select_With_Inventory(INVENTORY.filter(i => i.giftable == true))
+        const INVENTORY = await this.user.populateTransferableInventory();
+        this.currentInvIndex = 0;
 
-        // second, we 
+        await this.__fill_Select_With_Inventory(INVENTORY.filter(i => i.giftable == true));
+        
+        // second, we insert the gift selection node.
+        const SELECTION_NODE: NovelSingle[] = [
+            {
+                "type": {
+                    "display": "normal",
+                    "special": {
+                        "type": "selection",
+                        "choices": this.invInGroups[this.currentInvIndex],
+                        "default": "Choose an item to gift"
+                    }
+                }
+            }
+        ]
+
+        // Append this to the end of the multiples.
+        await this.coreHandler.insertToMultiples(SELECTION_NODE);
+        await this.coreHandler.cacheAssets();
+
+        // Set it as the page.
+        this.coreHandler.setPage(this.coreHandler.multiples[this.coreHandler.index + 1].i)
+
+        // We look out for the gift actions like selection and next page.
+        this.coreHandler.on("selectEvent", async (selection, index) => {
+            if (index != this.coreHandler.multiples[this.coreHandler.index].i) return;
+            await this.__gift_action(selection)
+        })
+
+        this.coreHandler.on("userSelectionConfirmed", async (index, selection) => {
+            if (index != this.coreHandler.multiples[this.coreHandler.index].i) return;
+            //selectedGift = this.invInGroups[this.currentInvIndex][selection]
+        })
         
 
     }
 
+    private async __gift_action(selection: number) {
+        let value = this.invInGroups[this.currentInvIndex][selection].value;
+        let parsedValue = parseInt(value);
+        if (parsedValue == NaN) throw new EngineError("Tomo", "Error, parsed gift value is not a number (__gift_action)");
+        const tandemValue = this.invInGroups[this.currentInvIndex][parsedValue]
+        console.log(this.currentInvIndex + " Current index")
+
+        switch (tandemValue.route) {
+            case "backInventoryPage":
+                if (this.currentInvIndex == 0) throw new EngineError("Tomo", "Error, trying to go back but no more selection columns.")
+                this.currentInvIndex--;
+                break;
+            case "nextInventoryPage":
+                if (this.currentInvIndex == this.invInGroups.length) throw new EngineError("Tomo", "Error, trying to move forward to next column but reached end.")
+                this.currentInvIndex++;
+                console.log("Added to inv")
+                break;
+            default: return;
+        }
+
+        this.coreHandler.multiples[this.coreHandler.index].type.special.choices = this.invInGroups[this.currentInvIndex];
+        await this.coreHandler.setPage(this.coreHandler.index)
+    }
+
+    private async __talk(CHARACTER: Character, index: number = this.index) {
+        const SELECTED_STORY: Story = await CHARACTER.getStoryFromDB(CHARACTER._id as number, EngineUtils.convertNumberToMoodStr(this.chInUser[index].stats.mood.current), "interact")
+        // Insert the story into the already init handler.
+        await this.coreHandler.insertToMultiples(SELECTED_STORY.multiples);
+        // Cache the newly added assets.
+        await this.coreHandler.cacheAssets();
+        // Set the page of the novel to the handler
+        this.coreHandler.setPage(this.coreHandler.multiples[this.coreHandler.index + 1].i)
+    }
+
     private async _interact(index: number = this.index) {
         // declare
-        let BASIC = this.cachedCharacters.get(this.multiples[index].ch[0].id as number), SELECTED_STORY: Story, CHARACTER: Character;
+        let BASIC = this.cachedCharacters.get(this.multiples[index].ch[0].id as number), CHARACTER: Character;
         // if its not a normal mood.
         if (this.chInUser[index].stats.mood.current != 0) {
             const PAYLOAD = await Queries.characterBasicVariant(BASIC._id as number, EngineUtils.convertNumberToMoodStr(this.chInUser[index].stats.mood.current))
@@ -188,7 +261,6 @@ export default class TomoCore extends EngineBase {
             CHARACTER = new Character(PAYLOAD._id as number, PAYLOAD, BASIC.skins, await Queries.character(PAYLOAD.pointers.interaction, "interactions") as CharacterInteractions);
         };
 
-        SELECTED_STORY = await CHARACTER.getStoryFromDB(CHARACTER._id as number, "normal", "gift");
         // Standard interaction
         const STANDARD: NovelSingle[] = [{
             "backable": false,
@@ -243,16 +315,11 @@ export default class TomoCore extends EngineBase {
                     break;
                 // talk
                 case 1:
-                    SELECTED_STORY = await CHARACTER.getStoryFromDB(CHARACTER._id as number, EngineUtils.convertNumberToMoodStr(this.chInUser[index].stats.mood.current), "interact")
+                    
+                    this.__talk(CHARACTER, index)
                     break;
 
             }
-
-
-            await this.coreHandler.insertToMultiples(SELECTED_STORY.multiples);
-            
-            console.log(this.coreHandler.multiples)
-            this.coreHandler.setPage(this.coreHandler.multiples[this.coreHandler.index + 1].i)
             
         })
         
