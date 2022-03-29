@@ -5,7 +5,7 @@ import { MessageButtonStyles } from "discord.js/typings/enums";
 import sharp from "sharp";
 import { CharacterInteractions } from "../../types/models/characters";
 import { Item } from "../../types/models/items";
-import { BaseSingle, SelectItemMenuChoices, Story } from "../../types/models/stories";
+import { BaseSingle, NovelSingle, SelectItemMenuChoices, Story } from "../../types/models/stories";
 import { ChInUser, ItemInUser } from "../../types/models/users";
 import { EngineUtils } from "../../utilities/engineUtilities/utils";
 import { EngineError } from "../../utilities/errors/errors";
@@ -163,6 +163,11 @@ export default class TomoCore extends EngineBase {
         
     }
 
+    /**
+     * @name __gift
+     * @description main gift driver function.
+     * @param CHARACTER 
+     */
     private async __gift(CHARACTER: Character) {
         // first, we populate the inventory (with data from item db)
         const INVENTORY = await this.user.populateTransferableInventory()
@@ -175,22 +180,54 @@ export default class TomoCore extends EngineBase {
 
     private async _interact(index: number = this.index) {
         // declare
-        
-        let CHARACTER = this.cachedCharacters.get(this.multiples[index].ch[0].id);
-        let STORY: Story, SELECTED_STORY: Story;
-
+        let BASIC = this.cachedCharacters.get(this.multiples[index].ch[0].id as number), SELECTED_STORY: Story, CHARACTER: Character;
         // if its not a normal mood.
         if (this.chInUser[index].stats.mood.current != 0) {
-            const PAYLOAD = await Queries.characterBasicVariant(CHARACTER._id as number, EngineUtils.convertNumberToMoodStr(this.chInUser[index].stats.mood.current))
-            CHARACTER = new Character(PAYLOAD._id as number, PAYLOAD, CHARACTER.skins, await Queries.character(PAYLOAD.pointers.interaction, "interactions") as CharacterInteractions);
+            const PAYLOAD = await Queries.characterBasicVariant(BASIC._id as number, EngineUtils.convertNumberToMoodStr(this.chInUser[index].stats.mood.current))
+            // Get a new character variant based on the Variant basic.
+            CHARACTER = new Character(PAYLOAD._id as number, PAYLOAD, BASIC.skins, await Queries.character(PAYLOAD.pointers.interaction, "interactions") as CharacterInteractions);
         };
 
-        STORY = await Queries.story(CHARACTER.basic.stories.base[0]);
+        SELECTED_STORY = await CHARACTER.getStoryFromDB(CHARACTER._id as number, "normal", "gift");
+        // Standard interaction
+        const STANDARD: NovelSingle[] = [{
+            "backable": false,
+            "bg": this.chInUser[index].bgToUse || { "blurred": true, "id": 0},
+            "ch": [{
+                id: BASIC._id as number,
+                mood: EngineUtils.convertNumberToMoodStr(this.chInUser[index].stats.mood.current),
+                useSkin: true
+            }],
+            "txt": {
+                "content": "$greetings",
+                "speaker": 0
+            },
+            "type": {
+                "display": "normal",
+                "special": {
+                    "type": "selection",
+                    "default": "So many choices...",
+                    "choices": [{
+                        "label": "Gift",
+                        "emoji": "🎁",
+                        "value": "0",
+                        "route": null,
+                        "description": "Gift something."
+                    }, {
+                        "label": "Talk",
+                        "emoji": "💬",
+                        "value": "1",
+                        "route": null,
+                        "description": "Talk about something."
+                    }]
+                }
+            }
+        }]
 
-        this.coreHandler = new NovelCore(this.interaction, STORY.multiples);
+        this.coreHandler = new NovelCore(this.interaction, STANDARD);
 
-        this.coreHandler.once("ready", () => {
-            this.coreHandler.start();
+        this.coreHandler.once("ready", async () => {
+            await this.coreHandler.start();
         })
         
         this.coreHandler.once("userSelectionConfirmed", async (i, selection) => {
@@ -200,8 +237,9 @@ export default class TomoCore extends EngineBase {
             switch (selection) {
                 // gift
                 case 0:
-                   // SELECTED_STORY = await CHARACTER.getStoryFromDB(CHARACTER._id as number, EngineUtils.convertNumberToMoodStr(this.chInUser[index].stats.mood.current), "gift")
+                    //SELECTED_STORY = await CHARACTER.getStoryFromDB(CHARACTER._id as number, EngineUtils.convertNumberToMoodStr(this.chInUser[index].stats.mood.current), "gift")
                     this.__gift(CHARACTER)
+                    
                     break;
                 // talk
                 case 1:
@@ -210,8 +248,11 @@ export default class TomoCore extends EngineBase {
 
             }
 
-            //await this.coreHandler.insertToMultiples(SELECTED_STORY.multiples);
-            //this.coreHandler.setPage(this.coreHandler.multiples[this.coreHandler.index + 1].i)
+
+            await this.coreHandler.insertToMultiples(SELECTED_STORY.multiples);
+            
+            console.log(this.coreHandler.multiples)
+            this.coreHandler.setPage(this.coreHandler.multiples[this.coreHandler.index + 1].i)
             
         })
         

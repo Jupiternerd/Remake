@@ -73,10 +73,9 @@ export default class Character extends UniBase {
      * @param type 
      * @returns 
      */
-    public async getStoryFromDB(id: number = this._id as number, mood: TemporaryMoodTypeStrings, type: "base" | "interact" | "gift"): Promise<Story> {
+    public async getStoryFromDB(id: number = this._id as number, mood: TemporaryMoodTypeStrings, type: "interact" | "gift"): Promise<Story> {
         // edge case.
         if (mood == "current") return;
-        
         
         if (mood != "normal" && this.basic.pointers.original == this._id) {
             const VARIANT = await Queries.characterBasicVariant(id, mood);

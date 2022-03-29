@@ -6,7 +6,7 @@ import { ItemInUser } from "./users";
 
 export type DisplayTypes = "wallpaper" | "duet" | "normal";
 export type SpecialTypes = "selection" | "timed" | "normal";
-export type InteractionTypes = "gift" | "interact";
+export type InteractionTypes = "gift" | "interact" | "gift_response";
 export type CapsuleMood = TemporaryMoodTypeStrings | "current"
 
 export type CharacterCapsule = {

@@ -1,6 +1,7 @@
 //imps
 
 import { basic } from "../local/static";
+import { BackgroundCapsule } from "./stories";
 
 // author = shokkunn
 export interface MoodInUser {
@@ -16,7 +17,7 @@ export interface StatsInUser {
 
 export interface ChInUser extends basic {
     skinToUse: number | null,
-    bgToUse: number | null,
+    bgToUse: BackgroundCapsule,
     stats: StatsInUser
 }
 

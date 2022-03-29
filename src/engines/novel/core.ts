@@ -46,10 +46,13 @@ export default class NovelCore extends EngineBase {
      */
     public async prepareNodes() {
         // built the nodes.
+        let i = 0;
         for (let SINGLES of this.multiples as Array<NovelSingle>) {
             if (SINGLES.i >= this.LIMIT) throw new NovelError("Multiples limit reached. (prepareNodes)");
             SINGLES.built = await this._buildSinglet(SINGLES.i);
+            i++;
         }
+        console.log("Loop One Cleared with passes: " + i)
         // set ready.
         this.ready()
     }
@@ -64,6 +67,8 @@ export default class NovelCore extends EngineBase {
 
         // variables.
         let single = this.multiples[i] as NovelSingle, IMAGE: Sharp, CANVAS: Sharp, iC: number = 0, BUFFER: Buffer;
+
+        console.log(single);
 
         // Set custom novel id.
         let IMAGE_BUFFER_KEY = "NOVEL_BUFFER" + "_" + single.bg + "_";
@@ -449,10 +454,13 @@ export default class NovelCore extends EngineBase {
             const ROUTE = this.multiples[this.index].type.special.choices[this.selection].route;
             // clear the selection.
             this.selection = undefined;            
+            // Edge Case, if it's null do nothing.
+            if (ROUTE == null || !ROUTE) return; 
             // If the route is a number, we assume they want to travel to that index in the novel.
             if (typeof ROUTE == "number") return await this.setPage(ROUTE);
             // If the route is a script (string), we leave the parseScript function to handle it.
             if (typeof ROUTE == "string") return await this._parseScript(ROUTE);
+
         }
     }
 

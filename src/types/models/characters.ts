@@ -10,7 +10,6 @@ export interface CharacterBasic extends basic {
         interaction: number
     }
     stories: {
-        base?: Array<number>
         interact: Array<number>
         gift: Array<number>
     }

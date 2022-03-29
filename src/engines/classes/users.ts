@@ -114,12 +114,19 @@ export default class Users extends UniBase {
      * @returns mapped transferable array
      */
     public async populateTransferableInventory() {
-        console.log(this.inventory.transferable)
-        let ret: Array<ItemClass> = [];
+        let ret: Array<ItemClass> = [], temp: ItemClass;
         for (const iterable of this.inventory.transferable) {
-            ret.push(new ItemClass(await Queries.item(iterable._id)))
+            try {
+                temp = new ItemClass(await Queries.item(iterable._id));
+            } catch(e) {
+                console.error(e);
+                return ret;
+
+            } finally {
+                ret.push(temp);
+                return ret;
+            }
         }
-        return ret;
     }
 
     /**

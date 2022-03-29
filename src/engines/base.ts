@@ -139,7 +139,7 @@ export default class EngineBase extends EventEmitter {
     /**
      * @Name | injectCharacter
      * @Desc | used in and outside the obj, this is to add character caches.
-     * @param {CharacterCapsule[]} ch | Array of character capsules you want to cache inside the engine.
+     * @param {CharacterCapsule[]} capsule | Array of character capsules you want to cache inside the engine.
      */
     public async injectCharacter(capsule: CharacterCapsule) {
         // get the key.
@@ -163,7 +163,7 @@ export default class EngineBase extends EventEmitter {
         const INTERACTION: CharacterInteractions = capsule.mood == "normal" ? await Queries.character(capsule.id, "interactions") as CharacterInteractions : await Character.getInteractionFromMood(capsule.id, capsule.mood);
         
         // Check if the basic we got is original.             If it is undefined, then we assume its the original.
-        if (BASIC.pointers.original != BASIC._id && BASIC.pointers.original != undefined) throw new EngineError("Base", "Pointer for Character is not Original.")
+        if (BASIC.pointers.original != BASIC._id && BASIC.pointers.original != undefined) throw new EngineError("Base", "Pointer for Character is not Original. (injectCharacter)")
         // set the cache.
         this.cachedCharacters.set(capsule.id, 
             new Character(capsule.id, BASIC, SKINS, INTERACTION)
