@@ -205,11 +205,13 @@ export default class TomoCore extends EngineBase {
 
         // We look out for the gift actions like selection and next page.
         this.coreHandler.on("selectEvent", async (selection, index) => {
+            this.coreHandler.refreshCoolDown()
             if (index != this.coreHandler.multiples[this.coreHandler.index].i) return;
             await this.__gift_action(selection)
         })
 
         this.coreHandler.on("userSelectionConfirmed", async (index, selection) => {
+            this.coreHandler.refreshCoolDown()
             if (index != this.coreHandler.multiples[this.coreHandler.index].i) return;
             console.log("Collected Gift: " + this.invInGroups[this.currentInvIndex][selection].item.name)
 
