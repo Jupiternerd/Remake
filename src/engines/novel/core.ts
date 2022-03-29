@@ -389,7 +389,7 @@ export default class NovelCore extends EngineBase {
         // Select Menu
         SELECT_MENU: MessageSelectMenuOptions = {
             // If this single has it's own default place holder. If not provide our own.
-            // Also if there is a selection we will put the selection as the label.
+            // Also if there is a selection we will put the selection as the label. ( deprecated, since discord already does it )
             placeholder: this.multiples[this.index].type.special.default ? this.multiples[this.index].type.special.default : "Select an option",
             //this.selection == undefined ? (this.multiples[this.index].type.special.default ? this.multiples[this.index].type.special.default : "Select an option") : this.multiples[this.index].type.special.choices[this.selection].label,
             customId: "NOVEL.select_" + "0" + "_user_" + this.interaction.user.id,
