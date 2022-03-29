@@ -21,7 +21,7 @@ export default class NovelCore extends EngineBase {
     private LIMIT: number = 40;
     declare multiples: Array<NovelSingle>
     // internal tracker for selection.
-    protected selection: number
+    public selection: number
     public constructor(
         interaction: CommandInteraction,
         multiples: Array<NovelSingle>,

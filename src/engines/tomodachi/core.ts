@@ -211,7 +211,8 @@ export default class TomoCore extends EngineBase {
 
         this.coreHandler.on("userSelectionConfirmed", async (index, selection) => {
             if (index != this.coreHandler.multiples[this.coreHandler.index].i) return;
-            //selectedGift = this.invInGroups[this.currentInvIndex][selection]
+            console.log("Collected Gift: " + this.invInGroups[this.currentInvIndex][selection].item.name)
+
         })
         
 
@@ -222,8 +223,7 @@ export default class TomoCore extends EngineBase {
         let parsedValue = parseInt(value);
         if (parsedValue == NaN) throw new EngineError("Tomo", "Error, parsed gift value is not a number (__gift_action)");
         const tandemValue = this.invInGroups[this.currentInvIndex][parsedValue]
-        console.log(this.currentInvIndex + " Current index")
-
+        // Menu management
         switch (tandemValue.route) {
             case "backInventoryPage":
                 if (this.currentInvIndex == 0) throw new EngineError("Tomo", "Error, trying to go back but no more selection columns.")
@@ -232,10 +232,11 @@ export default class TomoCore extends EngineBase {
             case "nextInventoryPage":
                 if (this.currentInvIndex == this.invInGroups.length) throw new EngineError("Tomo", "Error, trying to move forward to next column but reached end.")
                 this.currentInvIndex++;
-                console.log("Added to inv")
                 break;
             default: return;
         }
+        // delete the selection in the core.
+        this.coreHandler.selection = undefined;
 
         this.coreHandler.multiples[this.coreHandler.index].type.special.choices = this.invInGroups[this.currentInvIndex];
         await this.coreHandler.setPage(this.coreHandler.index)
