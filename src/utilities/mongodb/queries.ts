@@ -6,7 +6,7 @@ import { BackgroundBasic } from "../../types/models/backgrounds";
 import { CharacterBasic, CharacterInteractions, CharacterSkins, TemporaryMoodTypeStrings } from "../../types/models/characters";
 import { Item } from "../../types/models/items";
 import { Story } from "../../types/models/stories";
-import { StatisticsUser, UniverseUser } from "../../types/models/users";
+import { ChInUser, intransferable, ItemInUser, StatisticsUser, UniverseUser } from "../../types/models/users";
 import { UniBaseNotFoundError, UserNotFoundError } from "../errors/errors";
 import Square from "../redis/square";
 import Mango from "./mango";
@@ -147,7 +147,16 @@ export default class Queries {
     }
 
     public static async updateUser(id: string, collection: "universe" | "statistics", payload: UniverseUser | StatisticsUser): Promise<void> {
-        Mango.DB_USERS.collection(collection).updateOne({_id: id}, payload);
+        Mango.DB_USERS.collection<UniverseUser | StatisticsUser>(collection).updateOne({_id: id}, payload);
+    }
+
+    public static async updateUserTransferableInventory(id: string, payload: ItemInUser[]) {
+        Mango.DB_USERS.collection("universe").updateOne({"_id": id}, {$set: { "inventory.transferable": payload }})
+    }
+
+    public static async updateTomos(id: string, tomo: ChInUser[]) {
+        Mango.DB_USERS.collection<UniverseUser>("universe").updateOne({_id: id}, {$set: { "inventory.intransferable.chs": tomo }})
+        
     }
 
     public static async item(id: number): Promise<Item> {

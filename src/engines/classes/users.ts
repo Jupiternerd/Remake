@@ -69,6 +69,27 @@ export default class Users extends UniBase {
         Queries.updateUser(this._id as string, type, (type == "universe" ? this.universe : this.statistics))
     }
 
+    public async updateTransferableInventory() {
+        await Queries.updateUserTransferableInventory(this._id as string, this.inventory.transferable)
+    }
+
+    public async setItemAsTomoGifted(tomoID: number, itemID: number, amount: number = 1) {
+        let tomo = this.findTomoIndexInInventory(tomoID);
+        if (tomo < 0) return;
+        await this.addToTransferableInventory(itemID, -Math.abs(amount));
+        await this.addToTomoInventory(this.chs[tomo]._id as number, itemID, amount);
+        this.inventory.intransferable.chs[tomo].stats.gift.recentReceived.sort((a, b) => b.date.getTime() - a.date.getTime());
+        this.inventory.intransferable.chs[tomo].stats.gift.recentReceived[0] = {
+            "date": new Date(),
+            "itemID": itemID
+        }
+    }
+
+    public async updateTomo() {
+        console.log(this.chs[0].stats.inventory)
+        await Queries.updateTomos(this._id as string, this.chs)
+    }
+
     /**
      * @name hasItemInTransferableInv
      * @description checks if an item exists in a user TRANSFERABLE inventory.
@@ -86,7 +107,7 @@ export default class Users extends UniBase {
      * @param id id of the item you want to add
      * @param amount amount of the item.
      */
-    public addToTransferableInventory(id: number, amount: number = 1) {
+    public async addToTransferableInventory(id: number, amount: number = 1) {
         const find: number = this.hasItemInTransferableInv(id)
         // if it does not exist, add it.
         if (find < 0) this.universe.inventory.transferable.push({_id: id, amount: amount});
@@ -136,7 +157,7 @@ export default class Users extends UniBase {
      * @returns index of tomo
      */
     public findTomoIndexInInventory(tomoID: number) {
-        return this.chs.findIndex((tomo) => tomo._id = tomoID)
+        return this.chs.findIndex((tomo) => tomo._id == tomoID)
     }
 
     /**
@@ -146,7 +167,27 @@ export default class Users extends UniBase {
      * @returns ID of the skin that the user has set for the tomo
      */
     public getSkinOfTomo(tomoID: number): number {
-        if (this.findTomoIndexInInventory(tomoID) > 0) return this.chs[tomoID].skinToUse;
+        let tomo = this.findTomoIndexInInventory(tomoID)
+        if (tomo > 0) return this.chs[tomo].skinToUse;
         return -1;
+    }
+
+    public async addToTomoInventory(tomoID: number, itemID: number, amount: number) {
+        let tomo = this.findTomoIndexInInventory(tomoID);
+        if (tomo < 0) return;
+        const FIND = this.chs[tomo].stats.inventory.findIndex(i => i._id == itemID);
+        console.log(FIND)
+        if (FIND < 0) {
+            this.universe.inventory.intransferable.chs[tomo].stats.inventory.push({_id: itemID, amount: amount});
+        }
+        else {
+            const result = this.universe.inventory.intransferable.chs[tomo].stats.inventory[FIND].amount + amount;
+            console.log(result + " RESULT")
+            // add the amount to the inventory if it exists.
+            if (result <= 0) return this.universe.inventory.intransferable.chs[tomo].stats.inventory.slice(FIND); 
+            // set the amount
+            this.universe.inventory.intransferable.chs[tomo].stats.inventory[FIND].amount = result;
+        }
+        
     }
 }

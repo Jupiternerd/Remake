@@ -72,7 +72,6 @@ export interface CharacterInteractions extends basic {
             other: Array<string>
         }
         none: Array<string>
-
     }
 }
 

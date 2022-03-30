@@ -111,66 +111,6 @@ export default class TomoCore extends EngineBase {
 
     }
 
-    public async fill_Select_With_Inventory(INVENTORY: Array<ItemClass>, maxPerColumn: number) {
-        // declare.
-        let i: number = 0, invI: number = 0, columnAmount = Math.ceil(INVENTORY.length / maxPerColumn), totalMax: number = 0, ret = [];
-        // init the array(s).
-        let innerArray: Array<SelectItemMenuChoices> = [];
-        // main loop
-        for (let j: number = 0; j < columnAmount; j++) {
-            i = 0;
-            // default next and back reset for each column.
-            innerArray = [];
-            
-            if (j < columnAmount - 1) {
-                innerArray.push({
-                    "label": `Next Inventory Page ${j + 1}/${columnAmount}`,
-                    "emoji": "➡️",
-                    "value": i.toString(),
-                    "route": "nextInventoryPage"
-                })
-                i++;
-            }
-            if (j > 0) {
-                innerArray.push({
-                    "label": `Go Back Inventory Page ${j + 1}/${columnAmount}`,
-                    "emoji": "⬅️",
-                    "value": i.toString(),
-                    "route": "backInventoryPage"
-                })
-                i++;
-            }        
-            
-            // for every 23 items since 25 is the max and we need 2 slots for moving.
-            totalMax = (maxPerColumn + i);
-            while (i < (totalMax)) {
-                console.log(i + "<" + totalMax)
-                // to stop out of bound error.
-                if (INVENTORY.length - 1 < invI) break;
-                // get the current item in iteration.
-                const CUR_ITEM = INVENTORY[invI];
-                // next item cycle.
-                invI++;
-                 // push item into array.
-                innerArray.push({
-                    "label": CUR_ITEM?.basic.name || "???",
-                    "description": CUR_ITEM?.basic.description || "???",
-                    "item": CUR_ITEM.basic,
-                    "emoji": CUR_ITEM?.basic.emoji || "📦",
-                    "route": null,
-                    "value": i.toString()
-                })
-                console.log("Added to cart: " + CUR_ITEM.basic.name)
-                i++;
-            }
-            // push the rows into the column if it's not just the defaults.       
-            ret.push(innerArray);  
-        }
-        // return result
-        return ret;
-        
-    }
-
     /**
      * @name __gift
      * @description main gift driver function.
@@ -181,7 +121,7 @@ export default class TomoCore extends EngineBase {
         const INVENTORY = await this.user.populateTransferableInventory();
         this.currentInvIndex = 0;
 
-        this.invInGroups = await this.fill_Select_With_Inventory(INVENTORY.filter(i => i.giftable == true), 23);
+        this.invInGroups = await EngineUtils.fill_Select_With_Inventory(INVENTORY.filter(i => i.giftable == true), 23);
         
         // second, we insert the gift selection node.
         const SELECTION_NODE: NovelSingle[] = [
@@ -217,6 +157,8 @@ export default class TomoCore extends EngineBase {
             if (index != this.coreHandler.multiples[this.coreHandler.index].i) return;
             console.log("Collected Gift: " + this.invInGroups[this.currentInvIndex][selection].item.name)
             await this.__gift_collected(this.invInGroups[this.currentInvIndex][selection].item, CHARACTER)
+            // Then we display the end scren.
+            // TODO: END
         })
     }
 
@@ -247,7 +189,7 @@ export default class TomoCore extends EngineBase {
         responseMood = "flustered";
 
         // Unless it's a duplicate.
-        if (specificCharacter.gift.recentReceived.includes(gift._id as number)) responseContent = responseDict.duplicate[MathUtils.randIntFromZero(responseDict.duplicate.length)],
+        if (specificCharacter.gift.recentReceived.findIndex(i => i.itemID == gift._id as number) > -1) responseContent = responseDict.duplicate[MathUtils.randIntFromZero(responseDict.duplicate.length)],
         responseMood = "sad";
 
         // Set the character to their mood.
@@ -266,10 +208,16 @@ export default class TomoCore extends EngineBase {
             "speaker": 0
         }
 
+        // Remove the item from the inventory.
+        await this.user.setItemAsTomoGifted(this.chInUser[this.index]._id as number, gift._id as number, 1);
+        this.user.updateTransferableInventory();
+        this.user.updateTomo();
 
+        // Insert the reaction node.
         await this.coreHandler.insertToMultiples([REACTION_NODE]);
-        await this.coreHandler.cacheAssets();
+        await this.coreHandler.cacheAssets(); // Recache.
 
+        // Set the page to the reaction.
         await this.coreHandler.setPage(this.coreHandler.index + 1);   
     }
 

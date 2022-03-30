@@ -10,7 +10,10 @@ export interface MoodInUser {
     meterxp: number
 }
 
-
+export interface recentGift {
+    date: Date,
+    itemID: number
+}
 export interface StatsInUser {
     level: number,
     xp: number,
@@ -18,7 +21,7 @@ export interface StatsInUser {
     gift: {
         likes: Array<number>
         dislikes: Array<number>
-        recentReceived: FixedLengthArray<[number, number, number]>
+        recentReceived: FixedLengthArray<[recentGift, recentGift, recentGift]>
     }
     inventory: Array<ItemInUser>
 }
@@ -34,15 +37,16 @@ export interface ItemInUser {
     amount: number
 }
 
+export interface intransferable { 
+    bgs: Array<number>
+    chs: Array<ChInUser>
+    skins: Array<number>
+}
 
 export interface UniverseUser extends basic {
     inventory: {
         transferable: Array<ItemInUser>
-        intransferable: {
-            bgs: Array<number>
-            chs: Array<ChInUser>
-            skins: Array<number>
-        }
+        intransferable: intransferable
     }
 }
 

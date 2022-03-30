@@ -1,9 +1,10 @@
 // author = shokkunn
 
 import Character from "../../engines/classes/characters";
+import ItemClass from "../../engines/classes/items";
 import { BaseGrade } from "../../types/local/static";
 import { TemporaryMoodType, TemporaryMoodTypeStrings } from "../../types/models/characters";
-import { CapsuleMood, DialogueScript } from "../../types/models/stories"
+import { CapsuleMood, DialogueScript, SelectItemMenuChoices } from "../../types/models/stories"
 import { EngineError } from "../errors/errors";
 
 // Constants
@@ -111,7 +112,72 @@ export class EngineUtils {
         return `${id}_${bool}`;
     }
 
+    /**
+     * @name convertNumberToRarity
+     * @description converts a integer to a string
+     * @param int 
+     * @returns 
+     */
     public static convertNumberToRarity(int: number) {
-        return BaseGrade[int]
+        return BaseGrade[int] 
+    }
+
+    public static async fill_Select_With_Inventory(INVENTORY: Array<ItemClass>, maxPerColumn: number) {
+        // declare.
+        let i: number = 0, invI: number = 0, columnAmount = Math.ceil(INVENTORY.length / maxPerColumn), totalMax: number = 0, ret = [];
+        // init the array(s).
+        let innerArray: Array<SelectItemMenuChoices> = [];
+        // main loop
+        for (let j: number = 0; j < columnAmount; j++) {
+            i = 0;
+            // default next and back reset for each column.
+            innerArray = [];
+            
+            if (j < columnAmount - 1) {
+                innerArray.push({
+                    "label": `Next Page ${j + 1}/${columnAmount}`,
+                    "emoji": "➡️",
+                    "value": i.toString(),
+                    "route": "nextInventoryPage"
+                })
+                i++;
+            }
+            if (j > 0) {
+                innerArray.push({
+                    "label": `Go Back a Page ${j + 1}/${columnAmount}`,
+                    "emoji": "⬅️",
+                    "value": i.toString(),
+                    "route": "backInventoryPage"
+                })
+                i++;
+            }        
+            
+            // for every 23 items since 25 is the max and we need 2 slots for moving.
+            totalMax = (maxPerColumn + i);
+            while (i < (totalMax)) {
+                // to stop out of bound error.
+                if (INVENTORY.length - 1 < invI) break;
+                // get the current item in iteration.
+                const CUR_ITEM = INVENTORY[invI];
+                // next item cycle.
+                invI++;
+                 // push item into array.
+                innerArray.push({
+                    "label": CUR_ITEM?.basic.name || "???",
+                    "description": CUR_ITEM?.basic.description || "???",
+                    "item": CUR_ITEM.basic,
+                    "emoji": CUR_ITEM?.basic.emoji || "📦",
+                    "route": null,
+                    "value": i.toString()
+                })
+                console.log("Added to cart: " + CUR_ITEM.basic.name)
+                i++;
+            }
+            // push the rows into the column if it's not just the defaults.       
+            ret.push(innerArray);  
+        }
+        // return result
+        return ret;
+        
     }
 }
