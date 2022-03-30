@@ -21,7 +21,7 @@ export interface StatsInUser {
     gift: {
         likes: Array<number>
         dislikes: Array<number>
-        recentReceived: FixedLengthArray<[recentGift, recentGift, recentGift]>
+        recentReceived: recentGift
     }
     inventory: Array<ItemInUser>
 }

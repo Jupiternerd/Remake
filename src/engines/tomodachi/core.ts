@@ -153,7 +153,6 @@ export default class TomoCore extends EngineBase {
 
         // When the user has confirmed the item to gift.
         this.coreHandler.on("userSelectionConfirmed", async (index, selection) => {
-            this.coreHandler.refreshCoolDown()
             if (index != this.coreHandler.multiples[this.coreHandler.index].i) return;
             console.log("Collected Gift: " + this.invInGroups[this.currentInvIndex][selection].item.name)
             await this.__gift_collected(this.invInGroups[this.currentInvIndex][selection].item, CHARACTER)
@@ -189,7 +188,7 @@ export default class TomoCore extends EngineBase {
         responseMood = "flustered";
 
         // Unless it's a duplicate.
-        if (specificCharacter.gift.recentReceived.findIndex(i => i.itemID == gift._id as number) > -1) responseContent = responseDict.duplicate[MathUtils.randIntFromZero(responseDict.duplicate.length)],
+        if (specificCharacter.gift.recentReceived.itemID == gift._id) responseContent = responseDict.duplicate[MathUtils.randIntFromZero(responseDict.duplicate.length)],
         responseMood = "sad";
 
         // Set the character to their mood.
