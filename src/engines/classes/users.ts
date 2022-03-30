@@ -124,7 +124,7 @@ export default class Users extends UniBase {
         else {
             const result = this.universe.inventory.transferable[find].amount + amount;
             // add the amount to the inventory if it exists.
-            if (result <= 0) this.universe.inventory.transferable.slice(find); 
+            if (result <= 0) this.universe.inventory.transferable.splice(find, 1); 
             // set the amount
             this.universe.inventory.transferable[find].amount = result;
         }

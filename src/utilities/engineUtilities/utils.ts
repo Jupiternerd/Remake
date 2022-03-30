@@ -163,7 +163,7 @@ export class EngineUtils {
                 invI++;
                  // push item into array.
                 innerArray.push({
-                    "label": CUR_ITEM.formattedOutputNoMarkUp + ` x${CUR_ITEM.amount}`|| "???",
+                    "label": CUR_ITEM.formattedOutputNoMarkUp || "???",
                     "description": CUR_ITEM?.basic.description || "???",
                     "item": CUR_ITEM.basic,
                     "emoji": CUR_ITEM?.basic.emoji || "📦",
