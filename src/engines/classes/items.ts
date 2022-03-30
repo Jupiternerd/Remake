@@ -13,8 +13,10 @@ export default class ItemClass extends UniBase {
      */
     declare basic: Item
     public giftable?: boolean;
-    constructor(item: Item) {
+    public amount?: number;
+    constructor(item: Item, amount: number = 0) {
         super(item._id, item)
         this.giftable = item?.giftable || false;
+        this.amount = amount;
     }
 }

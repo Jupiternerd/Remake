@@ -138,7 +138,7 @@ export default class Users extends UniBase {
         let ret: Array<ItemClass> = [], temp: ItemClass;
         for (const iterable of this.inventory.transferable) {
             try {
-                temp = new ItemClass(await Queries.item(iterable._id));
+                temp = new ItemClass(await Queries.item(iterable._id), iterable.amount);
             } catch(e) {
                 console.error(e);
                 return ret;
