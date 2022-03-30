@@ -1,6 +1,6 @@
 //imps
 
-import { basic } from "../local/static";
+import { basic, FixedLengthArray } from "../local/static";
 import { BackgroundCapsule } from "./stories";
 
 // author = shokkunn
@@ -9,10 +9,18 @@ export interface MoodInUser {
     meter: number,
     meterxp: number
 }
+
+
 export interface StatsInUser {
     level: number,
     xp: number,
     mood: MoodInUser
+    gift: {
+        likes: Array<number>
+        dislikes: Array<number>
+        recentReceived: FixedLengthArray<[number, number, number]>
+    }
+    inventory: Array<ItemInUser>
 }
 
 export interface ChInUser extends basic {

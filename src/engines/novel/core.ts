@@ -275,6 +275,24 @@ export default class NovelCore extends EngineBase {
         this.refreshCoolDown()
     }
 
+    /**
+     * @name updateComponents
+     * @description updates the components instead of the whole webhook.
+     * @returns void
+     */
+    public async updateComponents() {
+        // if it is not sent, something went wrong.
+        if (!this.interaction.replied) throw new NovelError("Error, updating a message that is not sent!")
+        const payload: WebhookEditMessageOptions = {
+            components: await this._action()
+        }
+        // edit.
+        await this.interaction.editReply(payload);
+
+        // Refresh CoolDown
+        this.refreshCoolDown();
+    }
+
     /** Interaction with User */
     /**
      * @name collectButton

@@ -3,11 +3,11 @@
 import { ButtonInteraction, CommandInteraction, InteractionCollector, Message, MessageActionRow, MessageAttachment, MessageButton, MessageButtonOptions, MessageSelectMenu, MessageSelectMenuOptions, WebhookEditMessageOptions } from "discord.js";
 import { MessageButtonStyles } from "discord.js/typings/enums";
 import sharp from "sharp";
-import { CharacterInteractions } from "../../types/models/characters";
+import { CharacterInteractions, TemporaryMoodTypeStrings } from "../../types/models/characters";
 import { Item } from "../../types/models/items";
 import { BaseSingle, NovelSingle, SelectItemMenuChoices, Story } from "../../types/models/stories";
 import { ChInUser, ItemInUser } from "../../types/models/users";
-import { EngineUtils } from "../../utilities/engineUtilities/utils";
+import { EngineUtils, MathUtils } from "../../utilities/engineUtilities/utils";
 import { EngineError } from "../../utilities/errors/errors";
 import Queries from "../../utilities/mongodb/queries";
 import EngineBase from "../base";
@@ -111,11 +111,10 @@ export default class TomoCore extends EngineBase {
 
     }
 
-    private async __fill_Select_With_Inventory(INVENTORY: Array<ItemClass>) {
+    public async fill_Select_With_Inventory(INVENTORY: Array<ItemClass>, maxPerColumn: number) {
         // declare.
-        let i: number = 0, invI: number = 0, maxPerColumn = 1, columnAmount = Math.ceil(INVENTORY.length / maxPerColumn), totalMax: number = 0;
+        let i: number = 0, invI: number = 0, columnAmount = Math.ceil(INVENTORY.length / maxPerColumn), totalMax: number = 0, ret = [];
         // init the array(s).
-        this.invInGroups = [];
         let innerArray: Array<SelectItemMenuChoices> = [];
         // main loop
         for (let j: number = 0; j < columnAmount; j++) {
@@ -165,8 +164,10 @@ export default class TomoCore extends EngineBase {
                 i++;
             }
             // push the rows into the column if it's not just the defaults.       
-            this.invInGroups.push(innerArray);  
+            ret.push(innerArray);  
         }
+        // return result
+        return ret;
         
     }
 
@@ -180,7 +181,7 @@ export default class TomoCore extends EngineBase {
         const INVENTORY = await this.user.populateTransferableInventory();
         this.currentInvIndex = 0;
 
-        await this.__fill_Select_With_Inventory(INVENTORY.filter(i => i.giftable == true));
+        this.invInGroups = await this.fill_Select_With_Inventory(INVENTORY.filter(i => i.giftable == true), 23);
         
         // second, we insert the gift selection node.
         const SELECTION_NODE: NovelSingle[] = [
@@ -210,14 +211,66 @@ export default class TomoCore extends EngineBase {
             await this.__gift_action(selection)
         })
 
+        // When the user has confirmed the item to gift.
         this.coreHandler.on("userSelectionConfirmed", async (index, selection) => {
             this.coreHandler.refreshCoolDown()
             if (index != this.coreHandler.multiples[this.coreHandler.index].i) return;
             console.log("Collected Gift: " + this.invInGroups[this.currentInvIndex][selection].item.name)
-
+            await this.__gift_collected(this.invInGroups[this.currentInvIndex][selection].item, CHARACTER)
         })
-        
+    }
 
+    private async __gift_collected(gift: Item, CHARACTER: Character) {
+        let REACTION_NODE: NovelSingle = {"type": {
+            "display": "normal",
+            "special": {
+                "type": "normal"
+            }
+        }}, responseDict = CHARACTER.interactions.gifts, specificCharacter = this.chInUser[this.index].stats, 
+        responseContent: string,
+        responseMood: TemporaryMoodTypeStrings
+
+        // Check if the item grade against the character. 
+        if (CHARACTER.basic.grade < gift.grade) responseContent = responseDict.aboveTier[MathUtils.randIntFromZero(responseDict.aboveTier.length)],
+        responseMood = "happy";
+        if (CHARACTER.basic.grade == gift.grade) responseContent = responseDict.averageTier[MathUtils.randIntFromZero(responseDict.averageTier.length)],
+        responseMood = "normal";
+        if (CHARACTER.basic.grade > gift.grade) responseContent = responseDict.belowTier[MathUtils.randIntFromZero(responseDict.belowTier.length)],
+        responseMood = "sad";
+
+        // If the item is hated, this is the second strongest reaction.
+        if (specificCharacter.gift.dislikes.includes(gift._id as number)) responseContent = responseDict.dislikes[MathUtils.randIntFromZero(responseDict.dislikes.length)],
+        responseMood = "annoyed";
+
+        // Liking something should be the strongest reaction.
+        if (specificCharacter.gift.likes.includes(gift._id as number)) responseContent = responseDict.likes[MathUtils.randIntFromZero(responseDict.likes.length)], 
+        responseMood = "flustered";
+
+        // Unless it's a duplicate.
+        if (specificCharacter.gift.recentReceived.includes(gift._id as number)) responseContent = responseDict.duplicate[MathUtils.randIntFromZero(responseDict.duplicate.length)],
+        responseMood = "sad";
+
+        // Set the character to their mood.
+        REACTION_NODE.ch = [
+            {
+                "id": CHARACTER.basic.pointers.original || CHARACTER._id as number,
+                "mood": "normal", //responseMood, TESTING: CHANGE TO RESPONSE MOOD
+                "useSkin": true
+            }
+        ]
+
+        // Set the text to the response content.
+        console.log(responseContent)
+        REACTION_NODE.txt = {
+            "content": responseContent,
+            "speaker": 0
+        }
+
+
+        await this.coreHandler.insertToMultiples([REACTION_NODE]);
+        await this.coreHandler.cacheAssets();
+
+        await this.coreHandler.setPage(this.coreHandler.index + 1);   
     }
 
     private async __gift_action(selection: number) {
@@ -241,7 +294,8 @@ export default class TomoCore extends EngineBase {
         this.coreHandler.selection = undefined;
 
         this.coreHandler.multiples[this.coreHandler.index].type.special.choices = this.invInGroups[this.currentInvIndex];
-        await this.coreHandler.setPage(this.coreHandler.index)
+        await this.coreHandler.updateComponents();
+        //await this.coreHandler.setPage(this.coreHandler.index)
     }
 
     private async __talk(CHARACTER: Character, index: number = this.index) {
@@ -256,7 +310,7 @@ export default class TomoCore extends EngineBase {
 
     private async _interact(index: number = this.index) {
         // declare
-        let BASIC = this.cachedCharacters.get(this.multiples[index].ch[0].id as number), CHARACTER: Character;
+        let BASIC = this.cachedCharacters.get(this.multiples[index].ch[0].id as number), CHARACTER: Character = BASIC;
         // if its not a normal mood.
         if (this.chInUser[index].stats.mood.current != 0) {
             const PAYLOAD = await Queries.characterBasicVariant(BASIC._id as number, EngineUtils.convertNumberToMoodStr(this.chInUser[index].stats.mood.current))
