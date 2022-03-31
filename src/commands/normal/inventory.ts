@@ -15,21 +15,12 @@ class Inventory extends Commands {
         "Shows your inventory",
         {
             coolDown: 5000
-        },
-        new SlashCommandBuilder().addSubcommand(subc => 
-            subc
-            .setName("test")
-            .setDescription("description for 1_test"))
-        )
+        })
     }
 
     // Executes the command.
     public async execute(bot: client, interaction: CommandInteraction): Promise<void> {
-        interaction.reply("dong");
-    }
-
-    public async test(bot: client, interaction: CommandInteraction): Promise<void> {
-        interaction.reply("Test!")
+        
     }
 }
 
