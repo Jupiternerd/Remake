@@ -21,7 +21,7 @@ export interface StatsInUser {
     gift: {
         likes: Array<number>
         dislikes: Array<number>
-        recentReceived: recentGift
+        recentReceived: Array<recentGift>
     }
     inventory: Array<ItemInUser>
 }

@@ -188,7 +188,7 @@ export default class TomoCore extends EngineBase {
         responseMood = "flustered";
 
         // Unless it's a duplicate.
-        if (specificCharacter.gift.recentReceived.itemID == gift._id) responseContent = responseDict.duplicate[MathUtils.randIntFromZero(responseDict.duplicate.length)],
+        if (specificCharacter.gift.recentReceived.findIndex(i => i.itemID == gift._id) >= 0) responseContent = responseDict.duplicate[MathUtils.randIntFromZero(responseDict.duplicate.length)],
         responseMood = "sad";
 
         // Set the character to their mood.

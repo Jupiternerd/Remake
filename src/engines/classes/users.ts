@@ -82,17 +82,17 @@ export default class Users extends UniBase {
         if (tomo < 0) return;
         await this.addToTransferableInventory(itemID, -Math.abs(amount));
         await this.addToTomoInventory(this.chs[tomo]._id as number, itemID, amount);
-        //this.inventory.intransferable.chs[tomo].stats.gift.recentReceived.sort((a, b) => b.date.getTime() - a.date.getTime());
-        /*
+        this.inventory.intransferable.chs[tomo].stats.gift.recentReceived.sort((a, b) => b.date.getTime() - a.date.getTime());
+
+        if (this.inventory.intransferable.chs[tomo].stats.gift.recentReceived.findIndex(i => i.itemID == itemID) >= 0) return;
         if (this.inventory.intransferable.chs[tomo].stats.gift.recentReceived.length == 3) {
-            this.inventory.intransferable.chs[tomo].stats.gift.recentReceived[0] = payload;
+            this.inventory.intransferable.chs[tomo].stats.gift.recentReceived[2] = payload;
         } else {
-            this.inventory.intransferable.chs[tomo].stats.gift.recentReceived
-
+            this.inventory.intransferable.chs[tomo].stats.gift.recentReceived.unshift(payload);
         }
-        */
+        
 
-        this.inventory.intransferable.chs[tomo].stats.gift.recentReceived = payload;
+        //this.inventory.intransferable.chs[tomo].stats.gift.recentReceived = payload;
     }
 
     public async updateTomo() {
