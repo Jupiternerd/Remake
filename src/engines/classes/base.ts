@@ -15,11 +15,17 @@ export default abstract class UniBase {
 
     }
 
+    /**
+     * @returns a markedup version of the formatted name.
+     */
     get formattedOutput() {
         const grade = (typeof this.basic.grade == "number" ? EngineUtils.convertNumberToRarity(this.basic.grade) : this.basic.grade);
         return `${this.basic.name} | Grade · ${grade}`;
     }
 
+    /**
+     * @returns a no markup version of the formatted name.
+     */
     get formattedOutputNoMarkUp() {
         return this.formattedOutput.replace(/\*/g, "")
     }

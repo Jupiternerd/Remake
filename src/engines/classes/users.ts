@@ -1,6 +1,5 @@
 // imp
 
-import { Item } from "../../types/models/items";
 import { StatisticsUser, UniverseUser } from "../../types/models/users";
 import Queries from "../../utilities/mongodb/queries";
 import UniBase from "./base";
@@ -36,13 +35,15 @@ export default class Users extends UniBase {
         return this.universe.inventory.intransferable.bgs;
     }
 
+    public get inventory() {
+        return this.universe.inventory;
+    }
+
     /**
      * @Name | pullUniverse
      * @Desc | pulls user universe like inventory, etc.
-     * @param universe 
      */
-    public async pullUniverse(universe?: UniverseUser): Promise<void> {
-        if (universe) this.universe = universe;
+    public async pullUniverse(): Promise<void> {
         this.universe = await Queries.user(this._id as string, "universe") as UniverseUser;
     }
 
@@ -56,10 +57,6 @@ export default class Users extends UniBase {
 
     /** Inventory Management */
 
-    get inventory() {
-        return this.universe.inventory;
-    }
-
     /**
      * @name setUserInDB
      * @description calls query to update user.
@@ -69,10 +66,22 @@ export default class Users extends UniBase {
         Queries.updateUser(this._id as string, type, (type == "universe" ? this.universe : this.statistics))
     }
 
+    /**
+     * @name updateTransferableInventory
+     * @description updates the database of the transferable inventory.
+     */
     public async updateTransferableInventory() {
         await Queries.updateUserTransferableInventory(this._id as string, this.inventory.transferable)
     }
 
+    /**
+     * @name setItemAsTomoGifted
+     * @description gives item to tomo. marks the gifted array with the item and stores it in tomo inventory.
+     * @param tomoID number of the tomo you want to gift.
+     * @param itemID the item id 
+     * @param amount the item amount
+     * @returns 
+     */
     public async setItemAsTomoGifted(tomoID: number, itemID: number, amount: number = 1) {
         const payload = {
             "date": new Date(),
@@ -90,9 +99,6 @@ export default class Users extends UniBase {
         } else {
             this.inventory.intransferable.chs[tomo].stats.gift.recentReceived.unshift(payload);
         }
-        
-
-        //this.inventory.intransferable.chs[tomo].stats.gift.recentReceived = payload;
     }
 
     public async updateTomo() {

@@ -122,7 +122,7 @@ export class EngineUtils {
         return BaseGrade[int] 
     }
 
-    public static async fill_Select_With_Inventory(INVENTORY: Array<ItemClass>, maxPerColumn: number) {
+    public static async fillSelectWithInventory(INVENTORY: Array<ItemClass>, maxPerColumn: number = 23): Promise<Array<Array<SelectItemMenuChoices>>> {
         // declare.
         let i: number = 0, invI: number = 0, columnAmount = Math.ceil(INVENTORY.length / maxPerColumn), totalMax: number = 0, ret = [];
         // init the array(s).

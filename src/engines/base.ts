@@ -1,12 +1,12 @@
 //imports
-import { ButtonInteraction, CollectorFilter, CommandInteraction, InteractionCollector, Message, MessageAttachment, MessageComponentInteraction, MessageComponentType, SelectMenuInteraction } from "discord.js";
+import { ButtonInteraction, CollectorFilter, CommandInteraction, InteractionCollector, Message, MessageComponentInteraction, MessageComponentType, SelectMenuInteraction } from "discord.js";
 import { EventEmitter } from "events";
 import { CharacterBasic, CharacterInteractions, CharacterSkins } from "../types/models/characters";
 import { BackgroundCapsule, BaseSingle, CharacterCapsule, NovelSingle } from "../types/models/stories";
 import { UniverseUser } from "../types/models/users";
 import AssetManagement from "../utilities/assetManagement/assetUtililties";
 import { EngineUtils } from "../utilities/engineUtilities/utils";
-import { EngineError, UniBaseNotFoundError } from "../utilities/errors/errors";
+import { EngineError } from "../utilities/errors/errors";
 import Queries from "../utilities/mongodb/queries";
 import Background from "./classes/backgrounds";
 import Character from "./classes/characters";

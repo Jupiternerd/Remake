@@ -12,7 +12,6 @@ import { EngineError } from "../../utilities/errors/errors";
 import Queries from "../../utilities/mongodb/queries";
 import EngineBase from "../base";
 import Character from "../classes/characters";
-import ItemClass from "../classes/items";
 import NovelCore from "../novel/core";
 
 // author = shokkunn
@@ -121,7 +120,7 @@ export default class TomoCore extends EngineBase {
         const INVENTORY = await this.user.populateTransferableInventory();
         this.currentInvIndex = 0;
 
-        this.invInGroups = await EngineUtils.fill_Select_With_Inventory(INVENTORY.filter(i => i.giftable == true), 23);
+        this.invInGroups = await EngineUtils.fillSelectWithInventory(INVENTORY.filter(i => i.giftable == true), 23);
         
         // second, we insert the gift selection node.
         const SELECTION_NODE: NovelSingle[] = [
