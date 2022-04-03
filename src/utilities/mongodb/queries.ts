@@ -139,7 +139,7 @@ export default class Queries {
             payload = await Mango.DB_USERS.collection<basic>(collections).findOne({_id: id});
             if (!payload) throw new UserNotFoundError(id) // error logging.
         } catch (error) {
-            console.error(error);
+            //console.error(error);
         } finally {
             // return the payload.
             return payload;

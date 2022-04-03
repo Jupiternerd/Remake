@@ -39,6 +39,14 @@ export default class Users extends UniBase {
         return this.universe.inventory;
     }
 
+    public set level(lvl: number) {
+        this.universe.level = lvl;
+    }
+
+    public set exp(xp: number) {
+        this.universe.exp = xp;
+    }
+
     /**
      * @Name | pullUniverse
      * @Desc | pulls user universe like inventory, etc.
@@ -101,8 +109,28 @@ export default class Users extends UniBase {
         }
     }
 
+    /**
+     * @name addToUserEXP
+     * @description This is a temporary command where you can add to a user exp.
+     * If it reaches 100, we add one to the user's level and reset the exp.
+     * @param {number} amount you want to add to the exp pool.
+     */
+    public async addToUserEXP(amount: number) {
+        const FINAL = this.universe.exp + amount;
+        if (FINAL >= 100) {
+            this.exp = 0;
+            this.level += 1;
+        }
+        this.exp += FINAL;
+    }
+
+
+
+    /**
+     * @name updateTomo
+     * @description Updates the tomo stats.
+     */
     public async updateTomo() {
-        console.log(this.chs[0].stats.inventory)
         await Queries.updateTomos(this._id as string, this.chs)
     }
 

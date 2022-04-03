@@ -1,6 +1,7 @@
 // imports
 const { SlashCommandBuilder } = require("@discordjs/builders");
 import { CommandInteraction } from "discord.js";
+import Queries from "../../utilities/mongodb/queries.js";
 import square from "../../utilities/redis/square.js"
 import Custom_Client from "../client/client";
 
@@ -80,6 +81,7 @@ export default abstract class Commands {
         // Main server check.
         if (this.mainOnly) {
             interaction.reply("This command does not work here.")
+            return false;
         }
 
         // Owner check.
@@ -97,8 +99,14 @@ export default abstract class Commands {
             }
         }
 
-        // All clear.
+        // Finally, Check user is in Db.
+        if (!(await Queries.user(interaction.user.id, "universe"))) {
+            // Add in user Database.
+            return false;
+        }
+
         return true;
+
     }
 
     /** @Helpful Functions */

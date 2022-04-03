@@ -44,6 +44,8 @@ export interface intransferable {
 }
 
 export interface UniverseUser extends basic {
+    level: number,
+    exp: number
     inventory: {
         transferable: Array<ItemInUser>
         intransferable: intransferable
