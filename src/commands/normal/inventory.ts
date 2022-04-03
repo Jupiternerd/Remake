@@ -4,9 +4,6 @@ import client from "../../amadeus/client/client";
 import Commands from "../../amadeus/abstracts/commands";
 import { EngineUtils, StringUtils } from "../../utilities/engineUtilities/utils";
 import Users from "../../engines/classes/users";
-import { SelectItemMenuChoices } from "../../types/models/stories";
-import { SelectMenuComponent } from "@discordjs/builders";
-import { RawMessageSelectMenuInteractionData } from "discord.js/typings/rawDataTypes";
 
 // author = Shokkunn
 
@@ -41,10 +38,7 @@ class Inventory extends Commands {
         }
 
         const COMPONENT: MessageSelectMenuOptions = {
-            // If this single has it's own default place holder. If not provide our own.
-            // Also if there is a selection we will put the selection as the label. ( deprecated, since discord already does it )
             placeholder: "⚠️ Prettier Version Soon! Temporary Command.",
-            //this.selection == undefined ? (this.multiples[this.index].type.special.default ? this.multiples[this.index].type.special.default : "Select an option") : this.multiples[this.index].type.special.choices[this.selection].label,
             customId: "CMD_INVENTORY.select_" + "0" + "_user_" + interaction.user.id,
             options: col[0]
         }
