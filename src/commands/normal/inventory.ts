@@ -31,7 +31,7 @@ class Inventory extends Commands {
         await USER.pullUniverse();
 
         const INVENTORY = await USER.populateTransferableInventory()
-        let col = await EngineUtils.fillSelectWithInventory(INVENTORY, 25)
+        let col = await EngineUtils.fillSelectWithInventory(INVENTORY, 25), curItem: number;
 
         // Prunes the buttons to move the menu.
         for (let i = 0; i < col.length - 1; i++) {
@@ -43,7 +43,7 @@ class Inventory extends Commands {
         const COMPONENT: MessageSelectMenuOptions = {
             // If this single has it's own default place holder. If not provide our own.
             // Also if there is a selection we will put the selection as the label. ( deprecated, since discord already does it )
-            placeholder: "WARNING: Prettier command soon. Work around for now.",
+            placeholder: "⚠️ Prettier Version Soon! Temporary Command.",
             //this.selection == undefined ? (this.multiples[this.index].type.special.default ? this.multiples[this.index].type.special.default : "Select an option") : this.multiples[this.index].type.special.choices[this.selection].label,
             customId: "CMD_INVENTORY.select_" + "0" + "_user_" + interaction.user.id,
             options: col[0]
@@ -63,9 +63,12 @@ class Inventory extends Commands {
 
         COLLECTOR.on("collect", async (i) => {
             const ITEMID = col[0][parseInt(i.values[0])].item._id as number;
+            if (curItem == ITEMID) return;
             const ITEM = INVENTORY.find(i => i._id == ITEMID)
 
-            await interaction.editReply({content: `${ITEM.basic.emoji} ITEM: ${ITEM.formattedOutput}\n❓ DESC: ${ITEM.basic.description}\n🎁 GIFTABLE? ${StringUtils.boolToReadable(ITEM.giftable)}\n\n🔢 AMOUNT IN INVENTORY: ` + ITEM.amount})
+            curItem = ITEMID;
+
+            await interaction.editReply({content: `${ITEM.basic.emoji} **${ITEM.formattedOutput}**\n\n❓ **Description** • \`\`${ITEM.basic.description}\`\`\n🎁 **Giftable?** • \`\`${StringUtils.boolToReadable(ITEM.giftable)}\`\`\n🔢 **Amount in Inventory** • \`\`${ITEM.amount}\`\``})
         })
 
         COLLECTOR.once("end", async (i) => {
