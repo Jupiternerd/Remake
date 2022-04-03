@@ -171,23 +171,29 @@ export default class TomoCore extends EngineBase {
         responseMood: TemporaryMoodTypeStrings
 
         // Check if the item grade against the character. 
-        if (CHARACTER.basic.grade < gift.grade) responseContent = responseDict.aboveTier[MathUtils.randIntFromZero(responseDict.aboveTier.length)],
+        if (CHARACTER.basic.grade < gift.grade) 
+        responseContent = responseDict.aboveTier[MathUtils.randIntFromZero(responseDict.aboveTier.length)],
         responseMood = "happy";
-        if (CHARACTER.basic.grade == gift.grade) responseContent = responseDict.averageTier[MathUtils.randIntFromZero(responseDict.averageTier.length)],
+        if (CHARACTER.basic.grade == gift.grade) 
+        responseContent = responseDict.averageTier[MathUtils.randIntFromZero(responseDict.averageTier.length)],
         responseMood = "normal";
-        if (CHARACTER.basic.grade > gift.grade) responseContent = responseDict.belowTier[MathUtils.randIntFromZero(responseDict.belowTier.length)],
+        if (CHARACTER.basic.grade > gift.grade) 
+        responseContent = responseDict.belowTier[MathUtils.randIntFromZero(responseDict.belowTier.length)],
         responseMood = "sad";
 
         // If the item is hated, this is the second strongest reaction.
-        if (specificCharacter.gift.dislikes.includes(gift._id as number)) responseContent = responseDict.dislikes[MathUtils.randIntFromZero(responseDict.dislikes.length)],
+        if (specificCharacter.gift.dislikes.includes(gift._id as number)) 
+        responseContent = responseDict.dislikes[MathUtils.randIntFromZero(responseDict.dislikes.length)],
         responseMood = "annoyed";
 
         // Liking something should be the strongest reaction.
-        if (specificCharacter.gift.likes.includes(gift._id as number)) responseContent = responseDict.likes[MathUtils.randIntFromZero(responseDict.likes.length)], 
+        if (specificCharacter.gift.likes.includes(gift._id as number)) 
+        responseContent = responseDict.likes[MathUtils.randIntFromZero(responseDict.likes.length)], 
         responseMood = "flustered";
 
         // Unless it's a duplicate.
-        if (specificCharacter.gift.recentReceived.findIndex(i => i.itemID == gift._id) >= 0) responseContent = responseDict.duplicate[MathUtils.randIntFromZero(responseDict.duplicate.length)],
+        if (specificCharacter.gift.recentReceived.findIndex(i => i.itemID == gift._id) >= 0) 
+        responseContent = responseDict.duplicate[MathUtils.randIntFromZero(responseDict.duplicate.length)],
         responseMood = "sad";
 
         // Set the character to their mood.
