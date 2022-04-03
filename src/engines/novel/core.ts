@@ -185,13 +185,13 @@ export default class NovelCore extends EngineBase {
         // Get the current slide.
         const CURRENT: NovelSingle = this.multiples[this.index]
         // Edge case.
-        if (CURRENT.txt.speaker == "monologue") return `>>> ${StringUtils.periodTheString(CURRENT.txt.content)}`;
-        if (CURRENT.txt.speaker == "user") return `>>> You • ${StringUtils.periodTheString(CURRENT.txt.content)}`
+        if (CURRENT.txt.speaker == "monologue") return `>>> *${StringUtils.periodTheString(CURRENT.txt.content)}*`;
+        if (CURRENT.txt.speaker == "user") return `>>> **You** • ${StringUtils.periodTheString(CURRENT.txt.content)}`
         // Parse the script.
         const CHARACTER: Character = this.cachedCharacters.get(CURRENT.ch[CURRENT.txt.speaker].id),
         SANITIZED_CONTENT: string = StringUtils.periodTheString(CURRENT.txt.content.startsWith("$") ? this._parseDialogue(CURRENT.txt.content as DialogueScript) : CURRENT.txt.content)
         // format and return the string.
-        return `>>> ${CHARACTER.basic.emoji} ${CHARACTER.basic.name} • ` + SANITIZED_CONTENT;
+        return `>>> ${CHARACTER.basic.emoji} **${CHARACTER.basic.name}** • ` + SANITIZED_CONTENT;
     }
 
     /**
