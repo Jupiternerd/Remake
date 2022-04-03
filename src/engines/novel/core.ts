@@ -70,8 +70,8 @@ export default class NovelCore extends EngineBase {
 
         // Set custom novel id.
         let IMAGE_BUFFER_KEY = "NOVEL_BUFFER" + "_" + single.bg + "_";
-        if (single.type.display == "duet") IMAGE_BUFFER_KEY += `${single.ch[0].id}_${single.ch[0].mood}_DUET_${single.ch[1].id}_${single.ch[1].mood}`;
-        if (single.type.display == "normal") IMAGE_BUFFER_KEY += `${single.ch[0].id}_${single.ch[0].mood}`;
+        if (single.type.display == "duet") IMAGE_BUFFER_KEY += `${single.ch[0].id}_${single.ch[0].mood}_DUET_${single.ch[1].id}_${single.ch[1].mood}+${single.txt.speaker}`;
+        if (single.type.display == "normal") IMAGE_BUFFER_KEY += `${single.ch[0].id}_${single.ch[0].mood}+${single.txt.speaker}`;
         if (single.type.display == "wallpaper") IMAGE_BUFFER_KEY += "WALLPAPER";
         const CUSTOM_ID = "NOVEL" + "_" + single.i + "_" + single.type.display.toUpperCase() + "_"+ "_USERID_" + this.interaction.user.id + "." + "webp", QUALITY = {quality: 24, alphaQuality: 40} // file name.
         
@@ -98,7 +98,7 @@ export default class NovelCore extends EngineBase {
         if (SIMILAR_NODE) {
             single.built = SIMILAR_NODE.built;
             //console.log("Found Similar Node");
-            //console.timeEnd("BUILD_" + i);
+            console.timeEnd("BUILD_" + i);
             return single.built;
         }
         // try to get bg.
@@ -113,7 +113,7 @@ export default class NovelCore extends EngineBase {
         if (single.type.display === "wallpaper") {
             //console.log("wallpaper")
             // set the property to show that it is built and attach the MessageAttachment.
-            //console.timeEnd("BUILD_" + i);
+            console.timeEnd("BUILD_" + i);
             // return built image.
             return new MessageAttachment(await CANVAS.webp(QUALITY).toBuffer(), CUSTOM_ID);
         }
@@ -150,14 +150,12 @@ export default class NovelCore extends EngineBase {
             // Final output block.                           
             CANVAS.composite(IMGARR)
             // Log end time.
-            //console.timeEnd("BUILD_" + i);
+            console.timeEnd("BUILD_" + i);
             // return
             return new MessageAttachment(await CANVAS.webp(QUALITY).toBuffer(), CUSTOM_ID);
         }
 
-        // Finally the default normal display.
-        //console.log("normal")
-        // get the image from the cache.
+        // Default display (One Character). get the image from the cache.
         try {
             // Since ic will always be 0, we don't have to just put in 0.
             IMAGE = this.loadedImageCharacters.get(EngineUtils.getCharacterCacheKey(single.ch[0].id, single.ch[0].mood))
@@ -170,8 +168,9 @@ export default class NovelCore extends EngineBase {
         // overlay the image ontop of the background. 
         CANVAS.composite([{input: await IMAGE.toBuffer(), gravity: sharp.gravity.south}]) // Gravity to south so there is no space in the bottom.
         // complete the timer.
-        BUFFER = await CANVAS.webp(QUALITY).toBuffer()
         console.timeEnd("BUILD_" + i);
+        // Set the buffer in the memory.
+        BUFFER = await CANVAS.webp(QUALITY).toBuffer()
         Square.memory().setBuffer(IMAGE_BUFFER_KEY, BUFFER);
         // return the attachment.
         return new MessageAttachment(BUFFER, CUSTOM_ID);
