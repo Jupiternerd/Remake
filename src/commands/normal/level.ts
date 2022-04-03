@@ -1,16 +1,15 @@
 // imports
 import { CommandInteraction } from "discord.js";
-const { SlashCommandBuilder } = require("@discordjs/builders")
 import client from "../../amadeus/client/client";
 import Commands from "../../amadeus/abstracts/commands";
 import Queries from "../../utilities/mongodb/queries";
 import { UniverseUser } from "../../types/models/users";
-import { GUIUtils, StringUtils } from "../../utilities/engineUtilities/utils";
+import { GUIUtils } from "../../utilities/engineUtilities/utils";
 
 // author = Shokkunn
 
 /**
- * Name | Ping command
+ * Name | Level command
  */
 class Level extends Commands {
     constructor() {
@@ -26,7 +25,7 @@ class Level extends Commands {
         const USER = await Queries.user(interaction.user.id, "universe") as UniverseUser;
         const FLOOR: number = Math.floor(USER.exp / 10);
         const GUI: string = await GUIUtils.barUI(FLOOR, 10)
-        interaction.reply(`Level • ${USER.level}\n${GUI}\n    EXP • ${USER.exp} / 100`);
+        interaction.reply(`**${interaction.user.username}\'s** Level • \`\`${USER.level}\`\`\n${GUI}\n        EXP • \`\`${USER.exp}\`\` / 100`);
     }
 }
 
