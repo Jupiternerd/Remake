@@ -66,6 +66,16 @@ export class StringUtils {
     static periodTheString(string: string): string {
         return (string.endsWith('.') && !string.endsWith("?" || "!") ? string : string + '.');
     }
+
+    /**
+     * Name | boolToReadable
+     * Desc | converts true to yes, false to no.
+     * @param bool 
+     * @returns string
+     */
+    static boolToReadable(bool: boolean): string {
+        return (bool ? "yes" : "no");
+    }
 }
 
 export class EngineUtils {

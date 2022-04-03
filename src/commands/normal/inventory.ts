@@ -2,7 +2,7 @@
 import { CommandInteraction, MessageSelectMenu, MessageSelectMenuOptions, MessageActionRow, Message, MessageComponentInteraction} from "discord.js";
 import client from "../../amadeus/client/client";
 import Commands from "../../amadeus/abstracts/commands";
-import { EngineUtils } from "../../utilities/engineUtilities/utils";
+import { EngineUtils, StringUtils } from "../../utilities/engineUtilities/utils";
 import Users from "../../engines/classes/users";
 import { SelectItemMenuChoices } from "../../types/models/stories";
 import { SelectMenuComponent } from "@discordjs/builders";
@@ -64,8 +64,12 @@ class Inventory extends Commands {
         COLLECTOR.on("collect", async (i) => {
             const ITEMID = col[0][parseInt(i.values[0])].item._id as number;
             const ITEM = INVENTORY.find(i => i._id == ITEMID)
-            
-            await interaction.editReply({content: `${ITEM.basic.emoji} ITEM: ${ITEM.formattedOutput}\n❓ DESC: ${ITEM.basic.description}\n🎁 GIFTABLE? ${ITEM.giftable}\n\n🔢 AMOUNT IN INVENTORY: ` + ITEM.amount})
+
+            await interaction.editReply({content: `${ITEM.basic.emoji} ITEM: ${ITEM.formattedOutput}\n❓ DESC: ${ITEM.basic.description}\n🎁 GIFTABLE? ${StringUtils.boolToReadable(ITEM.giftable)}\n\n🔢 AMOUNT IN INVENTORY: ` + ITEM.amount})
+        })
+
+        COLLECTOR.once("end", async (i) => {
+            interaction.editReply({content: "COMPLETED", components: []})
         })
 
         
