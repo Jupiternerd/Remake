@@ -470,12 +470,13 @@ export default class NovelCore extends EngineBase {
             // clear the selection.
             this.selection = undefined;            
             // Edge Case, if it's null do nothing.
-            if (ROUTE == null || !ROUTE) return; 
-            // If the route is a number, we assume they want to travel to that index in the novel.
-            if (typeof ROUTE == "number") return await this.setPage(ROUTE);
+            if (ROUTE == null) return; 
+            // Parse the Route to see if it's a NaN or not.
+            const PARSED = parseInt(ROUTE as string);
             // If the route is a script (string), we leave the parseScript function to handle it.
-            if (typeof ROUTE == "string") return await this._parseScript(ROUTE);
-
+            if (PARSED == NaN) return await this._parseScript(ROUTE as NovelScript);
+            // If the route is a number, we assume they want to travel to that index in the novel.
+            return await this.setPage(PARSED);
         }
     }
 
