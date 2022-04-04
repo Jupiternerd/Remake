@@ -69,37 +69,39 @@ export default class NovelCore extends EngineBase {
         let single = this.multiples[i] as NovelSingle, IMAGE: Sharp, CANVAS: Sharp, iC: number = 0, BUFFER: Buffer;
 
         // Set custom novel id.
-        let IMAGE_BUFFER_KEY = "NOVEL_BUFFER" + "_" + single.bg + "_";
+        let IMAGE_BUFFER_KEY = "NOVEL_BUFFER" + `_${single.bg.id}+${single.bg.blurred}_;`
         if (single.type.display == "duet") IMAGE_BUFFER_KEY += `${single.ch[0].id}_${single.ch[0].mood}_DUET_${single.ch[1].id}_${single.ch[1].mood}+${single.txt.speaker}`;
         if (single.type.display == "normal") IMAGE_BUFFER_KEY += `${single.ch[0].id}_${single.ch[0].mood}+${single.txt.speaker}`;
         if (single.type.display == "wallpaper") IMAGE_BUFFER_KEY += "WALLPAPER";
         const CUSTOM_ID = "NOVEL" + "_" + single.i + "_" + single.type.display.toUpperCase() + "_"+ "_USERID_" + this.interaction.user.id + "." + "webp", QUALITY = {quality: 24, alphaQuality: 40} // file name.
         
-        // First redundant filter, if we have the same image in the redis buffer. (Only works with no skin)
+        // First redundant filter. So we don't waste power on drawing the same image.
+        const SIMILAR_NODE: NovelSingle = this.multiples.find((node: NovelSingle) =>
+            (node.built != undefined || !node.built) && // is it built?
+            (node.i < single.i) &&
+            (node.type.display == single.type.display) && // if there are nodes that have the same display type.
+            (node.ch == single.ch) && // same characters.
+            (node.txt.speaker == single.txt.speaker) && // same speaker.
+            (node.bg.id == single.bg.id)) // and same background.
+
+        // if we do find one.
+        if (SIMILAR_NODE) {
+            single.built = SIMILAR_NODE.built;
+            console.log("Found Similar Node at " + i + " From surrogate " + SIMILAR_NODE.i);
+            console.timeEnd("BUILD_" + i);
+            return single.built;
+        }
+
+        // Second redundant filter, if we have the same image in the redis buffer. (Only works with no skin)
         if (single.ch[0].useSkin == false) {
             BUFFER = await Square.memory().getBuffer(IMAGE_BUFFER_KEY);
             if (BUFFER) {
                 // if we have a buffer
                 single.built = new MessageAttachment(BUFFER, CUSTOM_ID);
+                console.log("Found Buffer at " + i)
                 console.timeEnd("BUILD_" + i)
                 return single.built;
             }
-        }
-
-        // More redundant filters. So we don't waste power on drawing the same image.
-        const SIMILAR_NODE: NovelSingle = this.multiples.find((node: NovelSingle) => 
-            (node.built != undefined) && // is it built?
-            (node.type.display === single.type.display) && // if there are nodes that have the same display type.
-            (node.ch === single.ch) && // same characters.
-            (node.txt.speaker === single.txt.speaker) && // same speaker.
-            (node.bg.id === single.bg.id)) // and same background.
-
-        // if we do find one.
-        if (SIMILAR_NODE) {
-            single.built = SIMILAR_NODE.built;
-            //console.log("Found Similar Node");
-            console.timeEnd("BUILD_" + i);
-            return single.built;
         }
         // try to get bg.
         try {
@@ -114,8 +116,11 @@ export default class NovelCore extends EngineBase {
             //console.log("wallpaper")
             // set the property to show that it is built and attach the MessageAttachment.
             console.timeEnd("BUILD_" + i);
-            // return built image.
-            return new MessageAttachment(await CANVAS.webp(QUALITY).toBuffer(), CUSTOM_ID);
+            // Set the buffer in the memory.
+            BUFFER = await CANVAS.webp(QUALITY).toBuffer();
+            Square.memory().setBuffer(IMAGE_BUFFER_KEY, BUFFER);
+            // return the attachment.
+            return new MessageAttachment(BUFFER, CUSTOM_ID);
         }
         // duet display.
         if (single.type.display === "duet") {
@@ -147,12 +152,15 @@ export default class NovelCore extends EngineBase {
                     top: POSITIONY
                 })
             }
-            // Final output block.                           
-            CANVAS.composite(IMGARR)
+            // Final output block.         
+            CANVAS.composite(IMGARR);
             // Log end time.
             console.timeEnd("BUILD_" + i);
-            // return
-            return new MessageAttachment(await CANVAS.webp(QUALITY).toBuffer(), CUSTOM_ID);
+            // Set the buffer in the memory.
+            BUFFER = await CANVAS.webp(QUALITY).toBuffer();
+            Square.memory().setBuffer(IMAGE_BUFFER_KEY, BUFFER);
+            // return the attachment.
+            return new MessageAttachment(BUFFER, CUSTOM_ID);
         }
 
         // Default display (One Character). get the image from the cache.
@@ -256,6 +264,8 @@ export default class NovelCore extends EngineBase {
         this.pageChange(this.multiples[to])
         // set this as new index.
         this.index = to;
+
+        console.log(to + " Loading to page.")
         // configure the payload.
         const payload: WebhookEditMessageOptions = {
             files: [ this.multiples[this.index].built ? 
@@ -287,7 +297,6 @@ export default class NovelCore extends EngineBase {
         }
         // edit.
         await this.interaction.editReply(payload);
-
         // Refresh CoolDown
         this.refreshCoolDown();
     }
@@ -471,12 +480,10 @@ export default class NovelCore extends EngineBase {
             this.selection = undefined;            
             // Edge Case, if it's null do nothing.
             if (ROUTE == null) return; 
-            // Parse the Route to see if it's a NaN or not.
-            const PARSED = parseInt(ROUTE as string);
-            // If the route is a script (string), we leave the parseScript function to handle it.
-            if (PARSED == NaN) return await this._parseScript(ROUTE as NovelScript);
             // If the route is a number, we assume they want to travel to that index in the novel.
-            return await this.setPage(PARSED);
+            if (typeof ROUTE == "number") return await this.setPage(ROUTE);
+            // If the route is a script (string), we leave the parseScript function to handle it.
+            if (typeof ROUTE == "string") return await this._parseScript(ROUTE);
         }
     }
 

@@ -238,17 +238,10 @@ class Novel extends Commands {
             
         ]
         
-        const stuff = await Queries.story(0)
-        
         const novel = new NovelCore(interaction, multiples)
-        console.time("One")
         novel.once("ready", () => {
-            console.timeEnd("One")
             novel.start()
-
-            //console.log(sharp.concurrency())
         })
-        console.log(stuff)
 
         
     }

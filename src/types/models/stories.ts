@@ -1,5 +1,5 @@
 import { MessageAttachment, MessageSelectOptionData } from "discord.js";
-import { basic } from "../local/static";
+import { basic, FixedLengthArray } from "../local/static";
 import { TemporaryMoodTypeStrings } from "./characters";
 import { Item } from "./items";
 import { ItemInUser } from "./users";
@@ -23,7 +23,7 @@ export interface BackgroundCapsule {
 export interface BaseSingle {
     i?: number;
     bg?: BackgroundCapsule,
-    ch?: Array<CharacterCapsule>
+    ch?: FixedLengthArray<[CharacterCapsule, CharacterCapsule?]>
     built?: MessageAttachment
 }
 export type NovelScript = "next" | "back" | "nextInventoryPage" | "backInventoryPage" | "findInventoryPage";
