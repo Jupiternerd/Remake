@@ -70,7 +70,7 @@ export default class NovelCore extends EngineBase {
 
         // Set custom novel id.
         let IMAGE_BUFFER_KEY = "NOVEL_BUFFER" + `_${single.bg.id}+${single.bg.blurred}_;`
-        if (single.type.display == "duet") IMAGE_BUFFER_KEY += `${single.ch[0].id}_${single.ch[0].mood}_DUET_${single.ch[1].id}_${single.ch[1].mood}+${single.txt.speaker}`;
+        if (single.type.display == "duet") IMAGE_BUFFER_KEY += `${single.ch[0].id}_${single.ch[0].mood}_DUET_${single.ch[1].id}_${single.ch[1].mood}+${(typeof single.txt.speaker == "string" ? "GRAY" : "COLOR")}`;
         if (single.type.display == "normal") IMAGE_BUFFER_KEY += `${single.ch[0].id}_${single.ch[0].mood}+${single.txt.speaker}`;
         if (single.type.display == "wallpaper") IMAGE_BUFFER_KEY += "WALLPAPER";
         const CUSTOM_ID = "NOVEL" + "_" + single.i + "_" + single.type.display.toUpperCase() + "_"+ "_USERID_" + this.interaction.user.id + "." + "webp", QUALITY = {quality: 24, alphaQuality: 40} // file name.
