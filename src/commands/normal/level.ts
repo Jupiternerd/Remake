@@ -25,7 +25,7 @@ class Level extends Commands {
         const USER = await Queries.user(interaction.user.id, "universe") as UniverseUser;
         const FLOOR: number = Math.floor(USER.exp / 10);
         const GUI: string = await GUIUtils.barUI(FLOOR, 10)
-        interaction.reply(`**${interaction.user.username}\'s** Level • \`\`${USER.level}\`\`\n${GUI}\n        EXP • \`\`${USER.exp}\`\` / 100`);
+        interaction.reply(`  **${interaction.user.username}\'s** Level • \`\`${USER.level}\`\`\n\`\`${USER.level}\`\` *${GUI}* \`\`${USER.level + 1}\`\`\n   ✨ EXP • \`\`${USER.exp}\`\` / 100`);
     }
 }
 

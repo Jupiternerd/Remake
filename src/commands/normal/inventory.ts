@@ -15,7 +15,7 @@ class Inventory extends Commands {
         super("inventory", // name 
         "Shows your inventory",
         {
-            coolDown: 5000
+            coolDown: 8000
         })
 
     }
@@ -61,12 +61,12 @@ class Inventory extends Commands {
             const ITEM = INVENTORY.find(i => i._id == ITEMID)
 
             curItem = ITEMID;
-
+            COLLECTOR.resetTimer();
             await interaction.editReply({content: `${ITEM.basic.emoji} **${ITEM.formattedOutput}**\n\n❓ **Description** • \`\`${ITEM.basic.description}\`\`\n🎁 **Giftable?** • \`\`${StringUtils.boolToReadable(ITEM.giftable)}\`\`\n🔢 **Amount in Inventory** • \`\`${ITEM.amount}\`\``})
         })
 
         COLLECTOR.once("end", async (i) => {
-            interaction.editReply({content: "COMPLETED", components: []})
+            interaction.editReply({content: "Command timed-out. /inventory again to view!", components: []})
         })
 
         
