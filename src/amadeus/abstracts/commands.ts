@@ -92,7 +92,7 @@ export default abstract class Commands {
         // Cool down check.
         if (this.cooldown > 0) {
             if (await this.isUserInCoolDown(interaction)) {
-                interaction.reply(`Sorry, you're on a cooldown!`)
+                interaction.reply(`Sorry, you're on a cooldown! \`\`${await this.getUserInCoolDown(interaction.user.id)}\`\` seconds.`)
                 return false;
             } else {
                 this.addUserToCoolDown(interaction);
@@ -106,7 +106,6 @@ export default abstract class Commands {
         }
 
         return true;
-
     }
 
     /** @Helpful Functions */
@@ -120,7 +119,17 @@ export default abstract class Commands {
     static async isUserInCoolDown(interaction: CommandInteraction, command: string): Promise<boolean> {
         // The .exists() spits out a number that matches the key so if there are 2 matches it will return 2. 0 if none.
         return (await square.memory().exists(`cd_${interaction.user.id}`, command) > 0 ? true : false ) // > 0 true. less than 0: false.
+    }
 
+    /**
+     * @name getUserInCoolDown
+     * @description gets the user in cd's information about the cd.
+     * @param userID 
+     * @param command 
+     * @returns the type of user in cd.
+     */
+    static async getUserInCoolDown(userID: string): Promise<number> {
+        return (await square.memory().ttl(`cd_${userID}`));
     }
 
     /**
@@ -148,6 +157,15 @@ export default abstract class Commands {
      */
      async isUserInCoolDown(interaction: CommandInteraction, command: string = this.name): Promise<boolean> {
         return await Commands.isUserInCoolDown(interaction, command);
+    }
+    /**
+     * overload of getUserInCoolDown
+     * @param userID 
+     * @param command 
+     * @returns 
+     */
+    async getUserInCoolDown(userID: string): Promise<number> {
+        return await Commands.getUserInCoolDown(userID)
     }
 
     /**
