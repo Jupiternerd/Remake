@@ -107,8 +107,20 @@ export default class TomoCore extends EngineBase {
     
     /** Buttons */
     private async _info(index: number = this.index) {
-        console.log("_info")
-
+        const CHARACTER = this.cachedCharacters.get(this.chInUser[index]._id as number), 
+        SPECIFIC = this.chInUser[index];
+        await this.interaction.editReply(
+            {
+                content: "*Temporary Information Page. Custom Pages soon...*\n" +
+                `${CHARACTER.basic.emoji} **${CHARACTER.formattedOutput}**\n` +
+                // Actual info
+                `Level • ${SPECIFIC.stats.level}\n EXP • ${SPECIFIC.stats.xp} / 100\n Hungry? • ${SPECIFIC.stats.hunger <= this.hungerLimit ? 'yes' : 'no'}\n\n` +
+                `Meter • ${SPECIFIC.stats.mood.meter}`,
+                attachments: [],
+                components: []
+            }
+            )
+        
     }
 
     /**
@@ -167,7 +179,8 @@ export default class TomoCore extends EngineBase {
             "special": {
                 "type": "normal"
             }
-        }}, responseDict = CHARACTER.interactions.gifts, specificCharacter = this.chInUser[this.index].stats, 
+        }}, 
+        responseDict = CHARACTER.interactions.gifts, specificCharacter = this.chInUser[this.index].stats, 
         response: Reaction,
         column: string;
 
@@ -316,15 +329,10 @@ export default class TomoCore extends EngineBase {
                 // gift
                 case 0:
                     //SELECTED_STORY = await CHARACTER.getStoryFromDB(CHARACTER._id as number, EngineUtils.convertNumberToMoodStr(this.chInUser[index].stats.mood.current), "gift")
-                    this.__gift(CHARACTER)
-                    
-                    break;
+                    return this.__gift(CHARACTER)
                 // talk
                 case 1:
-                    
-                    this.__talk(CHARACTER, index)
-                    break;
-
+                    return this.__talk(CHARACTER, index)
             }
             
         })
@@ -353,15 +361,13 @@ export default class TomoCore extends EngineBase {
             switch (BUTTON) {
                 // 0 is info.
                 case 0:
-                    return this._info()
+                    return this._info();
                 case 1:
                 // 1 is intearact.
-                    return this._interact()
+                    return this._interact();
                 case 2:
                 // 2 is danger.
-                    return this._danger()
-
-                    
+                    return this._danger();
             }
         })        
     }
