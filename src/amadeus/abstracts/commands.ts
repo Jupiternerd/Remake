@@ -92,7 +92,8 @@ export default abstract class Commands {
         // Cool down check.
         if (this.cooldown > 0) {
             if (await this.isUserInCoolDown(interaction)) {
-                interaction.reply(`Sorry, you're on a cooldown! \`\`${await this.getUserInCoolDown(interaction.user.id)}\`\` seconds.`)
+                const CD = await this.getUserInCoolDown(interaction.user.id);
+                interaction.reply(`Sorry, you're on a cooldown! \`\`${CD}\`\` second${CD > 1 ? 's' : ''}.`)
                 return false;
             } else {
                 this.addUserToCoolDown(interaction);
