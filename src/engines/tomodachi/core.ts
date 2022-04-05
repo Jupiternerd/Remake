@@ -3,7 +3,7 @@
 import { ButtonInteraction, CommandInteraction, InteractionCollector, Message, MessageActionRow, MessageAttachment, MessageButton, MessageButtonOptions, MessageSelectMenu, MessageSelectMenuOptions, WebhookEditMessageOptions } from "discord.js";
 import { MessageButtonStyles } from "discord.js/typings/enums";
 import sharp from "sharp";
-import { CharacterInteractions, TemporaryMoodTypeStrings } from "../../types/models/characters";
+import { CharacterInteractions, Reaction, TemporaryMoodTypeStrings } from "../../types/models/characters";
 import { Item } from "../../types/models/items";
 import { BaseSingle, NovelSingle, SelectItemMenuChoices, Story } from "../../types/models/stories";
 import { ChInUser, ItemInUser } from "../../types/models/users";
@@ -21,6 +21,7 @@ export default class TomoCore extends EngineBase {
     private LIMIT: number = 8;
     private coreHandler: NovelCore;
     private chInUser: Array<ChInUser>;
+    private hungerLimit: number = 75;
 
     // gifting globals.
     private invInGroups: Array<Array<SelectItemMenuChoices>> 
@@ -167,35 +168,32 @@ export default class TomoCore extends EngineBase {
                 "type": "normal"
             }
         }}, responseDict = CHARACTER.interactions.gifts, specificCharacter = this.chInUser[this.index].stats, 
-        responseContent: string,
-        responseMood: TemporaryMoodTypeStrings
+        response: Reaction,
+        column: string;
 
         // Check if the item grade against the character. 
-        if (CHARACTER.basic.grade < gift.grade) 
-        responseContent = responseDict.aboveTier[MathUtils.randIntFromZero(responseDict.aboveTier.length)],
-        responseMood = "happy";
-        if (CHARACTER.basic.grade == gift.grade) 
-        responseContent = responseDict.averageTier[MathUtils.randIntFromZero(responseDict.averageTier.length)],
-        responseMood = "normal";
-        if (CHARACTER.basic.grade > gift.grade) 
-        responseContent = responseDict.belowTier[MathUtils.randIntFromZero(responseDict.belowTier.length)],
-        responseMood = "sad";
+        if (CHARACTER.basic.grade < gift.grade) column = "aboveTier";
+        if (CHARACTER.basic.grade == gift.grade) column = "averageTier";
+        if (CHARACTER.basic.grade > gift.grade) column = "belowTier";
 
         // If the item is hated, this is the second strongest reaction.
-        if (specificCharacter.gift.dislikes.includes(gift._id as number)) 
-        responseContent = responseDict.dislikes[MathUtils.randIntFromZero(responseDict.dislikes.length)],
-        responseMood = "annoyed";
+        if (specificCharacter.gift.dislikes.includes(gift._id as number)) column = "dislike";
 
         // Liking something should be the strongest reaction.
-        if (specificCharacter.gift.likes.includes(gift._id as number)) 
-        responseContent = responseDict.likes[MathUtils.randIntFromZero(responseDict.likes.length)], 
-        responseMood = "flustered";
+        if (specificCharacter.gift.likes.includes(gift._id as number)) column = "like";
 
         // Unless it's a duplicate.
-        if (specificCharacter.gift.recentReceived.findIndex(i => i.itemID == gift._id) >= 0) 
-        responseContent = responseDict.duplicate[MathUtils.randIntFromZero(responseDict.duplicate.length)],
-        responseMood = "sad";
+        if (specificCharacter.gift.recentReceived.findIndex(i => i.itemID == gift._id) >= 0) column = "duplicate";
 
+        // Since Hunger is a special case, we set the response before we check for it.
+        response = responseDict[column][MathUtils.randIntFromZero(responseDict[column].length)];
+
+        // Hunger munch munch.
+        if (gift?.type == "food") {
+            if (specificCharacter.hunger <= this.hungerLimit) response = responseDict["hunger"].food[MathUtils.randIntFromZero(responseDict["hunger"].food.length)];
+            else responseDict["hunger"].other[MathUtils.randIntFromZero(responseDict["hunger"].other.length)];
+        };
+        
         // Set the character to their mood.
         REACTION_NODE.ch = [
             {
@@ -203,14 +201,13 @@ export default class TomoCore extends EngineBase {
                 "mood": "normal", //responseMood, TESTING: CHANGE TO RESPONSE MOOD
                 "useSkin": true
             }
-        ]
+        ];
 
         // Set the text to the response content.
-        console.log(responseContent)
         REACTION_NODE.txt = {
-            "content": responseContent,
+            "content": response.content,
             "speaker": 0
-        }
+        };
 
         // Remove the item from the inventory.
         await this.user.setItemAsTomoGifted(this.chInUser[this.index]._id as number, gift._id as number, 1);

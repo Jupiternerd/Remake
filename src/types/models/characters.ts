@@ -53,6 +53,11 @@ export interface CharacterSkins extends basic {
     moods: FixedLengthArray<[string, string, string, string, string]>
 }
 
+export interface Reaction {
+    mood: TemporaryMoodTypeStrings,
+    content: string
+}
+
 export interface CharacterInteractions extends basic {
     pointers: number,
     base: {
@@ -60,18 +65,18 @@ export interface CharacterInteractions extends basic {
         farewells: Array<string>
     }
     gifts: { 
-        default: Array<string>
-        likes: Array<string>
-        dislikes: Array<string>
-        aboveTier: Array<string>
-        belowTier: Array<string>
-        averageTier: Array<string>
-        duplicate: Array<string>
+        default: Array<Reaction>
+        likes: Array<Reaction>
+        dislikes: Array<Reaction>
+        aboveTier: Array<Reaction>
+        belowTier: Array<Reaction>
+        averageTier: Array<Reaction>
+        duplicate: Array<Reaction>
         hunger: {
-            food: Array<string>
-            other: Array<string>
+            food: Array<Reaction>
+            other: Array<Reaction>
         }
-        none: Array<string>
+        none: Array<Reaction>
     }
 }
 

@@ -18,6 +18,7 @@ export interface StatsInUser {
     level: number,
     xp: number,
     mood: MoodInUser
+    hunger: number,
     gift: {
         likes: Array<number>
         dislikes: Array<number>
