@@ -125,8 +125,7 @@ export default abstract class Commands {
     /**
      * @name getUserInCoolDown
      * @description gets the user in cd's information about the cd.
-     * @param userID 
-     * @param command 
+     * @param userID  
      * @returns the type of user in cd.
      */
     static async getUserInCoolDown(userID: string): Promise<number> {

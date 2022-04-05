@@ -39,14 +39,6 @@ export default class Users extends UniBase {
         return this.universe.inventory;
     }
 
-    public set level(lvl: number) {
-        this.universe.level = lvl;
-    }
-
-    public set exp(xp: number) {
-        this.universe.exp = xp;
-    }
-
     /**
      * @Name | pullUniverse
      * @Desc | pulls user universe like inventory, etc.
@@ -116,15 +108,46 @@ export default class Users extends UniBase {
      * @param {number} amount you want to add to the exp pool.
      */
     public async addToUserEXP(amount: number) {
-        const FINAL = this.universe.exp + amount;
+        let FINAL = this.universe.exp + amount;
         if (FINAL >= 100) {
-            this.exp = 0;
-            this.level += 1;
+            this.universe.exp = 0;
+            FINAL = 0;
+            this.universe.level += 1;
         }
-        this.exp += FINAL;
+        this.universe.exp = FINAL;
+        console.log(" Added " + FINAL + " to the user's EXP")
     }
 
+    /**
+     * @name addToTomoEXP
+     * @param tomoID 
+     * @param amount 
+     */
+    public async addToTomoEXP(tomoID: number, amount: number) {
+        let tomo = this.findTomoIndexInInventory(tomoID);
+        if (tomo < 0) return;
+        
+        let FINAL = this.chs[tomo].stats.xp + amount;
+        if (FINAL >= 100) {
+            FINAL = 0;
+            this.chs[tomo].stats.xp = 0;
+            this.chs[tomo].stats.level += 1;
+        }
+        this.chs[tomo].stats.xp = FINAL;
+    }
 
+    public async addToTomoLP(tomoID: number, amount: number) {
+        let tomo = this.findTomoIndexInInventory(tomoID);
+        if (tomo < 0) return;
+        
+        let FINAL = this.chs[tomo].stats.mood.meterxp + amount;
+        if (FINAL >= 200) {
+            FINAL = 0;
+            this.chs[tomo].stats.mood.meterxp = 0;
+            this.chs[tomo].stats.mood.meter += 1;
+        }
+        this.chs[tomo].stats.mood.meterxp = FINAL;
+    }
 
     /**
      * @name updateTomo
@@ -220,7 +243,7 @@ export default class Users extends UniBase {
         let tomo = this.findTomoIndexInInventory(tomoID);
         if (tomo < 0) return;
         const FIND = this.chs[tomo].stats.inventory.findIndex(i => i._id == itemID);
-        console.log(FIND)
+
         if (FIND < 0) {
             this.universe.inventory.intransferable.chs[tomo].stats.inventory.push({_id: itemID, amount: amount});
         }

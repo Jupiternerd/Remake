@@ -106,6 +106,12 @@ export default class TomoCore extends EngineBase {
     }
     
     /** Buttons */
+
+    /**
+     * @name _info
+     * @description Shows description of the tomodachi.
+     * @param {number} index that the tomo is located in.
+     */
     private async _info(index: number = this.index) {
         const CHARACTER = this.cachedCharacters.get(this.chInUser[index]._id as number), 
         SPECIFIC = this.chInUser[index];
@@ -115,21 +121,21 @@ export default class TomoCore extends EngineBase {
                 `${CHARACTER.basic.emoji} **${CHARACTER.formattedOutput}**\n` +
                 // Actual info
                 `Level • ${SPECIFIC.stats.level}\n EXP • ${SPECIFIC.stats.xp} / 100\n Hungry? • ${SPECIFIC.stats.hunger <= this.hungerLimit ? 'yes' : 'no'}\n\n` +
-                `Meter • ${SPECIFIC.stats.mood.meter}`,
+                `Meter • ${SPECIFIC.stats.mood.meter}\n Meter EXP • ${SPECIFIC.stats.mood.meterxp} / 200`,
                 attachments: [],
                 components: []
             }
             )
-        
     }
 
     /**
      * @name __gift
      * @description main gift driver function.
-     * @param CHARACTER 
+     * @param {Character} CHARACTER to comapre to against the gift. 
      */
     private async __gift(CHARACTER: Character) {
         // first, we populate the inventory (with data from item db)
+        let response: Reaction;
         const INVENTORY = await this.user.populateTransferableInventory();
         this.currentInvIndex = 0;
 
@@ -167,9 +173,10 @@ export default class TomoCore extends EngineBase {
         this.coreHandler.on("userSelectionConfirmed", async (index, selection) => {
             if (index != this.coreHandler.multiples[this.coreHandler.index].i) return;
             console.log("Collected Gift: " + this.invInGroups[this.currentInvIndex][selection].item.name)
-            await this.__gift_collected(this.invInGroups[this.currentInvIndex][selection].item, CHARACTER)
-            // Then we display the end scren.
-            // TODO: END
+            response = await this.__gift_collected(this.invInGroups[this.currentInvIndex][selection].item, CHARACTER)
+
+            // End, we display the end screen. 40 is temporary. (TODO: Alpha)
+            await this._endScreen(CHARACTER._id as number, await this._rewardsCalculation(response), 40);
         })
     }
 
@@ -232,7 +239,10 @@ export default class TomoCore extends EngineBase {
         await this.coreHandler.cacheAssets(); // Recache.
 
         // Set the page to the reaction.
-        await this.coreHandler.setPage(this.coreHandler.index + 1);   
+        await this.coreHandler.setPage(this.coreHandler.index + 1);
+
+        // Return the response we collected.
+        return response;
     }
 
     private async __gift_action(selection: number) {
@@ -443,5 +453,45 @@ export default class TomoCore extends EngineBase {
         row.push(/*SELECTROW,*/ BUTTONROW)
         // Return the row.
         return row;
+    }
+
+    private async _endScreen(tomoID: number, LP: number, XP: number) {
+        await this.interaction.editReply({
+            components: [],
+            attachments: [],
+            content: "TEMPORARY END SCREEN\n LP GAINED: " + LP + "\n XP Gained (Tomo gets half): " + XP
+        });
+
+        await this.user.addToUserEXP(XP);
+        await this.user.addToTomoEXP(tomoID, XP / 2);
+        await this.user.addToTomoLP(tomoID, LP)
+
+        await this.user.updateTomo();
+        this.user.setUserInDB("universe");
+    }
+
+    /**
+     * @name _rewardsCalculation
+     * @description temporary rewards calculation module. (TODO: COMPLETE AFTER ALPHA)
+     * @param {Reaction} reaction the mood needed to calculate the LP gain or loss.
+     * @returns the LP gained or loss.
+     */
+    private async _rewardsCalculation(reaction: Reaction) {
+        let LP = 0;
+        switch (reaction.mood) {
+            case "annoyed": 
+                LP -= 30;
+                break;
+            case "flustered":
+                LP += 30;
+                break;
+            case "happy":
+                LP += 20;
+                break;
+            case "sad":
+                LP -= 20;
+                break;
+        }
+    return LP;
     }
 }

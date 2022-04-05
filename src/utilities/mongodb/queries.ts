@@ -147,7 +147,7 @@ export default class Queries {
     }
 
     public static async updateUser(id: string, collection: "universe" | "statistics", payload: UniverseUser | StatisticsUser): Promise<void> {
-        Mango.DB_USERS.collection<UniverseUser | StatisticsUser>(collection).updateOne({_id: id}, payload);
+        Mango.DB_USERS.collection<UniverseUser | StatisticsUser>(collection).updateOne({"_id": id}, {$set: payload });
     }
 
     public static async updateUserTransferableInventory(id: string, payload: ItemInUser[]) {
@@ -155,7 +155,7 @@ export default class Queries {
     }
 
     public static async updateTomos(id: string, tomo: ChInUser[]) {
-        Mango.DB_USERS.collection<UniverseUser>("universe").updateOne({_id: id}, {$set: { "inventory.intransferable.chs": tomo }})
+        Mango.DB_USERS.collection<UniverseUser>("universe").updateOne({"_id": id}, {$set: { "inventory.intransferable.chs": tomo }})
         
     }
 
