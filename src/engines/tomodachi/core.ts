@@ -176,7 +176,7 @@ export default class TomoCore extends EngineBase {
             response = await this.__gift_collected(this.invInGroups[this.currentInvIndex][selection].item, CHARACTER)
 
             // End, we display the end screen. 40 is temporary. (TODO: Alpha)
-            await this._endScreen(CHARACTER._id as number, await this._rewardsCalculation(response), 40);
+            await this._endScreen(await this._rewardsCalculation(response), 40);
         })
     }
 
@@ -212,6 +212,9 @@ export default class TomoCore extends EngineBase {
         if (gift?.type == "food") {
             if (specificCharacter.hunger <= this.hungerLimit) response = responseDict["hunger"].food[MathUtils.randIntFromZero(responseDict["hunger"].food.length)];
             else responseDict["hunger"].other[MathUtils.randIntFromZero(responseDict["hunger"].other.length)];
+
+            // Satiate the hunger.
+            this.user.addToTomoHunger(CHARACTER._id as number, parseInt(gift?.values[0] || 0))
         };
         
         // Set the character to their mood.
@@ -455,16 +458,23 @@ export default class TomoCore extends EngineBase {
         return row;
     }
 
-    private async _endScreen(tomoID: number, LP: number, XP: number) {
-        await this.interaction.editReply({
+    /**
+     * @name _endScreen
+     * @description Temporary endscreen just used for testing and alpha (TODO)
+     * @param tomoID the tomoID that 
+     * @param LP 
+     * @param XP 
+     */
+    private async _endScreen(LP: number, XP: number) {
+        setTimeout( async () => {
+            await this.interaction.editReply({
             components: [],
-            attachments: [],
-            content: "TEMPORARY END SCREEN\n LP GAINED: " + LP + "\n XP Gained (Tomo gets half): " + XP
-        });
+            content: "TEMPORARY END SCREEN\n 💖 LP GAINED: " + LP + "\n ✨ XP Gained (Tomo gets half): " + XP
+        });}, 5000)
 
         await this.user.addToUserEXP(XP);
-        await this.user.addToTomoEXP(tomoID, XP / 2);
-        await this.user.addToTomoLP(tomoID, LP)
+        await this.user.addToTomoEXP(this.chInUser[this.index]._id as number, XP / 2);
+        await this.user.addToTomoLP(this.chInUser[this.index]._id as number, LP)
 
         await this.user.updateTomo();
         this.user.setUserInDB("universe");
@@ -480,16 +490,16 @@ export default class TomoCore extends EngineBase {
         let LP = 0;
         switch (reaction.mood) {
             case "annoyed": 
-                LP -= 30;
+                LP -= 5;
                 break;
             case "flustered":
-                LP += 30;
+                LP += 15;
                 break;
             case "happy":
-                LP += 20;
+                LP += 10;
                 break;
             case "sad":
-                LP -= 20;
+                LP -= 10;
                 break;
         }
     return LP;

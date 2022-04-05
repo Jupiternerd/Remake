@@ -149,6 +149,16 @@ export default class Users extends UniBase {
         this.chs[tomo].stats.mood.meterxp = FINAL;
     }
 
+    public async addToTomoHunger(tomoID: number, amount: number) {
+        let tomo = this.findTomoIndexInInventory(tomoID);
+        if (tomo < 0) return;
+        
+        let FINAL = this.chs[tomo].stats.hunger + amount;
+        if (FINAL > 100) FINAL = 100;
+
+        this.chs[tomo].stats.hunger = FINAL;
+    }
+
     /**
      * @name updateTomo
      * @description Updates the tomo stats.
