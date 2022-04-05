@@ -58,7 +58,7 @@ class Inventory extends Commands {
         COLLECTOR.on("collect", async (i) => {
             const ITEMID = col[0][parseInt(i.values[0])].item._id as number;
             if (curItem == ITEMID) return;
-            const ITEM = INVENTORY.find(i => i._id == ITEMID)
+            const ITEM = INVENTORY.find(i => i._id == ITEMID);
 
             curItem = ITEMID;
             COLLECTOR.resetTimer();
@@ -66,7 +66,7 @@ class Inventory extends Commands {
         })
 
         COLLECTOR.once("end", async (i) => {
-            interaction.editReply({content: "Command timed-out. /inventory again to view!", components: []})
+            interaction.editReply({content: "Command timed-out. \`\`/inventory\`\` again to view!", components: []})
         })
     }
 }

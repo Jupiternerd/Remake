@@ -455,12 +455,12 @@ export default class NovelCore extends EngineBase {
      * @param button number that got passed.
      */
     private async _timedInteract(button?: number): Promise<void> {
-        // clear all the things in the action rows.
-        await this._clearMenuActionRows();
         // Get the timeout.
         const TIMEOUT: number = this.multiples[this.index].type?.special?.wait || 5000;
         // wait out the timeout. Then call the setPage.
         setTimeout(async () => await this.setPage(this.index + 1), TIMEOUT)
+        // clear all the things in the action rows.
+        await this._clearMenuActionRows();
     }
 
     /**
