@@ -68,11 +68,7 @@ class Inventory extends Commands {
         COLLECTOR.once("end", async (i) => {
             interaction.editReply({content: "Command timed-out. /inventory again to view!", components: []})
         })
-
-        
-
     }
-
 }
 
 export = Inventory; // require doesn't seem to like export default class.

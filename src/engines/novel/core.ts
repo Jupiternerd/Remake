@@ -19,6 +19,13 @@ export default class NovelCore extends EngineBase {
     // index for keeping track of our location in the multipes.
     public index: number = 0;
     private LIMIT: number = 40;
+    private _isSameNode: Function = ((node: NovelSingle, single: NovelSingle) =>
+    (node.built != undefined || !node.built) && // is it built?
+    (node.type.display == single.type.display) && // if there are nodes that have the same display type.
+    (node.ch == single.ch) && // same characters.
+    (node.txt.speaker == single.txt.speaker) && // same speaker.
+    (node.bg.id == single.bg.id)) // and same background.
+
     declare multiples: Array<NovelSingle>
     // internal tracker for selection.
     public selection: number
@@ -76,13 +83,7 @@ export default class NovelCore extends EngineBase {
         const CUSTOM_ID = "NOVEL" + "_" + single.i + "_" + single.type.display.toUpperCase() + "_"+ "_USERID_" + this.interaction.user.id + "." + "webp", QUALITY = {quality: 24, alphaQuality: 40} // file name.
         
         // First redundant filter. So we don't waste power on drawing the same image.
-        const SIMILAR_NODE: NovelSingle = this.multiples.find((node: NovelSingle) =>
-            (node.built != undefined || !node.built) && // is it built?
-            (node.i < single.i) &&
-            (node.type.display == single.type.display) && // if there are nodes that have the same display type.
-            (node.ch == single.ch) && // same characters.
-            (node.txt.speaker == single.txt.speaker) && // same speaker.
-            (node.bg.id == single.bg.id)) // and same background.
+        const SIMILAR_NODE: NovelSingle = this.multiples.find((node: NovelSingle) => this._isSameNode(node, single) && (node.i < single.i))
 
         // if we do find one.
         if (SIMILAR_NODE) {
@@ -264,8 +265,6 @@ export default class NovelCore extends EngineBase {
         this.pageChange(this.multiples[to])
         // set this as new index.
         this.index = to;
-
-        console.log(to + " Loading to page.")
         // configure the payload.
         const payload: WebhookEditMessageOptions = {
             files: [ this.multiples[this.index].built ? 
