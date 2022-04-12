@@ -119,7 +119,7 @@ export default abstract class Commands {
      */
     static async isUserInCoolDown(interaction: CommandInteraction, command: string): Promise<boolean> {
         // The .exists() spits out a number that matches the key so if there are 2 matches it will return 2. 0 if none.
-        return (await square.memory().exists(`cd_${interaction.user.id}`, command) > 0 ? true : false ) // > 0 true. less than 0: false.
+        return (await square.memory().exists(`cd_${interaction.user.id}`) > 0 ? true : false ) // > 0 true. less than 0: false.
     }
 
     /**
