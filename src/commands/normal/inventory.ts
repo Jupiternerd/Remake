@@ -1,5 +1,5 @@
 // imports
-import { CommandInteraction, MessageSelectMenu, MessageSelectMenuOptions, MessageActionRow, Message, MessageComponentInteraction} from "discord.js";
+import { CommandInteraction, MessageSelectMenu, MessageSelectMenuOptions, MessageActionRow, Message, MessageComponentInteraction, MessageButtonOptions, MessageButton, CollectorFilter} from "discord.js";
 import client from "../../amadeus/client/client";
 import Commands from "../../amadeus/abstracts/commands";
 import { EngineUtils, StringUtils } from "../../utilities/engineUtilities/utils";
@@ -17,13 +17,12 @@ class Inventory extends Commands {
         {
             coolDown: 8000
         })
-
     }
-
 
     // Executes the command.
     public async execute(bot: client, interaction: CommandInteraction): Promise<void> {
         const USER: Users = new Users(interaction.user.id);
+        const FILTER: CollectorFilter<[unknown]> = async(i: MessageComponentInteraction) => { await i.deferUpdate(); return i.user.id == interaction.user.id }
 
         await USER.pullUniverse();
 
@@ -33,7 +32,7 @@ class Inventory extends Commands {
         // Prunes the buttons to move the menu.
         for (let i = 0; i < col.length - 1; i++) {
             for (let j = 0; j < col[i].length - 1; j++) {
-                if (col[i][j].route == "backInventoryPage" || col[i][j].route == "nextInventoryPage") col[i].splice(j, 1)
+                if (col[i][j].route == "backInventoryPage" || col[i][j].route == "nextInventoryPage") col[i].splice(j, 1);
             }
         }
 
@@ -51,7 +50,7 @@ class Inventory extends Commands {
 
         const COLLECTOR = MSG.createMessageComponentCollector({
             "componentType": "SELECT_MENU",
-            "filter": async(i: MessageComponentInteraction) => { await i.deferUpdate(); return i.user.id == interaction.user.id },
+            "filter": FILTER,
             "time": 60000
         })
 
@@ -62,11 +61,11 @@ class Inventory extends Commands {
 
             curItem = ITEMID;
             COLLECTOR.resetTimer();
-            await interaction.editReply({content: `${ITEM.basic.emoji} **${ITEM.formattedOutput}**\n\n❓ **Description** • \`\`${ITEM.basic.description}\`\`\n🎁 **Giftable?** • \`\`${StringUtils.boolToReadable(ITEM.giftable)}\`\`\n🔢 **Amount in Inventory** • \`\`${ITEM.amount}\`\``})
+            await interaction.editReply({content: "⚠️ POTENTIAL ILLEGAL ACCESS", embeds: [ITEM.getInfoOutput.addField("Amount In Inventory", 'x' + ITEM.amount.toString(), )]})
         })
 
         COLLECTOR.once("end", async (i) => {
-            interaction.editReply({content: "Command timed-out. \`\`/inventory\`\` again to view!", components: []})
+            interaction.editReply({content: "Command timed-out. \`\`/inventory\`\` again to view!", components: [], embeds: []})
         })
     }
 }

@@ -1,8 +1,9 @@
 // author = shokkunn
 
+import { ColorResolvable } from "discord.js";
 import Character from "../../engines/classes/characters";
 import ItemClass from "../../engines/classes/items";
-import { BaseGrade } from "../../types/local/static";
+import { BaseGrade, GradeColor } from "../../types/local/static";
 import { TemporaryMoodType, TemporaryMoodTypeStrings } from "../../types/models/characters";
 import { CapsuleMood, DialogueScript, SelectItemMenuChoices } from "../../types/models/stories"
 import { EngineError } from "../errors/errors";
@@ -129,9 +130,26 @@ export class EngineUtils {
      * @returns 
      */
     public static convertNumberToRarity(int: number) {
-        return BaseGrade[int] 
+        return BaseGrade[int];
     }
 
+    /**
+     * @name convertNumberToColor
+     * @description converts an integer to a number
+     * @param int 
+     * @returns 
+     */
+    public static convertGradeToColor(grade: BaseGrade) {
+        return GradeColor[grade] as ColorResolvable;
+    }
+    
+    /**
+     * @name fillSelectWithInventory
+     * @description fills a select menu with inventory, returns arr of arr of {SelectItemMenuChoices}
+     * @param INVENTORY | Array of item class
+     * @param maxPerColumn | the max amount of item per column. 2 slots reserved for movement
+     * @returns 
+     */
     public static async fillSelectWithInventory(INVENTORY: Array<ItemClass>, maxPerColumn: number = 23): Promise<Array<Array<SelectItemMenuChoices>>> {
         // declare.
         let i: number = 0, invI: number = 0, columnAmount = Math.ceil(INVENTORY.length / maxPerColumn), totalMax: number = 0, ret = [];

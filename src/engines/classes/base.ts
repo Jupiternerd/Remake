@@ -1,5 +1,6 @@
 //imp
 
+import { MessageEmbed } from "discord.js";
 import { basic } from "../../types/local/static";
 import { EngineUtils } from "../../utilities/engineUtilities/utils";
 
@@ -12,7 +13,27 @@ export default abstract class UniBase {
     constructor(_id: number | string, basic?: basic) {
         this._id = _id;
         this.basic = basic;
+        //this.basic.description = (this.basic?.description ? this.basic.description : null);
+    }
 
+    /**
+     * @name getInfoOutput
+     * @returns a embeded info, should 
+     */
+    get getInfoOutput() {
+        return new MessageEmbed(
+            {
+                title: `Information Access Granted :: ${this.formattedOutputNoMarkUp}`,
+                color: EngineUtils.convertGradeToColor(this.basic.grade),
+                fields: [
+                    {
+                        name: "Basic Information",
+                        value: `Grade :: ${EngineUtils.convertNumberToRarity(this.basic.grade)}`,
+                        inline: true
+                    }
+                ]
+            }
+        )
     }
 
     /**

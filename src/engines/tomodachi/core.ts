@@ -3,10 +3,10 @@
 import { ButtonInteraction, CommandInteraction, InteractionCollector, Message, MessageActionRow, MessageAttachment, MessageButton, MessageButtonOptions, MessageSelectMenu, MessageSelectMenuOptions, WebhookEditMessageOptions } from "discord.js";
 import { MessageButtonStyles } from "discord.js/typings/enums";
 import sharp from "sharp";
-import { CharacterInteractions, Reaction, TemporaryMoodTypeStrings } from "../../types/models/characters";
+import { CharacterInteractions, Reaction } from "../../types/models/characters";
 import { Item } from "../../types/models/items";
 import { BaseSingle, NovelSingle, SelectItemMenuChoices, Story } from "../../types/models/stories";
-import { ChInUser, ItemInUser } from "../../types/models/users";
+import { ChInUser } from "../../types/models/users";
 import { EngineUtils, MathUtils } from "../../utilities/engineUtilities/utils";
 import { EngineError } from "../../utilities/errors/errors";
 import Queries from "../../utilities/mongodb/queries";

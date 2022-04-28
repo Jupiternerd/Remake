@@ -33,8 +33,9 @@ export enum GradeColor {
 
 export interface basic {
     _id: number | string,
-    name?: string,
+    name: string,
     grade?: BaseGrade
+    description?: string,
     emoji?: string
 }
 
