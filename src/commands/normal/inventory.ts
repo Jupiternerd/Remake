@@ -65,7 +65,7 @@ class Inventory extends Commands {
         })
 
         COLLECTOR.once("end", async (i) => {
-            interaction.editReply({content: "Command timed-out. \`\`/inventory\`\` again to view!", components: [], embeds: []})
+            interaction.editReply({content: "Connection :: timed-out. \`\`/inventory\`\` again to view!", components: [], embeds: []})
         })
     }
 }
