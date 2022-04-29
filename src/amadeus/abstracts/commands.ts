@@ -37,6 +37,7 @@ export default abstract class Commands {
         this.desc = desc;
         this.data = data || new SlashCommandBuilder();
         this.ownerOnly = settings ? settings.ownerOnly : false;
+        if (this.ownerOnly) this.data.set
         this.cooldown = settings ? settings.coolDown / 1000 : 2; // in s.
         this.mainOnly = settings ? settings.mainOnly : false;
 

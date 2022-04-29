@@ -1,7 +1,7 @@
 //imp
 
 import { MessageEmbed } from "discord.js";
-import { basic } from "../../types/local/static";
+import { BaseGrade, basic } from "../../types/local/static";
 import { EngineUtils } from "../../utilities/engineUtilities/utils";
 
 // author = shokkunn
@@ -13,6 +13,8 @@ export default abstract class UniBase {
     constructor(_id: number | string, basic?: basic) {
         this._id = _id;
         this.basic = basic;
+        console.log(_id)
+        if (this.basic) this.basic.grade = (isNaN(this.basic.grade) ? EngineUtils.convertNumberToRarity(this.basic.grade) : this.basic.grade) as BaseGrade;
         //this.basic.description = (this.basic?.description ? this.basic.description : null);
     }
 

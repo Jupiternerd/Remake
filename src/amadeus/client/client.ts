@@ -1,5 +1,5 @@
 // import classes from discord.js
-import {Client, Collection, Intents} from 'discord.js';
+import {ApplicationCommandPermissionData, Client, Collection, Guild, GuildApplicationCommandPermissionData, Intents} from 'discord.js';
 import { statSync, readdirSync } from 'fs';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9'
@@ -155,7 +155,7 @@ export default class Custom_Client extends Client {
      */
     async pushSlashesToDiscord() {
         const rest = new REST({ version: "9"}).setToken(this._token); // init new Rest client.
-
+        
         try {
             await rest.put(
                 Routes.applicationGuildCommands(
@@ -169,7 +169,6 @@ export default class Custom_Client extends Client {
         } catch(error) {
             console.error(error);
         }
-
     }
 
     /**
