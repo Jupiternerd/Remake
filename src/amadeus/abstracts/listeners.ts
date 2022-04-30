@@ -21,7 +21,7 @@ export default abstract class Listener {
      * @param bot | custom client of the bot.
      * @param args ...any
      */
-    abstract execute(bot: Custom_Client, ...args: any): void;
+    abstract execute(bot: Custom_Client, ...args: any): Promise<void>;
 
 
 }

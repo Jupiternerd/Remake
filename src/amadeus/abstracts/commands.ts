@@ -55,7 +55,7 @@ export default abstract class Commands {
      * @param bot custom client of the bot.
      * @param interaction of the slash command.
      */
-    abstract execute(bot: Custom_Client, interaction: CommandInteraction): void;
+    abstract execute(bot: Custom_Client, interaction: CommandInteraction): Promise<void>;
 
     /**
      * @override
