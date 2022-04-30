@@ -124,6 +124,8 @@ export default class Custom_Client extends Client {
 
         }, (onlyFile: string) => onlyFile.endsWith(".js"))
 
+        console.log(this.slashCommands);
+
         this.pushSlashesToDiscord() // finally send the slash commands to discord.
 
     }
