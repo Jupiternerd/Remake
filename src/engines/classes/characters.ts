@@ -1,5 +1,6 @@
 //imp
 
+import { MessageEmbed } from "discord.js";
 import { CharacterBasic, CharacterInteractions, CharacterSkins, TemporaryMoodTypeStrings } from "../../types/models/characters";
 import { Story } from "../../types/models/stories";
 import { MathUtils } from "../../utilities/engineUtilities/utils";
@@ -38,6 +39,14 @@ export default class Character extends UniBase {
 
     get baseReactions() {
         return this.interactions?.base ? this.interactions.base : null;
+    }
+
+    get getInfoOutput(): MessageEmbed {
+        return super.getInfoOutput.addField(
+            "Idk",
+            "UHHHHH",
+            true
+        )
     }
 
     /**

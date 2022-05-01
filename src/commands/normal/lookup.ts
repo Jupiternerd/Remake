@@ -5,6 +5,9 @@ import Commands from "../../amadeus/abstracts/commands";
 import Queries from "../../utilities/mongodb/queries";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { CharacterBasic } from "../../types/models/characters";
+import Custom_Client from "../../amadeus/client/client";
+import ItemClass from "../../engines/classes/items";
+import Character from "../../engines/classes/characters";
 
 // author = Shokkunn
 
@@ -45,20 +48,26 @@ class LookUp extends Commands {
         console.log("Executed")
     }
 
-    public async item(interaction: CommandInteraction) {
-        const itemID = interaction.options.getInteger("item");
-        const ITEM = await Queries.item(itemID);
+    public async item(bot: Custom_Client, interaction: CommandInteraction) {
+        console.log(interaction)
+        const itemID = interaction.options.getInteger("item", true);
+        const ITEM = new ItemClass(await Queries.item(itemID));
 
-        interaction.reply(ITEM.name);
+        interaction.reply({
+            embeds: [ITEM.getInfoOutput]
+        });
 
 
     }
 
-    public async tomo(interaction: CommandInteraction) {
-        const tomoID = interaction.options.getInteger("tomo");
-        const TOMO: CharacterBasic = await Queries.character(tomoID, "basic") as CharacterBasic;
+    public async tomo(bot: Custom_Client, interaction: CommandInteraction) {
+        const tomoID = interaction.options.getInteger("tomo", true);
+        const TOMO = new Character(tomoID, await Queries.character(tomoID, "basic") as CharacterBasic)
+        if (TOMO.basic.pointers.original != TOMO._id) return;
 
-        interaction.reply(TOMO.name);
+        interaction.reply({
+            embeds: [TOMO.getInfoOutput]
+        });
 
 
     }
