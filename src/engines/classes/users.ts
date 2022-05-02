@@ -1,10 +1,11 @@
 // imp
 
 import { StatisticsUser, UniverseUser } from "../../types/models/users";
+import { MathUtils } from "../../utilities/engineUtilities/utils";
 import Queries from "../../utilities/mongodb/queries";
 import UniBase from "./base";
 import ItemClass from "./items";
-
+import {differenceInMinutes} from "date-fns"
 // author = shokkunn
 
 export default class Users extends UniBase {
@@ -139,7 +140,7 @@ export default class Users extends UniBase {
     public async addToTomoLP(tomoID: number, amount: number) {
         let tomo = this.findTomoIndexInInventory(tomoID);
         if (tomo < 0) return;
-        
+        if (this.chs[tomo].stats.mood.meter == 9) return;
         let FINAL = this.chs[tomo].stats.mood.meterxp + amount;
         if (FINAL >= 200) {
             FINAL = 0;
@@ -166,6 +167,7 @@ export default class Users extends UniBase {
     public async updateTomo() {
         await Queries.updateTomos(this._id as string, this.chs)
     }
+
 
     /**
      * @name hasItemInTransferableInv
@@ -227,14 +229,42 @@ export default class Users extends UniBase {
         return ret;
     }
 
+    public async refreshTomoMood(tomoID: number) {
+        const tomo = this.findTomoIndexInInventory(tomoID)
+        if (tomo < 0) return;
+        console.log("DIFF " + differenceInMinutes(this.universe.inventory.intransferable.chs[tomo].stats.recentInteract.time, new Date()))
+        //if (differenceInMinutes(this.universe.inventory.intransferable.chs[tomo].stats.recentInteract.time, new Date()) < 60) return;
+        // ALPHA
+        this.universe.inventory.intransferable.chs[tomo].stats.mood.current = MathUtils.randIntFromZero(5);
+        this.universe.inventory.intransferable.chs[tomo].stats.recentInteract.type = "system";
+        this.universe.inventory.intransferable.chs[tomo].stats.recentInteract.time = new Date();
+        this.updateTomo();
+    }
+
+    public async refreshAllMoods() {
+        for (const tomos of this.inventory.intransferable.chs) 
+            this.refreshTomoMood(tomos._id as number)
+    }
+
     /**
      * @name findTomoIndexInInventory
      * @description finds the index of the tomo
-     * @param tomoID id of the tomo you want to find/
+     * @param tomoID id of the tomo you want to find
      * @returns index of tomo
      */
     public findTomoIndexInInventory(tomoID: number) {
         return this.chs.findIndex((tomo) => tomo._id == tomoID)
+    }
+
+    /**
+     * @name getTomoLastInteract
+     * @param tomoID id of the tomo you want to get last interaction of
+     * @returns recentInteract including date and the type of interaction
+     */
+    public async getTomoLastInteract(tomoID: number) {
+        let tomo = this.findTomoIndexInInventory(tomoID);
+        if (tomo > 0) return this.chs[tomo].stats.recentInteract
+        return -1;
     }
 
     /**
@@ -249,6 +279,13 @@ export default class Users extends UniBase {
         return -1;
     }
 
+    /**
+     * @name addToTomoInventory
+     * @param tomoID Id of the tomo inventory you want to access
+     * @param itemID the id of the item
+     * @param amount the amount
+     * @returns void
+     */
     public async addToTomoInventory(tomoID: number, itemID: number, amount: number) {
         let tomo = this.findTomoIndexInInventory(tomoID);
         if (tomo < 0) return;
@@ -265,6 +302,5 @@ export default class Users extends UniBase {
             // set the amount
             this.universe.inventory.intransferable.chs[tomo].stats.inventory[FIND].amount = result;
         }
-        
     }
 }

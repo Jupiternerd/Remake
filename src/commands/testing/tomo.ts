@@ -32,6 +32,8 @@ class Tomo extends Commands {
 
         let arr: Array<BaseSingle> = [], i = 0;
 
+        await USER.refreshAllMoods()
+
         for (const characters of USER.chs) {
             
             arr.push(

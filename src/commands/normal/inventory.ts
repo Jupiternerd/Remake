@@ -61,7 +61,7 @@ class Inventory extends Commands {
 
             curItem = ITEMID;
             COLLECTOR.resetTimer();
-            await interaction.editReply({content: "⚠️ POTENTIAL ILLEGAL ACCESS", embeds: [ITEM.getInfoOutput.addField("Amount In Inventory", 'x' + ITEM.amount.toString(), )]})
+            await interaction.editReply({content: "Test", embeds: [ITEM.getInfoOutput.addField("Amount In Inventory", 'x' + ITEM.amount.toString(), )]})
         })
 
         COLLECTOR.once("end", async (i) => {

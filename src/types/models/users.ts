@@ -10,6 +10,8 @@ export interface MoodInUser {
     meterxp: number
 }
 
+export type recentInteractTypes = "system" | "interact"
+
 export interface recentGift {
     date: Date,
     itemID: number
@@ -23,6 +25,10 @@ export interface StatsInUser {
         likes: Array<number>
         dislikes: Array<number>
         recentReceived: Array<recentGift>
+    }
+    recentInteract: {
+        type: recentInteractTypes,
+        time: Date
     }
     inventory: Array<ItemInUser>
 }

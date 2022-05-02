@@ -49,9 +49,10 @@ class LookUp extends Commands {
     }
 
     public async item(bot: Custom_Client, interaction: CommandInteraction) {
-        console.log(interaction)
         const itemID = interaction.options.getInteger("item", true);
-        const ITEM = new ItemClass(await Queries.item(itemID));
+        const payload = await Queries.item(itemID);
+        if (!payload) return;
+        const ITEM = new ItemClass(payload);
 
         interaction.reply({
             embeds: [ITEM.getInfoOutput]
@@ -63,7 +64,7 @@ class LookUp extends Commands {
     public async tomo(bot: Custom_Client, interaction: CommandInteraction) {
         const tomoID = interaction.options.getInteger("tomo", true);
         const TOMO = new Character(tomoID, await Queries.character(tomoID, "basic") as CharacterBasic)
-        if (TOMO.basic.pointers.original != TOMO._id) return;
+        if (TOMO.basic?.pointers?.original != TOMO._id) return;
 
         interaction.reply({
             embeds: [TOMO.getInfoOutput]

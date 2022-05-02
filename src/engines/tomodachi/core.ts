@@ -310,7 +310,7 @@ export default class TomoCore extends EngineBase {
                 "display": "normal",
                 "special": {
                     "type": "selection",
-                    "default": "So many choices...",
+                    "default": "What\'s your move?",
                     "choices": [{
                         "label": "Gift",
                         "emoji": "🎁",
@@ -349,12 +349,10 @@ export default class TomoCore extends EngineBase {
             }
             
         })
-        
-        
-
         console.log("_interact")
-
     }
+
+
     private async _danger(index: number = this.index) {
         console.log("_danger")
     }
@@ -384,6 +382,7 @@ export default class TomoCore extends EngineBase {
             }
         })        
     }
+
     private async _prepareNodes() {
         // set a limit incase it passes us like a lot of singles.
         for (const singlet of this.multiples) {
