@@ -25,7 +25,7 @@ export default abstract class UniBase {
     get getInfoOutput() {
         return new MessageEmbed(
             {
-                title: `Information Access Granted :: ${this.formattedOutputNoMarkUp}`,
+                title: `DB :: ${this.formattedOutputNoMarkUp}`,
                 color: EngineUtils.convertGradeToColor(this.basic.grade),
                 fields: [
                     {

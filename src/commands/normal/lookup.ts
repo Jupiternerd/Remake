@@ -51,7 +51,7 @@ class LookUp extends Commands {
     public async item(bot: Custom_Client, interaction: CommandInteraction) {
         const itemID = interaction.options.getInteger("item", true);
         const payload = await Queries.item(itemID);
-        if (!payload) return;
+        if (!payload) return interaction.reply("DB :: Query came back with no results...")
         const ITEM = new ItemClass(payload);
 
         interaction.reply({
@@ -64,7 +64,7 @@ class LookUp extends Commands {
     public async tomo(bot: Custom_Client, interaction: CommandInteraction) {
         const tomoID = interaction.options.getInteger("tomo", true);
         const TOMO = new Character(tomoID, await Queries.character(tomoID, "basic") as CharacterBasic)
-        if (TOMO.basic?.pointers?.original != TOMO._id) return;
+        if (TOMO.basic?.pointers?.original != TOMO._id) return interaction.reply("DB :: Query came back with no results...")
 
         interaction.reply({
             embeds: [TOMO.getInfoOutput]
