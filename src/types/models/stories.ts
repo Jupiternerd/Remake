@@ -2,7 +2,6 @@ import { MessageAttachment, MessageSelectOptionData } from "discord.js";
 import { basic, FixedLengthArray } from "../local/static";
 import { TemporaryMoodTypeStrings } from "./characters";
 import { Item } from "./items";
-import { ItemInUser } from "./users";
 
 export type DisplayTypes = "wallpaper" | "duet" | "normal";
 export type SpecialTypes = "selection" | "timed" | "normal";

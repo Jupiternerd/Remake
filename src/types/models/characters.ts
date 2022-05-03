@@ -1,6 +1,5 @@
 import { basic, FixedLengthArray } from "../local/static";
 
-
 export interface CharacterBasic extends basic {
     pointers: {
         variant?: TemporaryMoodTypeStrings
@@ -13,6 +12,7 @@ export interface CharacterBasic extends basic {
         gift: Array<number>
     }
 }
+
 export enum TemporaryMoodType {
     normal,
     happy,
@@ -21,6 +21,7 @@ export enum TemporaryMoodType {
     flustered,
     hungry
 }
+
 export type TemporaryMoodTypeStrings = keyof typeof TemporaryMoodType | "current";
 
 export enum AdvancementMoodType {

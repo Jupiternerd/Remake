@@ -6,6 +6,7 @@ import Queries from "../../utilities/mongodb/queries";
 import UniBase from "./base";
 import ItemClass from "./items";
 import {differenceInMinutes} from "date-fns"
+import { TemporaryMoodType, TemporaryMoodTypeStrings } from "../../types/models/characters";
 // author = shokkunn
 
 export default class Users extends UniBase {
@@ -232,10 +233,9 @@ export default class Users extends UniBase {
     public async refreshTomoMood(tomoID: number) {
         const tomo = this.findTomoIndexInInventory(tomoID)
         if (tomo < 0) return;
-        console.log("DIFF " + differenceInMinutes(this.universe.inventory.intransferable.chs[tomo].stats.recentInteract.time, new Date()))
-        //if (differenceInMinutes(this.universe.inventory.intransferable.chs[tomo].stats.recentInteract.time, new Date()) < 60) return;
+        if (differenceInMinutes(new Date(), this.universe.inventory.intransferable.chs[tomo].stats.recentInteract.time) < 60) return;
         // ALPHA
-        this.universe.inventory.intransferable.chs[tomo].stats.mood.current = MathUtils.randIntFromZero(5);
+        this.universe.inventory.intransferable.chs[tomo].stats.mood.current = MathUtils.randIntFromZero(Object.keys(TemporaryMoodType).length / 2) - 1;
         this.universe.inventory.intransferable.chs[tomo].stats.recentInteract.type = "system";
         this.universe.inventory.intransferable.chs[tomo].stats.recentInteract.time = new Date();
         this.updateTomo();

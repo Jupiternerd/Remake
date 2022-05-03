@@ -1,6 +1,6 @@
 //imps
 
-import { basic, FixedLengthArray } from "../local/static";
+import { basic } from "../local/static";
 import { BackgroundCapsule } from "./stories";
 
 // author = shokkunn
@@ -10,12 +10,13 @@ export interface MoodInUser {
     meterxp: number
 }
 
-export type recentInteractTypes = "system" | "interact"
+export type recentInteractTypes = "system" | "interact";
 
 export interface recentGift {
     date: Date,
     itemID: number
 }
+
 export interface StatsInUser {
     level: number,
     xp: number,
@@ -44,7 +45,7 @@ export interface ItemInUser {
     amount: number
 }
 
-export interface intransferable { 
+export interface intransferable {
     bgs: Array<number>
     chs: Array<ChInUser>
     skins: Array<number>
