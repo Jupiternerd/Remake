@@ -1,6 +1,6 @@
 //imp
 
-import { MessageEmbed } from "discord.js";
+import { MessageEmbed, MessageOptions } from "discord.js";
 import { BaseGrade, basic } from "../../types/local/static";
 import { EngineUtils } from "../../utilities/engineUtilities/utils";
 
@@ -30,7 +30,7 @@ export default abstract class UniBase {
                 fields: [
                     {
                         name: "Basic Information",
-                        value: `Grade :: ${EngineUtils.convertNumberToRarity(this.basic.grade)}`,
+                        value: `Description ::\n**${this.basic?.description}**\nGrade ::\n**${EngineUtils.convertNumberToRarity(this.basic.grade)}**`,
                         inline: true
                     }
                 ]
