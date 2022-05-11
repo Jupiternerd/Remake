@@ -27,6 +27,6 @@ export default class ItemClass extends UniBase {
             "Item Information", 
             `Giftable :: ${StringUtils.boolToReadable(this.giftable)}`,
             true
-        )
+        ).setTitle(`${this.basic.emoji} ` + this.formattedOutputNoMarkUp);
     }
 }
