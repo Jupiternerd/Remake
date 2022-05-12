@@ -25,7 +25,7 @@ export default class ItemClass extends UniBase {
     get getInfoOutput(): MessageEmbed {
         return super.getInfoOutput.addField(
             "Item Information", 
-            `Giftable :: ${StringUtils.boolToReadable(this.giftable)}`,
+            `Giftable :: \`\`\`${StringUtils.boolToReadable(this.giftable)}\`\`\``,
             true
         ).setTitle(`${this.basic.emoji} ` + this.formattedOutputNoMarkUp);
     }

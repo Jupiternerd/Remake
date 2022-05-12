@@ -46,7 +46,7 @@ export default class Character extends UniBase {
             "Idk",
             "UHHHHH",
             true
-        )
+        ).setTitle(`${this.basic.emoji} ${this.formattedOutputNoMarkUp}`)
     }
 
     /**

@@ -30,7 +30,7 @@ export default abstract class UniBase {
                 fields: [
                     {
                         name: "Basic Information",
-                        value: `Description ::\n**${this.basic?.description}**\nGrade ::\n**${EngineUtils.convertNumberToRarity(this.basic.grade)}**`,
+                        value: `Description ::\n\`\`${this.basic?.description}\`\`\nGrade ::\n**${EngineUtils.convertNumberToRarity(this.basic.grade)}**`,
                         inline: true
                     }
                 ]
