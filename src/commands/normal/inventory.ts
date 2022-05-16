@@ -21,13 +21,14 @@ class Inventory extends Commands {
 
     // Executes the command.
     public async execute(bot: client, interaction: CommandInteraction): Promise<void> {
+        const MAX_COLUMN = 25;
         const USER: Users = new Users(interaction.user.id);
-        const FILTER: CollectorFilter<[unknown]> = async(i: MessageComponentInteraction) => { await i.deferUpdate(); return i.user.id == interaction.user.id }
+        const FILTER: CollectorFilter<[unknown]> = async(i: MessageComponentInteraction) => { await i.deferUpdate(); return i.user.id == interaction.user.id };
 
         await USER.pullUniverse();
 
         const INVENTORY = await USER.populateTransferableInventory()
-        let col = await EngineUtils.fillSelectWithInventory(INVENTORY, 25), curItem: number;
+        let col = await EngineUtils.fillSelectWithInventory(INVENTORY, MAX_COLUMN), curItem: number;
 
         // Prunes the buttons to move the menu.
         for (let i = 0; i < col.length - 1; i++) {
