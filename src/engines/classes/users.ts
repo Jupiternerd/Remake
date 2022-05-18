@@ -42,7 +42,7 @@ export default class Users extends UniBase {
     }
 
     /**
-     * @Name | pullUniverse
+     * @name pullUniverse
      * @Desc | pulls user universe like inventory, etc.
      */
     public async pullUniverse(): Promise<void> {
@@ -50,7 +50,7 @@ export default class Users extends UniBase {
     }
 
     /**
-     * @Name | pullStatistics
+     * @name pullStatistics
      * @Desc | pulls data of user stats.
      */
     public async pullStatistics(): Promise<void> {
@@ -80,9 +80,8 @@ export default class Users extends UniBase {
      * @name setItemAsTomoGifted
      * @description gives item to tomo. marks the gifted array with the item and stores it in tomo inventory.
      * @param tomoID number of the tomo you want to gift.
-     * @param itemID the item id 
-     * @param amount the item amount
-     * @returns 
+     * @param itemID the item id.
+     * @param amount the item amount.
      */
     public async setItemAsTomoGifted(tomoID: number, itemID: number, amount: number = 1) {
         const payload = {
@@ -138,6 +137,12 @@ export default class Users extends UniBase {
         this.chs[tomo].stats.xp = FINAL;
     }
 
+    /**
+     * @name addToTomoLP
+     * @description adds to the tomo's Love Points.
+     * @param tomoID the Tomo's ID.
+     * @param amount the amount of points you want to give.
+     */
     public async addToTomoLP(tomoID: number, amount: number) {
         let tomo = this.findTomoIndexInInventory(tomoID);
         if (tomo < 0) return;
@@ -151,6 +156,12 @@ export default class Users extends UniBase {
         this.chs[tomo].stats.mood.meterxp = FINAL;
     }
 
+    /**
+     * @name addToTomoHunger
+     * @description adds to the tomo's hunger.
+     * @param tomoID the Tomo ID you want to add to hunger.
+     * @param amount amount of hunger you want to add.
+     */
     public async addToTomoHunger(tomoID: number, amount: number) {
         let tomo = this.findTomoIndexInInventory(tomoID);
         if (tomo < 0) return;
@@ -230,6 +241,11 @@ export default class Users extends UniBase {
         return ret;
     }
 
+    /**
+     * @name refreshTomoMood
+     * @description Refreshes a tomo's mood. 
+     * @param tomoID The tomo's ID you want to refresh.
+     */
     public async refreshTomoMood(tomoID: number) {
         const tomo = this.findTomoIndexInInventory(tomoID)
         if (tomo < 0) return;
@@ -241,9 +257,13 @@ export default class Users extends UniBase {
         this.updateTomo();
     }
 
+    /**
+     * @name refreshAllMoods
+     * @description refreshes all the moods of the user's tomo.
+     */
     public async refreshAllMoods() {
         for (const tomos of this.inventory.intransferable.chs) 
-            this.refreshTomoMood(tomos._id as number)
+            this.refreshTomoMood(tomos._id as number);
     }
 
     /**
