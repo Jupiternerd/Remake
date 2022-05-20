@@ -19,7 +19,7 @@ export default class Background extends UniBase {
         super(id, basic)
         this.basic = basic;
     }
-
+    
     /**
      * @name getInfoOutput
      * @returns the message embed to use in 
