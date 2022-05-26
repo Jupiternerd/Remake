@@ -21,7 +21,7 @@ export default class ItemClass extends UniBase {
         this.giftable = item?.giftable || false;
         this.amount = amount;
     }
-
+    
     get getInfoOutput(): MessageEmbed {
         return super.getInfoOutput.addField(
             "Item Information", 
