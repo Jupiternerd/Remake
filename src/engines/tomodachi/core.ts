@@ -127,6 +127,7 @@ export default class TomoCore extends EngineBase {
                 components: []
             }
             )
+        this.end();
     }
 
     /**
