@@ -356,6 +356,8 @@ export default class TomoCore extends EngineBase {
         this.coreHandler.once("ready", async () => {
             await this.coreHandler.start();
         })
+
+        this.coreHandler.once("end", async () => this._endScreen(20, 20))
         
         this.coreHandler.once("userSelectionConfirmed", async (i, selection) => {
             // edge cases.
