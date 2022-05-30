@@ -1,5 +1,5 @@
 // imports
-import { CommandInteraction, User } from "discord.js";
+import { CacheType, CommandInteraction, User } from "discord.js";
 import client from "../../amadeus/client/client";
 import Commands from "../../amadeus/abstracts/commands";
 import NovelCore from "../../engines/novel/core";
@@ -15,13 +15,26 @@ import TomoCore from "../../engines/tomodachi/core";
 import { EngineUtils } from "../../utilities/engineUtilities/utils";
 
 class Tomo extends Commands {
+    KEY: string;
     constructor() {
         super("tomo", // name 
         "runs tomo",
         {
-            ownerOnly: false
+            ownerOnly: false,
+            coolDown: 2000
         }
         )
+        this.KEY = "TOMO_CD_";
+    }
+
+    async check(bot: client, interaction: CommandInteraction<CacheType>): Promise<boolean> {
+        if (await Square.memory().hget(this.KEY, interaction.user.id) != null) {
+            interaction.reply("Finish your original tomo! Don't cheat >:(");
+            return false;
+        }
+
+        await Square.memory().hset(this.KEY, interaction.user.id, Date.now());
+        return true;
     }
 
     // Executes the command.
@@ -33,6 +46,7 @@ class Tomo extends Commands {
         let arr: Array<BaseSingle> = [], i = 0;
 
         await USER.refreshAllMoods()
+
 
         for (const characters of USER.chs) {
             
@@ -60,6 +74,10 @@ class Tomo extends Commands {
         const tomo = new TomoCore(interaction, arr,USER.chs)
         tomo.once("ready", () => {
             tomo.start()
+        })
+
+        tomo.once("end", async () => {
+            await Square.memory().hdel(this.KEY, interaction.user.id);
         })
 
         

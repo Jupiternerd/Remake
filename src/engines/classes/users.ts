@@ -153,6 +153,11 @@ export default class Users extends UniBase {
             this.chs[tomo].stats.mood.meterxp = 0;
             this.chs[tomo].stats.mood.meter += 1;
         }
+        if (FINAL <= 0) {
+            FINAL = 0;
+            this.chs[tomo].stats.mood.meterxp = 0;
+            if (this.chs[tomo].stats.mood.meter > 0) this.chs[tomo].stats.mood.meter -= 1;
+        }
         this.chs[tomo].stats.mood.meterxp = FINAL;
     }
 

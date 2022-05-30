@@ -92,11 +92,15 @@ export default abstract class Commands {
 
         // Cool down check.
         if (this.cooldown > 0) {
-            if (await this.isUserInCoolDown(interaction)) {
+            const COMMAND = (await square.memory().get('cd_' + interaction.user.id));
+
+            if (COMMAND?.toLowerCase() == interaction.commandName.toLowerCase()) {
+                
                 const CD = await this.getUserInCoolDown(interaction.user.id);
                 const TIMESTAMP = `<t:${CD + Math.floor(Date.now() / 1000)}:R>`;
-                interaction.reply({content: `Sorry, you're on a cooldown! ${TIMESTAMP}.`, ephemeral: true})
+                interaction.reply({content: `🔄 \`\`${interaction.commandName}\`\` is on cooldown! Retry in ${TIMESTAMP}.`, ephemeral: true})
                 return false;
+                
             } else {
                 this.addUserToCoolDown(interaction);
             }

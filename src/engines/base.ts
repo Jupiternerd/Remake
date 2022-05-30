@@ -129,12 +129,17 @@ export default class EngineBase extends EventEmitter {
      * @returns {InteractionCollector<MessageComponentInteraction | ButtonInteraction | SelectMenuInteraction>} your desired collector.
      */
      protected _createCollector(type: MessageComponentType, limit: number = null, filter: CollectorFilter<[unknown]> = this._filter): InteractionCollector<MessageComponentInteraction | ButtonInteraction | SelectMenuInteraction> {
-        return this.message.createMessageComponentCollector({
+        const COLLECTOR = this.message.createMessageComponentCollector({
             filter,
             componentType: type,
             max: limit,
             time: this.timeout // variable set in constructor.
         })
+        
+        // End the collector
+        COLLECTOR.once("end", () => this.end());
+
+        return COLLECTOR;
     } 
     /**
      * @Name | injectCharacter

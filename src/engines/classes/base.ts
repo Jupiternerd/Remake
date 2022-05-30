@@ -42,7 +42,7 @@ export default abstract class UniBase {
      */
     get formattedOutput() {
         const grade = (typeof this.basic.grade == "number" ? EngineUtils.convertNumberToRarity(this.basic.grade) : this.basic.grade);
-        return `${this.basic.name} | Grade · ${grade}`;
+        return `${this.basic.name} ${grade ? `| Grade · ${grade}` : ``}`;
     }
 
     /**

@@ -12,6 +12,7 @@ import { EngineError } from "../../utilities/errors/errors";
 import Queries from "../../utilities/mongodb/queries";
 import EngineBase from "../base";
 import Character from "../classes/characters";
+import ItemClass from "../classes/items";
 import NovelCore from "../novel/core";
 
 // author = shokkunn
@@ -136,11 +137,24 @@ export default class TomoCore extends EngineBase {
     private async __gift(CHARACTER: Character) {
         // first, we populate the inventory (with data from item db)
         let response: Reaction;
-        const INVENTORY = await this.user.populateTransferableInventory();
+        let INVENTORY = await this.user.populateTransferableInventory();
+
+        // This class is the no options class.
+        INVENTORY.push(new ItemClass(
+            {
+                "_id": -1,
+                "name": "Nothing...",
+                "description": "Give them nothing...",
+                "emoji": "😢",
+                "giftable": true,
+                "grade": null
+            },
+            1
+        ))
         this.currentInvIndex = 0;
 
         this.invInGroups = await EngineUtils.fillSelectWithInventory(INVENTORY.filter(i => i.giftable == true), 23);
-        
+
         // second, we insert the gift selection node.
         const SELECTION_NODE: NovelSingle[] = [
             {
@@ -205,6 +219,9 @@ export default class TomoCore extends EngineBase {
         // Unless it's a duplicate.
         if (specificCharacter.gift.recentReceived.findIndex(i => i.itemID == gift._id) >= 0) column = "duplicate";
 
+        // lastly, if it's nothing...
+        if (gift._id == -1) column = "none";
+
         // Since Hunger is a special case, we set the response before we check for it.
         response = responseDict[column][MathUtils.randIntFromZero(responseDict[column].length)];
 
@@ -216,6 +233,7 @@ export default class TomoCore extends EngineBase {
             // Satiate the hunger.
             this.user.addToTomoHunger(CHARACTER._id as number, parseInt(gift?.values[0] || 0))
         };
+
         
         // Set the character to their mood.
         REACTION_NODE.ch = [
@@ -232,10 +250,15 @@ export default class TomoCore extends EngineBase {
             "speaker": 0
         };
 
-        // Remove the item from the inventory.
+        // Remove the item from the inventory. (If its not empty...)
+        console.log(gift._id + "// GIFT ID")
+        if (gift._id != -1) { // (-1 == empty)
         await this.user.setItemAsTomoGifted(this.chInUser[this.index]._id as number, gift._id as number, 1);
         this.user.updateTransferableInventory();
-        this.user.updateTomo();
+        }
+
+        // We call this at the end, no need to double dip.
+        //this.user.updateTomo();
 
         // Insert the reaction node.
         await this.coreHandler.insertToMultiples([REACTION_NODE]);
@@ -477,6 +500,8 @@ export default class TomoCore extends EngineBase {
 
         await this.user.updateTomo();
         this.user.setUserInDB("universe");
+
+        return this.end();
     }
 
     /**

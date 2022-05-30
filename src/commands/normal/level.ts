@@ -16,7 +16,7 @@ class Level extends Commands {
         super("level", // name 
         "Shows you your level.",
         {
-            coolDown: 3000
+            coolDown: 10000
         })
     }
 
