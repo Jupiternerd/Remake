@@ -98,7 +98,7 @@ export default abstract class Commands {
                 
                 const CD = await this.getUserInCoolDown(interaction.user.id);
                 const TIMESTAMP = `<t:${CD + Math.floor(Date.now() / 1000)}:R>`;
-                interaction.reply({content: `🔄 \`\`${interaction.commandName}\`\` is on cooldown! Retry in ${TIMESTAMP}.`, ephemeral: true})
+                interaction.reply({content: `🔄 \`\`${interaction.commandName}\`\` is on cooldown! Retry ${TIMESTAMP}.`, ephemeral: true})
                 return false;
                 
             } else {
