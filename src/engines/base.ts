@@ -135,9 +135,6 @@ export default class EngineBase extends EventEmitter {
             max: limit,
             time: this.timeout // variable set in constructor.
         })
-        
-        // End the collector
-        COLLECTOR.once("end", () => this.end());
 
         return COLLECTOR;
     } 
