@@ -94,7 +94,8 @@ export default abstract class Commands {
         if (this.cooldown > 0) {
             if (await this.isUserInCoolDown(interaction)) {
                 const CD = await this.getUserInCoolDown(interaction.user.id);
-                interaction.reply(`Sorry, you're on a cooldown! \`\`${CD}\`\` second${CD > 1 ? 's' : ''}.`)
+                const TIMESTAMP = `<t:${CD + Math.floor(Date.now() / 1000)}:R>`;
+                interaction.reply({content: `Sorry, you're on a cooldown! ${TIMESTAMP}.`, ephemeral: true})
                 return false;
             } else {
                 this.addUserToCoolDown(interaction);
