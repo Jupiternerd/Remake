@@ -116,7 +116,7 @@ export default class Character extends UniBase {
      * @returns {CharacterInteractions} Interaction
      */
     public static async getInteractionFromMood(id: number, mood: TemporaryMoodTypeStrings): Promise<CharacterInteractions> {
-        const VARIANT = await Queries.characterBasicVariant(id, mood) 
+        const VARIANT = await Queries.characterBasicVariant(id, mood);
         return await Queries.character(VARIANT.pointers.interaction, "interactions") as CharacterInteractions;
     }
 

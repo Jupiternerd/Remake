@@ -220,8 +220,8 @@ export default class TomoCore extends EngineBase {
         // Set the character to their mood.
         REACTION_NODE.ch = [
             {
-                "id": CHARACTER.basic.pointers.original || CHARACTER._id as number,
-                "mood": "normal", //responseMood, TESTING: CHANGE TO RESPONSE MOOD
+                "id": CHARACTER.basic.pointers.original, //|| CHARACTER._id as number,
+                "mood": response.mood, //TESTING: CHANGE TO RESPONSE MOOD
                 "useSkin": true
             }
         ];
@@ -252,9 +252,9 @@ export default class TomoCore extends EngineBase {
         let value = this.invInGroups[this.currentInvIndex][selection].value;
         let parsedValue = parseInt(value);
         if (parsedValue == NaN) throw new EngineError("Tomo", "Error, parsed gift value is not a number (__gift_action)");
-        const tandemValue = this.invInGroups[this.currentInvIndex][parsedValue]
+        const TANDEM_VALUE = this.invInGroups[this.currentInvIndex][parsedValue]
         // Menu management
-        switch (tandemValue.route) {
+        switch (TANDEM_VALUE.route) {
             case "backInventoryPage":
                 if (this.currentInvIndex == 0) throw new EngineError("Tomo", "Error, trying to go back but no more selection columns.")
                 this.currentInvIndex--;

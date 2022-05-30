@@ -62,7 +62,6 @@ export default class Queries {
 
     public static async characterBasicVariant(originalId: number, mood: TemporaryMoodTypeStrings) {
         let payload: CharacterBasic, cache: string, redis: Redis = Square.memory(), key: string = `chv_${originalId.toString()}`
-
         // try and see if we can get the cache, if not we can just get the data from mongodb it self.
         try {
             cache = await redis.get(key)

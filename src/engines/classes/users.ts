@@ -6,7 +6,7 @@ import Queries from "../../utilities/mongodb/queries";
 import UniBase from "./base";
 import ItemClass from "./items";
 import {differenceInMinutes} from "date-fns"
-import { TemporaryMoodType, TemporaryMoodTypeStrings } from "../../types/models/characters";
+import { TemporaryMoodType } from "../../types/models/characters";
 // author = shokkunn
 
 export default class Users extends UniBase {

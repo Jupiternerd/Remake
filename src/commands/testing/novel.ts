@@ -163,12 +163,12 @@ class Novel extends Commands {
             "ch": [
                 {
                     "id":0,
-                    "mood": "normal",
+                    "mood": "sad",
                     "useSkin": false
                 },
                 {
                     "id":0,
-                    "mood": "normal",
+                    "mood": "sad",
                     "useSkin": false
                 }
             ],
