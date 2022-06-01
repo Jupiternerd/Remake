@@ -1,12 +1,10 @@
 // author = shokkunn
 
 import { ColorResolvable } from "discord.js";
-import Character from "../../engines/classes/characters";
 import ItemClass from "../../engines/classes/items";
 import { BaseGrade, GradeColor } from "../../types/local/static";
 import { TemporaryMoodType, TemporaryMoodTypeStrings } from "../../types/models/characters";
-import { CapsuleMood, DialogueScript, SelectItemMenuChoices } from "../../types/models/stories"
-import { EngineError } from "../errors/errors";
+import { SelectItemMenuChoices } from "../../types/models/stories"
 
 // Constants
 const EMOJI_CONSTANTS = {
