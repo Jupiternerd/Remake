@@ -358,8 +358,6 @@ export default class TomoCore extends EngineBase {
             await this.coreHandler.start();
         })
 
-        this.coreHandler.once("end", async () => this._endScreen(20, 20))
-        
         this.coreHandler.once("userSelectionConfirmed", async (i, selection) => {
             // edge cases.
             if (i != 0) throw new EngineError("Tomo", "Novel gave event \'userSelectionConfirmed\' at another index that is not \'0\'. ")
@@ -495,7 +493,8 @@ export default class TomoCore extends EngineBase {
             await this.interaction.editReply({
             components: [],
             content: "TEMPORARY END SCREEN\n 💖 LP GAINED: " + LP + "\n ✨ XP Gained (Tomo gets half): " + XP
-        });}, 5000)
+        });
+        }, 5000)
 
         await this.user.addToUserEXP(XP);
         await this.user.addToTomoEXP(this.chInUser[this.index]._id as number, XP / 2);
@@ -503,7 +502,6 @@ export default class TomoCore extends EngineBase {
 
         await this.user.updateTomo();
         this.user.setUserInDB("universe");
-
         return this.end();
     }
 

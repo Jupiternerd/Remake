@@ -146,19 +146,21 @@ export default class Users extends UniBase {
     public async addToTomoLP(tomoID: number, amount: number) {
         let tomo = this.findTomoIndexInInventory(tomoID);
         if (tomo < 0) return;
-        if (this.chs[tomo].stats.mood.meter == 9) return;
-        let FINAL = this.chs[tomo].stats.mood.meterxp + amount;
-        if (FINAL >= 200) {
-            FINAL = 0;
+
+        let finalLP = this.chs[tomo].stats.mood.meterxp + amount;
+
+        if (finalLP >= 200) {
+            finalLP = 0;
             this.chs[tomo].stats.mood.meterxp = 0;
-            this.chs[tomo].stats.mood.meter += 1;
+            if (this.chs[tomo].stats.mood.meter < 9)this.chs[tomo].stats.mood.meter += 1;
         }
-        if (FINAL <= 0) {
-            FINAL = 0;
-            this.chs[tomo].stats.mood.meterxp = 0;
+
+        if (finalLP <= 0) {
+            finalLP = 0;
             if (this.chs[tomo].stats.mood.meter > 0) this.chs[tomo].stats.mood.meter -= 1;
         }
-        this.chs[tomo].stats.mood.meterxp = FINAL;
+
+        this.chs[tomo].stats.mood.meterxp = finalLP;
     }
 
     /**
@@ -256,7 +258,7 @@ export default class Users extends UniBase {
         if (tomo < 0) return;
         if (differenceInMinutes(new Date(), this.universe.inventory.intransferable.chs[tomo].stats.recentInteract.time) < 60) return;
         // ALPHA
-        this.universe.inventory.intransferable.chs[tomo].stats.mood.current = MathUtils.randIntFromZero(Object.keys(TemporaryMoodType).length / 2) - 1;
+        this.universe.inventory.intransferable.chs[tomo].stats.mood.current = MathUtils.randIntFromZero(Object.keys(TemporaryMoodType).length / 2);
         this.universe.inventory.intransferable.chs[tomo].stats.recentInteract.type = "system";
         this.universe.inventory.intransferable.chs[tomo].stats.recentInteract.time = new Date();
         this.updateTomo();
