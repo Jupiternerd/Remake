@@ -303,7 +303,7 @@ export default class TomoCore extends EngineBase {
         await this.coreHandler.insertToMultiples(SELECTED_STORY.multiples);
         // Cache the newly added assets.
         await this.coreHandler.cacheAssets();
-        // Set the page of the novel to the handler
+        // Set the page of the novel to the handler.
         this.coreHandler.setPage(this.coreHandler.multiples[this.coreHandler.index + 1].i)
     }
 
@@ -356,7 +356,7 @@ export default class TomoCore extends EngineBase {
 
         this.coreHandler.once("ready", async () => {
             await this.coreHandler.start();
-        })
+        });
 
         this.coreHandler.once("userSelectionConfirmed", async (i, selection) => {
             // edge cases.
@@ -370,12 +370,15 @@ export default class TomoCore extends EngineBase {
                 // talk
                 case 1:
                     return this.__talk(CHARACTER, index)
-            }
-            
+            } 
         })
+
+        this.coreHandler.on("end", async () => {
+            await this._endScreen(20, 20);
+        })
+
         console.log("_interact")
     }
-
 
     private async _danger(index: number = this.index) {
         console.log("_danger")
