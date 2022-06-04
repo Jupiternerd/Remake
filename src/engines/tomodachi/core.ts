@@ -487,7 +487,6 @@ export default class TomoCore extends EngineBase {
     /**
      * @name _endScreen
      * @description Temporary endscreen just used for testing and alpha (TODO)
-     * @param tomoID the tomoID that 
      * @param LP 
      * @param XP 
      */
@@ -497,7 +496,7 @@ export default class TomoCore extends EngineBase {
             components: [],
             content: "TEMPORARY END SCREEN\n 💖 LP GAINED: " + LP + "\n ✨ XP Gained (Tomo gets half): " + XP
         });
-        }, 5000)
+        }, 6000)
 
         await this.user.addToUserEXP(XP);
         await this.user.addToTomoEXP(this.chInUser[this.index]._id as number, XP / 2);
