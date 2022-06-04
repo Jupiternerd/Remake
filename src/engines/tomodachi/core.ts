@@ -59,6 +59,10 @@ export default class TomoCore extends EngineBase {
             // listen to it.
             this._collectButton();
         }
+
+        this.buttonCollector.once("end", async () => {
+            return this.end();
+        });
         /*
         // if we don't have any select collectors initialized.
         if (!this.selectCollector) {
