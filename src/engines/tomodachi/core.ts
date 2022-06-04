@@ -394,7 +394,6 @@ export default class TomoCore extends EngineBase {
             const BUTTON = parseInt(buttonInteraction.customId.match(/(\d{1,1})/g)[0]);
             // Emit button pressed event
             this.emit("buttonEvent", BUTTON, this.index);
-            console.log(BUTTON)
             
             switch (BUTTON) {
                 // 0 is info.
