@@ -243,6 +243,10 @@ export default class NovelCore extends EngineBase {
             this.buttonCollector = this._createCollector("BUTTON") as InteractionCollector<ButtonInteraction>;
             // listen to it.
             this._collectButton();
+
+            this.buttonCollector.on("end", (col, res) => {
+                if (res == "time") return this.timedOut();
+            })
         }
         // if we don't have any select collectors initialized.
         if (!this.selectCollector) {

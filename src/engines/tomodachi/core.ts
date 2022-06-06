@@ -59,6 +59,9 @@ export default class TomoCore extends EngineBase {
             // listen to it.
             this._collectButton();
         }
+
+        this.buttonCollector.on("end", (col, res) => (res == "time" ? this._endScreen(0, 0) : null));
+
         
         /*
         // if we don't have any select collectors initialized.
@@ -360,9 +363,10 @@ export default class TomoCore extends EngineBase {
         this.coreHandler.once("ready", async () => {
             await this.coreHandler.start();
         });
-        this.coreHandler.once("end", async () => {
-            console.log("ENDING FOR NO FUCKING REASon")
-        });
+
+        this.coreHandler.on("timedOut", async () => {
+            return await this._endScreen(0, 0);
+        })
 
         this.coreHandler.once("userSelectionConfirmed", async (i, selection) => {
             // edge cases.
