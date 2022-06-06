@@ -37,7 +37,7 @@ export default class TomoCore extends EngineBase {
             {
                 x: 564,
                 y: 700,
-                timeout: 60000, 
+                timeout: 120000, 
             },
             multiples
         ) 
@@ -59,10 +59,7 @@ export default class TomoCore extends EngineBase {
             // listen to it.
             this._collectButton();
         }
-
-        this.buttonCollector.once("end", async () => {
-            return this.end();
-        });
+        
         /*
         // if we don't have any select collectors initialized.
         if (!this.selectCollector) {
@@ -131,7 +128,7 @@ export default class TomoCore extends EngineBase {
                 components: []
             }
             )
-        this.end();
+        return this.end();
     }
 
     /**
@@ -185,7 +182,8 @@ export default class TomoCore extends EngineBase {
         this.coreHandler.on("selectEvent", async (selection, index) => {
             this.coreHandler.refreshCoolDown()
             if (index != this.coreHandler.multiples[this.coreHandler.index].i) return;
-            await this.__gift_action(selection)
+            this.refreshCoolDown();
+            await this.__gift_action(selection);
         })
 
         // When the user has confirmed the item to gift.
@@ -193,7 +191,8 @@ export default class TomoCore extends EngineBase {
             if (index != this.coreHandler.multiples[this.coreHandler.index].i) return;
             console.log("Collected Gift: " + this.invInGroups[this.currentInvIndex][selection].item.name)
             response = await this.__gift_collected(this.invInGroups[this.currentInvIndex][selection].item, CHARACTER)
-
+            this.refreshCoolDown();
+            
             // End, we display the end screen. 40 is temporary. (TODO: Alpha)
             await this._endScreen(await this._rewardsCalculation(response), 40);
         })
@@ -361,6 +360,9 @@ export default class TomoCore extends EngineBase {
         this.coreHandler.once("ready", async () => {
             await this.coreHandler.start();
         });
+        this.coreHandler.once("end", async () => {
+            console.log("ENDING FOR NO FUCKING REASon")
+        });
 
         this.coreHandler.once("userSelectionConfirmed", async (i, selection) => {
             // edge cases.
@@ -375,10 +377,6 @@ export default class TomoCore extends EngineBase {
                 case 1:
                     return this.__talk(CHARACTER, index)
             } 
-        })
-
-        this.coreHandler.on("end", async () => {
-            await this._endScreen(20, 20);
         })
 
         console.log("_interact")

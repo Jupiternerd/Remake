@@ -37,7 +37,7 @@ export default class NovelCore extends EngineBase {
             {
                 x: 724,
                 y: 480,
-                timeout: 80000
+                timeout: 120000
             },
              multiples,
              ["bg", "ch", "backable", "type", "txt"]
