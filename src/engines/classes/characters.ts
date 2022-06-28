@@ -42,11 +42,7 @@ export default class Character extends UniBase {
     }
 
     get getInfoOutput(): MessageEmbed {
-        return super.getInfoOutput.addField(
-            "Idk",
-            "UHHHHH",
-            true
-        ).setTitle(`${this.basic.emoji} ${this.formattedOutputNoMarkUp}`)
+        return super.getInfoOutput.setTitle(`${this.basic.emoji} ${this.formattedOutputNoMarkUp}`)
     }
 
     /**

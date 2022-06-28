@@ -23,6 +23,7 @@ class Level extends Commands {
     // Executes the command.
     public async execute(bot: client, interaction: CommandInteraction): Promise<void> {
         const USER = await Queries.user(interaction.user.id, "universe") as UniverseUser;
+        if (!USER) return;
         const FLOOR: number = Math.floor(USER.exp / 10);
         const GUI: string = await GUIUtils.barUI(FLOOR, 10)
         interaction.reply(`\`\`${USER.level}\`\` ${GUI} \`\`${USER.level + 1}\`\`\n✨ EXP • \`\`${USER.exp}\`\` / 100`);

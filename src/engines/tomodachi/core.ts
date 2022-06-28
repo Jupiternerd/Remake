@@ -7,7 +7,7 @@ import { CharacterInteractions, Reaction } from "../../types/models/characters";
 import { Item } from "../../types/models/items";
 import { BaseSingle, NovelSingle, SelectItemMenuChoices, Story } from "../../types/models/stories";
 import { ChInUser } from "../../types/models/users";
-import { EngineUtils, MathUtils } from "../../utilities/engineUtilities/utils";
+import { EngineUtils, GUIUtils, MathUtils } from "../../utilities/engineUtilities/utils";
 import { EngineError } from "../../utilities/errors/errors";
 import Queries from "../../utilities/mongodb/queries";
 import EngineBase from "../base";
@@ -125,8 +125,8 @@ export default class TomoCore extends EngineBase {
                 content: "*Temporary Information Page. Custom Pages soon...*\n" +
                 `${CHARACTER.basic.emoji} **${CHARACTER.formattedOutput}**\n` +
                 // Actual info
-                `Level • ${SPECIFIC.stats.level}\n EXP • ${SPECIFIC.stats.xp} / 100\n Hungry? • ${SPECIFIC.stats.hunger <= this.hungerLimit ? 'yes' : 'no'}\n\n` +
-                `Meter • ${SPECIFIC.stats.mood.meter}\n Meter EXP • ${SPECIFIC.stats.mood.meterxp} / 200`,
+                `Level • ${SPECIFIC.stats.level}\nEXP • ${SPECIFIC.stats.xp}/100\n${await GUIUtils.barUI(Math.floor(SPECIFIC.stats.xp/10), 10)}\n Hungry? • ${SPECIFIC.stats.hunger <= this.hungerLimit ? 'yes' : 'no'}\n\n` +
+                `Meter • ${SPECIFIC.stats.mood.meter}\nMeter EXP • ${SPECIFIC.stats.mood.meterxp}/200\n${await GUIUtils.barUI(Math.floor(SPECIFIC.stats.xp/20), 10)}`,
                 attachments: [],
                 components: []
             }
